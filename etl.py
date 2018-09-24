@@ -19,11 +19,28 @@ def etl(query, source_cnx, target_cnx):
 	if data:
 		print("Si tiene data")
 		target_cursor = target_cnx.cursor()
-		target_cursor.execute("USE {}".format(datawarehouse_name))
+		#target_cursor.execute("USE {}".format(datawarehouse_name))
+		for d in data:
+			aux = list(d)
+			print(aux)
+			print("\n")
+			if(aux[0] is not None):
+				print("Entro")
+				print(aux[0])
+				print(query.get_query)
+				aux2 = [aux[0]]
+				target_cursor.execute(query.get_query, aux2)
+				rowExists = target_cursor.fetchone()
+				rowUpdate = [rowExists[0]]
+				rowUpdate.append(aux[1:len(aux)])
+				print(rowExists)
+				print(rowUpdate)
+
+				#target_cursor.execute(query.update_query, rowExists)
 		print(query.load_query)
 		print("\n")
-		target_cursor.executemany(query.load_query, data)
-		target_cnx.commit()
+		#target_cursor.executemany(query.load_query, data)
+		#target_cnx.commit()
 		print('Cargando datos al data warehouse')
 		target_cursor.close()
 	else:

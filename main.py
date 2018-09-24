@@ -33,18 +33,18 @@ def main():
 def sensor():
 	print("Scheduler esta vivo!")
 
-sched = BackgroundScheduler(deamon=True)
-sched.add_job(sensor, 'interval', minutes=1)
-sched.start()
+#sched = BackgroundScheduler(deamon=True)
+#sched.add_job(main, 'interval', minutes=1)
+#sched.start()
 
-app = Flask(__name__)
+#app = Flask(__name__)
 
-@app.route("/home")
-def home():
-	""" Funcion para fines de prueba. """
-	return "Bienvenidos :) !"
+#@app.route("/home")
+#def home():
+#	""" Funcion para fines de prueba. """
+#	return "Bienvenidos :) !"
 
 
 if __name__ == "__main__":
-	#main()
-	app.run()
+	main()
+	#app.run()

@@ -9,86 +9,65 @@ def etl(query, source_cnx, target_cnx):
 	# extraer datos de la fuente db
 	source_cursor = source_cnx.cursor()
 	print("ETL \n")
-	print(query.extract_query)
 	#dateCurrent = [datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
 	# buscar ultima fecha de actualizacion
 	target_cursor = target_cnx.cursor()
 	target_cursor.execute("USE {}".format(datawarehouse_name))
 	target_cursor.execute("SELECT * FROM LAST_UPDATE")
-	dateUpdated = target_cursor.fetchone()
-	print(dateUpdated)
-	if dateUpdated is None:
-		dateUpdated = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-		lastUpdate = [dateUpdated]
-		target_cursor.execute("INSERT INTO LAST_UPDATE (last_update) VALUES (NOW())")
-		target_cnx.commit()
-	else:  
-		lastUpdate = [dateUpdated[1]]
+	row = target_cursor.fetchone()
 
-	print(lastUpdate)
-	source_cursor.execute(query.extract_query, lastUpdate)
-	data = source_cursor.fetchall()
-	print(data)
-	source_cursor.close()
+	if row is not None:
 
-	# cargar datos en el data warehouse db
-	if data:
-		print("Si tiene data")
-		# modo actualizacion
-		for d in data:
-			params = list(d)
-			print(params)
-			#print("\n")
-			if(params[0] is not None):
-				print("Entro")
-				print(params[0])
-	
-				#buscar registro
-				target_cursor.execute(query.get_query, [params[0]])
-				rowExists = target_cursor.fetchone() #se obtiene el registro
+		if row[1] == False: 
+			# si es actualizacion
+			lastUpdate = [row[2]]
+			print(lastUpdate)
+			source_cursor.execute(query.extract_update_query, lastUpdate)
+			data = source_cursor.fetchall()
+			print(data)
+			source_cursor.close()
 
-				#print(row)
-				print(rowExists)
+			if data:
+				for d in data:
+					params = list(d)
+					if params[0] is not None:
+						# buscar registro
+						target_cursor.execute(query.get_query, [params[0]])
+						# se obtiene el registro
+						rowExists = target_cursor.fetchone()
 
+						if rowExists is not None:
+							params.append(rowExists[0])
+							target_cursor.execute(query.update_query, params)
+							print("Actualizo...")
+						else:
+							target_cursor.execute(query.load_query, params)
+							print("Inserto...")
 
-				if rowExists is not None:
-					#row.insert(0,rowExists[0]) #se obtiene el id del registro
-					#row = tuple(row)
-					print(params)
-					print("\n")
-					#print(row)
-					#row = ['Wilkel', 'w@gmail.com', 17]
-					params.append(rowExists[0])
-					print(params)
-					target_cursor.execute(query.update_query, params)
-					print("Actualizo...")
-				else:
-					print(params)
-					#row = tuple(row)
-					target_cursor.execute(query.load_query, params)
-					print("Inserto...")
-				
+						target_cnx.commit()
+
+				print('Cargando datos al data warehouse')
+				target_cursor.execute("UPDATE LAST_UPDATE SET is_load_initial=%s, last_update=NOW() WHERE id = %s", [False, row[0]])
 				target_cnx.commit()
-
-
-				target_cursor.execute("UPDATE LAST_UPDATE SET last_update=NOW() WHERE id = %s", [dateUpdated[0]])
+				print("Actualizando fecha actualizacion")
+			else:
+				print('Los datos estan vacios')
+		else:
+			# modo carga inicial
+			source_cursor.execute(query.extract_initial_query)
+			data = source_cursor.fetchall()
+			if data:
+				target_cursor.executemany(query.load_query, data)
 				target_cnx.commit()
-				#target_cursor.execute("INSERT INTO LAST_UPDATE (last_update) VALUES ()")
-
-		#print(query.load_query)
-		#print("\n")
-
-		# modo carga inicial
-
-		#target_cursor.executemany(query.load_query, data)
-		#target_cnx.commit()
-		print('Cargando datos al data warehouse')
-		#target_cursor.close()
+				print('Carga Inicial Lista...')
+				target_cursor.execute("UPDATE LAST_UPDATE SET is_load_initial=%s, last_update=NOW() WHERE id = %s", [False, row[0]])
+				target_cnx.commit()
+				print("Actualizando fecha actualizacion")
+			else: 
+				print('Los datos estan vacios')
 	else:
-		print('Los datos estan vacios')
-		
-
-	target_cursor.close()
+		print("Debe llenar un registro en la Tabla 'last_update'")		
+	target_cursor.close() 
 
 def etl_process(queries, target_cnx, source_db_config, db_platform):
 	# establecer la conexion de fuentes de db

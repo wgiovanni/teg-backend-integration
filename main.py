@@ -3,6 +3,7 @@ from db_credentials import datawarehouse_db_config, postgresql_db_config
 from sql_queries import postgresql_queries
 from variables import *
 from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime
 from flask import Flask
 import mysql.connector
 
@@ -31,11 +32,13 @@ def main():
 	target_cnx.close()
 
 def sensor():
+	print(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) # Se obtiene local para la actualizacion de la data cuando se ejecute el job
 	print("Scheduler esta vivo!")
 
-#sched = BackgroundScheduler(deamon=True)
+sched = BackgroundScheduler(deamon=True)
 #sched.add_job(main, 'interval', minutes=1)
-#sched.start()
+sched.add_job(sensor, 'interval', minutes=1)
+sched.start()
 
 #app = Flask(__name__)
 
@@ -47,4 +50,4 @@ def sensor():
 
 if __name__ == "__main__":
 	main()
-	#app.run()
+#	app.run()

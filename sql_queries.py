@@ -1,24 +1,25 @@
 from textwrap import dedent
 # extracción
 postgresql_extract = dedent("""\
-	SELECT name, created_date, updated_date 
+	SELECT name, email
 	FROM PRUEBA
-	WHERE updated_date > '2018-09-23 06:05:06-04' 
+	WHERE updated_date > %s 
 	""")
 
-# insertar
+# insertar en el DW
 postgresql_insert = dedent("""\
-	INSERT INTO PRUEBA (name, created_date, updated_date)
-	VALUES (%s, %s, %s)
+	INSERT INTO PRUEBA (name, email)
+	VALUES (%s, %s)
 	""")
-# actualizar
+# actualizar en el DW
 postgresql_update = dedent("""\
 	UPDATE PRUEBA
-   	SET name=%s, created_date=%s, updated_date=%s
- 	WHERE id = %s;
+   	SET name=%s, email=%s
+ 	WHERE id=%s;
 	""")
 
-# buscar 
+# buscar en el DW
+# el primer parametro sera el campo unico
 postgresql_get = dedent("""\
 	SELECT id 
 	FROM PRUEBA 
@@ -28,9 +29,6 @@ postgresql_get = dedent("""\
 # exportando consultas
 class SqlQuery:
 	def __init__(self, extract_query, load_query, update_query, get_query):
-		#print(extract_query)
-		#print("\n")
-		#print(load_query)
 		self.extract_query = extract_query
 		self.load_query = load_query
 		self.update_query = update_query

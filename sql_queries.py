@@ -145,7 +145,7 @@ postgresql_update_estudiante = dedent("""\
 	UPDATE DIM_ESTUDIANTE
    	SET cedula=%s, nacionalidad=%s, nombre=%s, 
 		apellido=%s, sexo=%s, fecha_nacimiento=%s, 
-		telefono1=%s, telefono2=%s, email=%s, edo_procedenciatipo=%s
+		telefono1=%s, telefono2=%s, email=%s, edo_procedencia=%s
  	WHERE id=%s;
 	""")
 
@@ -204,7 +204,7 @@ postgresql_get_estudiante_facultad = dedent("""\
 
 postgresql_verificate_estudiante_facultad = dedent("""\
 	SELECT * 
-	FROM FACT_ESTUDIANTES_FACULTAD
+	FROM FACT_ESTUDIANTE_FACULTAD
 	WHERE id_estudiante = %s AND id_facultad = %s
 	""")
 
@@ -247,6 +247,7 @@ postgresql_query_facultad = SqlQuery(
 	postgresql_extract_update_facultad, 
 	postgresql_insert_facultad, 
 	postgresql_update_facultad,
+	postgresql_get_facultad,
 	postgresql_type_table_facultad)
 
 # CARRERA
@@ -255,6 +256,7 @@ postgresql_query_carrera = SqlQuery(
 	postgresql_extract_update_carrera, 
 	postgresql_insert_carrera, 
 	postgresql_update_carrera,
+	postgresql_get_carrera,
 	postgresql_type_table_carrera)
 
 # ESTUDIANTE
@@ -263,17 +265,23 @@ postgresql_query_estudiante = SqlQuery(
 	postgresql_extract_update_estudiante, 
 	postgresql_insert_estudiante, 
 	postgresql_update_estudiante,
+	postgresql_get_estudiante,
 	postgresql_type_table_estudiante)
 
 # ESTUDIANTE_FACULTAD
 postgresql_query_estudiante_facultad = SqlQueryFact(
 	postgresql_extract_load_initial_estudiante_facultad, 
-	postgresql_insert_estudiante_facultad, 
-	postgresql_verificate_estudiante_facultad,
+	postgresql_insert_estudiante_facultad,
 	postgresql_get_estudiante_facultad,
+	postgresql_verificate_estudiante_facultad,
 	postgresql_type_table_estudiante_facultad,
 	postgresql_tables_estudiante_facultad)
 
 
 # almacenando como lista para iteraciones
-postgresql_queries = [postgresql_query, postgresql_query_facultad, postgresql_query_carrera, postgresql_query_estudiante, postgresql_query_estudiante_facultad]
+postgresql_queries = [
+	postgresql_query, 
+	postgresql_query_facultad, 
+	postgresql_query_carrera, 
+	postgresql_query_estudiante, 
+	postgresql_query_estudiante_facultad]

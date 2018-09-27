@@ -2,6 +2,7 @@
 import psycopg2
 import mysql.connector
 from datetime import datetime
+from textwrap import dedent
 # variables
 from variables import datawarehouse_name
 
@@ -26,6 +27,7 @@ def etl(query, source_cnx, target_cnx):
 				#print(lastUpdate)
 				source_cursor.execute(query.extract_update_query, lastUpdate)
 				data = source_cursor.fetchall()
+				print("Actualizacion")
 				#print(data)
 				source_cursor.close()
 
@@ -49,8 +51,8 @@ def etl(query, source_cnx, target_cnx):
 							target_cnx.commit()
 
 					print('Cargando datos al data warehouse')
-					target_cursor.execute("UPDATE LAST_UPDATE SET is_load_initial=%s, last_update=NOW() WHERE id = %s", [False, row[0]])
-					target_cnx.commit()
+					#target_cursor.execute("UPDATE LAST_UPDATE SET is_load_initial=%s, last_update=NOW() WHERE id = %s", [False, row[0]])
+					#target_cnx.commit()
 					print("Actualizando fecha actualizacion")
 				else:
 					print('Los datos estan vacios')
@@ -58,12 +60,14 @@ def etl(query, source_cnx, target_cnx):
 				# modo carga inicial
 				source_cursor.execute(query.extract_initial_query)
 				data = source_cursor.fetchall()
+				print("Carga inicial")
+				#print(data)
 				if data:
 					target_cursor.executemany(query.load_query, data)
 					target_cnx.commit()
 					print('Carga Inicial Lista...')
-					target_cursor.execute("UPDATE LAST_UPDATE SET is_load_initial=%s, last_update=NOW() WHERE id = %s", [False, row[0]])
-					target_cnx.commit()
+					#target_cursor.execute("UPDATE LAST_UPDATE SET is_load_initial=%s, last_update=NOW() WHERE id = %s", [False, row[0]])
+					#target_cnx.commit()
 					print("Actualizando fecha actualizacion")
 				else: 
 					print('Los datos estan vacios')
@@ -71,24 +75,36 @@ def etl(query, source_cnx, target_cnx):
 			print("Debe llenar un registro en la Tabla 'last_update'")		
 	else:
 		source_cursor.execute(query.extract_initial_query)
-		data: source_cursor.fetchall()
+		data = source_cursor.fetchall()
+		print("Tabla de hechos...")
+		#print(query.type_table)
+		#print(data)
 		if data:
 			for d in data:
 				if len(d) == len(query.tables):
 					print("Longitudes iguales")
+					#print(d)
+					ids = []
 					for i in range(len(d)):
-						id = select_query(query.tables[i], d[i])
-						ids = []
+						#print(query.tables[i])
+						#print(d[i])
+						id = select_query(query.tables[i], d[i], target_cursor)
 						if id is not None:
-							ids.append(id)
+							ids.append(id[0])
 						else: 
 							ids.append(None)
+						#print(ids)
 					target_cursor.execute(query.verificate_query, ids)
 					foundRegister = target_cursor.fetchone()
+					#print(foundRegister)
+					if foundRegister is None:
+						target_cursor.execute(query.load_query, ids)
+						target_cnx.commit()
+						print("Llenando tablas de hechos...")
+					else:
+						print("Ya existen los registros") 	
 				else:	
 					print("Longitudes diferentes")
-
-
 	target_cursor.close()	
 
 
@@ -105,25 +121,50 @@ def etl_process(queries, target_cnx, source_db_config, db_platform):
 	else:
 		return 'Error! plataforma db no reconocida'
 
+	
 	# ciclo a traves de consultas sql
 	for query in queries:
 		#print(query)
 		etl(query, source_cnx, target_cnx)
 
+	target_cursor = target_cnx.cursor()
+	target_cursor.execute("USE {}".format(datawarehouse_name))
+	target_cursor.execute("SELECT * FROM LAST_UPDATE")
+	row = target_cursor.fetchone()
+	#print(row)
+	# Despues de del proceso ETL de cada tabla se actualiza la fecha de actualizacion
+	if row is not None:
+		#if row[1]:
+		target_cursor.execute("UPDATE LAST_UPDATE SET is_load_initial=%s, last_update=NOW() WHERE id = %s", [False, row[0]])
+		#else:
+		#	target_cursor.execute("UPDATE LAST_UPDATE SET is_load_initial=%s, last_update=NOW() WHERE id = %s", [False, row[0]])
+		target_cnx.commit()
+		print("Se actualizo la fecha")
+			
+	else:
+		print("Debe llenar un registro en la Tabla 'last_update'")
+
 	# cerra la conexion de fuente de db
+	target_cursor.close()
 	source_cnx.close()
 
 def select_query(table: str, param: str, target_cursor):
-	sql = dedent("""\
+	sql = dedent(f"""\
 	SELECT COLUMN_NAME 
 	FROM INFORMATION_SCHEMA.COLUMNS 
-	WHERE TABLE_SCHEMA = 'PRUEBA' AND TABLE_NAME = {table} AND COLUMN_KEY = 'UNI'""")
-	target_cursor.execute(query)
+	WHERE TABLE_SCHEMA = 'PRUEBA' AND TABLE_NAME = '{table}' AND COLUMN_KEY = 'UNI'""")
+	#print(sql)
+	target_cursor.execute(sql)
 	col = target_cursor.fetchone()
+	#print(col)
 
-	query = "SELECT id FROM " + table + " WHERE " + col + " = " + param
-
+	query = dedent(f"""\
+		SELECT id 
+		FROM {table} 
+		WHERE {col[0]}  = '{param}'""")
+	#print(query)
 	target_cursor.execute(query)
 	row = target_cursor.fetchone()
+	#print(row)
 	return row
 

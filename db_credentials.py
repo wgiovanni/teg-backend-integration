@@ -1,4 +1,3 @@
-from variables import datawarehouse_name
 
 # mysql (target db, datawarehouse)
 datawarehouse_db_config = {

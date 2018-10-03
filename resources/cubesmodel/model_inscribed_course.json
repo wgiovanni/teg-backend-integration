@@ -34,23 +34,22 @@
           ]
         },
         {
-          "name":"dim_sexo",
+          "name": "dim_status",
           "levels": [
             {
-              "name": "sexo",
-              "label":"Sexo",
-              "key":"id",
+              "name": "status",
+              "label": "Status",
               "attributes": ["id", "codigo"],
               "label_attribute": "codigo"
             }
           ]
-        }, 
+        },
         {
-          "name": "dim_nacionalidad",
+          "name": "dim_asignatura_inscrita",
           "levels": [
             {
-              "name": "nacionalidad",
-              "label": "Nacionalidad",
+              "name": "status",
+              "label": "Status",
               "attributes": ["id", "codigo"],
               "label_attribute": "codigo"
             }
@@ -59,8 +58,8 @@
     ],
     "cubes": [
         {
-            "name": "fact_estudiante_facultad",
-            "dimensions": ["dim_estudiante", "dim_facultad", "dim_carrera", "dim_sexo", "dim_nacionalidad"],
+            "name": "fact_asignatura_inscrita",
+            "dimensions": ["dim_estudiante", "dim_facultad", "dim_carrera", "dim_status", "dim_asignatura_inscrita"],
             "measures": [
               {"name": "cantidad", "label": "Cantidad"}
             ],
@@ -73,24 +72,24 @@
             ],
             "joins": [
               {
-                "master": "fact_estudiante_facultad.id_estudiante",
+                "master": "fact_asignatura_inscrita.id_estudiante",
                 "detail": "dim_estudiante.id"
               },
               {
-                "master": "fact_estudiante_facultad.id_facultad",
+                "master": "fact_asignatura_inscrita.id_facultad",
                 "detail": "dim_facultad.id"
               },
               {
-                "master": "fact_estudiante_facultad.id_carrera",
+                "master": "fact_asignatura_inscrita.id_carrera",
                 "detail": "dim_carrera.id"
               },
               {
-                "master": "fact_estudiante_facultad.id_sexo",
-                "detail": "dim_sexo.id"
+                "master": "fact_asignatura_inscrita.id_status",
+                "detail": "dim_status.id"
               },
               {
-                "master": "fact_estudiante_facultad.id_nacionalidad",
-                "detail": "dim_nacionalidad.id"
+                "master": "fact_asignatura_inscrita.id_asignatura_inscrita",
+                "detail": "dim_asignatura_inscrita.id"
               }
             ],
             "mappings": {
@@ -107,10 +106,10 @@
               "dim_carrera.id": "dim_carrera.id",
               "dim_carrera.nombre": "dim_carrera.nombre",
               "dim_carrera.tipo": "dim_carrera.tipo",
-              "dim_sexo.id": "dim_sexo.id",
-              "dim_sexo.codigo": "dim_sexo.codigo",
-              "dim_nacionalidad.id": "dim_nacionalidad.id",
-              "dim_nacionalidad.codigo": "dim_nacionalidad.codigo"
+              "dim_status.id": "dim_status.id",
+              "dim_status.codigo": "dim_status.codigo",
+              "dim_asignatura_inscrita.id": "dim_asignatura_inscrita.id",
+              "dim_asignatura_inscrita.codigo": "dim_asignatura_inscrita.codigo"
             }
         }
     ]

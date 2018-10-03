@@ -1,0 +1,42 @@
+{
+    "estudiante": [
+        {
+            "cedula": "2545554",
+            "nacionalidad": "Venezolano",
+            "nombre": "Luis",
+            "apellido": "Servita",
+            "sexo": "Masculino",
+            "fecha_nacimiento": "1995-05-24",
+            "telefono1": "5615161610",
+            "telefono2": "0211544151",
+            "email": "luis@gmail.com",
+            "edo_procedencia": "Carabobo"
+        }
+    ],
+    "carrera": [
+        {
+            "nombre": "Computacion",
+            "tipo": "Semestre"
+        },
+        {
+            "nombre": "Quimica",
+            "tipo": "Semestre"
+        }
+    ],
+    "facultad": [
+        {
+            "nombre": "Ciencias y Tecnología"
+        },
+        {
+            "nombre": "Ciencia de la Salñud"
+        }
+    ],
+    "estudiante-carrera-facultad": [
+        {
+            "estudiante": "222465544",
+            "carrera": "Computacion",
+            "facultad": "Ciencias y Tecnología"
+        }
+    ]
+        
+}

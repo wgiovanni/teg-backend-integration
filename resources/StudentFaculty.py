@@ -11,12 +11,11 @@ workspace.register_default_store("sql", url="mysql+mysqlconnector://root@localho
 workspace.import_model("resources/cubesmodel/model.json")
 browser = workspace.browser("fact_estudiante_facultad")
 
-class Student(Resource):
+class Student(BD, Resource):
     representations = {'application/json': make_response}
     parser = reqparse.RequestParser()
     def get(self):
         try:
-            
             r = browser.aggregate()
             result = {"total-estudiantes": int(r.summary["sumatoria"])}
         except Exception as e:
@@ -82,9 +81,6 @@ class StudentSexFaculty(BD, Resource):
             for row in r:
                 item = {"sexo": row['dim_sexo.codigo'], "facultad": row['dim_facultad.nombre'], "total": row['sumatoria']}
                 result.append(item)
-        except DatabaseError as e:
-            self.rollback()
-            abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -146,9 +142,6 @@ class StudentNationalityFaculty(BD, Resource):
             for row in r:
                 item = {"nacionalidad": row['dim_nacionalidad.codigo'], "facultad": row['dim_facultad.nombre'], "total": row['sumatoria']}
                 result.append(item)
-        except DatabaseError as e:
-            self.rollback()
-            abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -162,9 +155,6 @@ class StudentProfessionFaculty(BD, Resource):
             for row in r:
                 item = {"carrera": row['dim_carrera.nombre'], "facultad": row['dim_facultad.nombre'], "total": row['sumatoria']}
                 result.append(item)
-        except DatabaseError as e:
-            self.rollback()
-            abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 

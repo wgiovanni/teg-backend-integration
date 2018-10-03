@@ -11,7 +11,7 @@ import mysql.connector
 
 # Resources
 from resources.StudentFaculty import Student, StudentMaleFaculty, StudentFemaleFaculty, StudentSexFaculty, StudentInternacionalFaculty, StudentNacionalFaculty, StudentNationalityFaculty, StudentProfessionFaculty, StudentProfessionConstantsFaculty
-
+from resources.InscribedCourse import InscribedCourseStudent, InscribedCourseStudentFaculty
 # metodos
 from etl import etl_process
 
@@ -73,6 +73,10 @@ api.add_resource(StudentNationalityFaculty, '/estudiantes-nacionalidad-facultad'
 api.add_resource(StudentProfessionFaculty, '/estudiantes-carrera-facultad')
 # cantidad de estudiantes por carrera, dada la facultad
 api.add_resource(StudentProfessionConstantsFaculty, '/estudiantes-carrera/<faculty_code>')
+
+# Cube para las materias inscritas
+api.add_resource(InscribedCourseStudent, '/asignatura-inscrita-estudiante')
+api.add_resource(InscribedCourseStudentFaculty, '/asignatura-inscrita-estudiante/<faculty_code>')
 
 if __name__ == "__main__":
 	#main()

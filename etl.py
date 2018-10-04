@@ -3,6 +3,8 @@ import psycopg2
 import mysql.connector
 from datetime import datetime
 from textwrap import dedent
+import simplejson as json
+import requests
 # variables
 from variables import datawarehouse_name
 
@@ -168,3 +170,27 @@ def select_query(table: str, param: str, target_cursor):
 	#print(row)
 	return row
 
+def etl_process2():
+	base_url = "http://127.0.0.1:8082"
+	path = "/estudiantes"
+	headers = {'content-type': 'application/json'}
+	r = requests.get(base_url + path, headers=headers)
+	#print(r.text)
+	#if r.status_code == requests.codes.ok:
+	result = json.loads(r.text)
+	#print(student)
+	student = result["estudiante"]
+	for row in student:
+		print(row)
+
+	
+	payload ="2018-09-26 11:01:00"
+	path = f"/estudiantes/{payload}"
+	r = requests.get(base_url + path, headers=headers)
+	#if r.status_code == requests.codes.ok:
+	result = json.loads(r.text)
+	print("\n")
+	print("\n")
+	student = result["estudiante"]
+	for row in student:
+		print(row)

@@ -13,7 +13,7 @@ import mysql.connector
 from resources.StudentFaculty import Student, StudentMaleFaculty, StudentFemaleFaculty, StudentSexFaculty, StudentInternacionalFaculty, StudentNacionalFaculty, StudentNationalityFaculty, StudentProfessionFaculty, StudentProfessionConstantsFaculty
 from resources.InscribedCourse import InscribedCourseStudent, InscribedCourseStudentFaculty
 # metodos
-from etl import etl_process
+from etl import etl_process, etl_process2
 
 def main():
 	print('Empezando ETL')
@@ -39,21 +39,18 @@ def main():
 def sensor():
 	print(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) # Se obtiene local para la actualizacion de la data cuando se ejecute el job
 	print("Scheduler esta vivo!")
+def extraction():
+	etl_process2()
 
 sched = BackgroundScheduler(deamon=True)
 #sched.add_job(main, 'interval', minutes=1)
-sched.add_job(sensor, 'interval', minutes=1)
+sched.add_job(extraction, 'interval', minutes=1)
 sched.start()
 
 app = Flask(__name__)
 api = Api(app)
 # enable CORS
 CORS(app)
-
-#@app.route("/home")
-#def home():
-#	""" Funcion para fines de prueba. """
-#	return "Bienvenidos :) !"
 
 # cantidad de estudiantes totales
 api.add_resource(Student, '/estudiantes')

@@ -58,3 +58,45 @@ class BD:
             columns = [column[0].lower() for column in cursor.description]
             cursor.close()
         return dict(zip(columns, row))
+
+    def insert(self, table: str, datos: dict=None, columns=None, values: list=None):
+        """
+        Inserta uno o varios registros en una tabla.
+
+        :param table: Nombre de la tabla.
+        :param datos: Diccionario con las keys para los nombres de columnas y los valores para insertar.\n
+            Ej. {"id": 1, "first_name": "Jose", ...}\n
+            Este diccionario sobreescribe los valores de los parámetros columns y values.
+        :param columns: Columnas de la tabla donde se van a insertar los datos.\n
+            Puede ser un string separado por comas. ej. 'id, first_name, ...'\n
+            Puede ser una lista de string. ej. ['id', 'first_name', ...]\n
+        :param values: Lista de valores a insertar en la tabla.\n
+            Puede ser una lista de valores simples para un solo registro. ej. [1, 'Jose', ...]\n
+            Puede ser una lista de tuplas para insertar varios registros. ej. [(1, 'Jose', ...), (2, 'Jesus', ...), ...]
+        """
+        self.connect()
+        cursor = self.conn.cursor()
+
+        if datos is not None:
+            columns = []
+            values = []
+            for col, val in datos.items():
+                columns.append(col)
+                values.append(val)
+
+        if isinstance(columns, str):
+            columns = "("+columns+")"
+        elif isinstance(columns, list):
+            columns = "("+", ".join(columns)+")"
+
+
+        if isinstance(values[0], (list, tuple)):
+            marks = "(%s" + (",%s" * (len(values[0]) - 1)) + ")"
+            sql = f"insert into {table} {columns} values {marks}", values
+            cursor.execute(sql, values)
+        else:
+            marks = "(%s" + (",%s" * (len(values) - 1)) + ")"
+            sql = f"insert into {table} {columns} values {marks}"
+            cursor.execute(sql, values)	
+
+        cursor.close()

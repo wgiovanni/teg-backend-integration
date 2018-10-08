@@ -496,7 +496,7 @@ def insertTableStatic(target_cnx):
 	#print(sexParams)
 	target_cursor.executemany(sexQuery.load_query, sexParams)
 	target_cnx.commit()
-	nationalityParams = [("Venezonalano",), ("Extranjero",)]
+	nationalityParams = [("Venezolano",), ("Extranjero",)]
 	target_cursor.executemany(nationalityQuery.load_query, nationalityParams)
 	target_cnx.commit()
 	#statusParams = [("Activo1",), ("Inactivo1",)]

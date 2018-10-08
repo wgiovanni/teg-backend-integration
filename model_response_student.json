@@ -1,20 +1,4 @@
 {
-    "dim-estudiante": {
-            "items": [
-                {
-                    "cedula": "2545554",
-                    "nacionalidad": "Venezolano",
-                    "nombre": "Luis",
-                    "apellido": "Servita",
-                    "sexo": "Masculino",
-                    "fecha_nacimiento": "1995-05-24",
-                    "telefono1": "5615161610",
-                    "telefono2": "0211544151",
-                    "email": "luis@gmail.com",
-                    "edo_procedencia": "Carabobo"
-                }
-            ]
-    },
     "dim-carrera": {
         "tipo-tabla": "dimension",
         "items": [
@@ -36,6 +20,22 @@
             },
             {
                 "nombre": "Ciencia de la Salñud"
+            }
+        ]
+    },
+    "dim-estudiante": {
+        "items": [
+            {
+                "cedula": "2545554",
+                "nacionalidad": "Venezolano",
+                "nombre": "Luis",
+                "apellido": "Servita",
+                "sexo": "Masculino",
+                "fecha_nacimiento": "1995-05-24",
+                "telefono1": "5615161610",
+                "telefono2": "0211544151",
+                "email": "luis@gmail.com",
+                "edo_procedencia": "Carabobo"
             }
         ]
     },

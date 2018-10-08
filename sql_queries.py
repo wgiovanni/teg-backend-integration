@@ -232,6 +232,30 @@ class SqlQueryFact:
 		self.type_table = type_table
 		self.tables = tables
 
+class SqlLastUpdate:
+	def __init__(self, get_query, update_query):
+		self.get_query = get_query
+		self.update_query = update_query
+
+class SqlTableStatic:
+	def __init__(self, get_query_code, load_query):
+		self.get_query_code = get_query_code
+		self.load_query = load_query
+
+class SqlStudent:
+	def __init__(self, get_query_code, load_query, update_query):
+		self.get_query_code = get_query_code
+		self.load_query = load_query
+		self.update_query = update_query
+
+class SqlTableSameParse:
+	def __init__(self, get_query_code):
+		self.get_query_code = get_query_code
+
+class SqlFactRelationship:
+	def __init__(self, get_query_code):
+		self.get_query_code = get_query_code
+
 # creando instancias para la clase SqlQuery 
 postgresql_query = SqlQuery(
 	postgresql_extract_load_initial, 
@@ -285,3 +309,68 @@ postgresql_queries = [
 	postgresql_query_carrera, 
 	postgresql_query_estudiante, 
 	postgresql_query_estudiante_facultad]
+
+
+
+# Querys para tablas donde se almacena la informacion de los estudiantes 
+# consultas para la actualizacion
+get_last_update = dedent("""\
+	SELECT * FROM last_update""")
+
+update_last_update = dedent("""\
+	UPDATE last_update SET is_load_initial=%s, last_update=NOW() WHERE id = %s""")
+
+last_update = SqlLastUpdate(get_last_update, update_last_update)
+
+# consultas para tablas estaticas
+
+get_nationality_code = dedent("""\
+	SELECT id FROM dim_nacionalidad WHERE codigo = %s""") 
+
+insert_nationality = dedent("""\
+	INSERT INTO dim_nacionalidad (codigo) VALUES (%s)""")
+
+get_sex_code = dedent("""\
+	SELECT id FROM dim_sexo WHERE codigo = %s""") 
+
+insert_sex = dedent("""\
+	INSERT INTO dim_sexo (codigo) VALUES (%s)""")
+
+# consultas para estudiante
+get_student_code = dedent("""\
+	SELECT id FROM dim_estudiante WHERE cedula = %s""")
+
+insert_student = dedent("""\
+	INSERT INTO dim_estudiante
+		(cedula, nombre, apellido, fecha_nacimiento, telefono1, telefono2, email, edo_procedencia)
+	VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""")
+
+update_student = dedent("""\
+	UPDATE dim_estudiante
+	SET cedula = %s, nombre=%s, apellido=%s, fecha_nacimiento=%s, telefono1=%s, telefono2=%s, email=%s, edo_procedencia=%s
+	WHERE id=%s""")
+
+# consultas para carrera
+get_profession_code = dedent("""\
+	SELECT id FROM dim_carrera WHERE nombre = %s""")
+
+# consultas para faculty
+get_faculty_code = dedent("""\
+	SELECT id FROM dim_facultad WHERE nombre = %s""")
+
+# consulta para verificar
+get_relationship_student = dedent("""\
+	SELECT fact.id 
+	FROM fact_estudiante_facultad AS fact 
+	INNER JOIN dim_estudiante AS e 
+	ON (fact.id_estudiante = e.id) WHERE cedula = %s""") 
+
+nationalityQuery = SqlTableStatic(get_nationality_code, insert_nationality)
+sexQuery = SqlTableStatic(get_sex_code, insert_sex)
+studentQuery = SqlStudent(get_student_code, insert_student, update_student)
+professionQuery = SqlTableSameParse(get_profession_code)
+facultyQuery = SqlTableSameParse(get_faculty_code)
+studentRelationship = SqlFactRelationship(get_relationship_student)
+
+
+

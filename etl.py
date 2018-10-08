@@ -8,6 +8,7 @@ import simplejson as json
 import requests
 from common.BD import BD
 from db_credentials import datawarehouse_db_config
+from sql_queries import last_update, nationalityQuery, sexQuery, studentQuery, professionQuery, facultyQuery, studentRelationship
 # variables
 from variables import datawarehouse_name
 
@@ -19,8 +20,8 @@ def etl(query, source_cnx, target_cnx):
 	# buscar ultima fecha de actualizacion
 	target_cursor = target_cnx.cursor()
 	target_cursor.execute("USE {}".format(datawarehouse_name))
-	target_cursor.execute("SELECT * FROM LAST_UPDATE")
-	row = target_cursor.fetchone()
+	target_cursor.execute()
+	row = target_cursor.fetchone(last_update.get_query)
 
 	if query.type_table == "DIM":
 
@@ -178,26 +179,20 @@ def etl_process2():
 	target_cnx = mysql.connector.connect(**datawarehouse_db_config)
 	target_cursor = target_cnx.cursor()
 	target_cursor.execute("USE {}".format(datawarehouse_name))
-	target_cursor.execute("SELECT * FROM LAST_UPDATE")
+	target_cursor.execute(last_update.get_query)
 	row = target_cursor.fetchone()
 	print(row)
+	dimension = "dim-"
+	hechos = "hechos-"
+	table = ''
 	if row is not None:
 		if row[1] == False:
 			#actualizacion
 			print("Actualizacion")
-		else:
-			print("Insercion")
-			# insercion de tablas estaticas
-			insertTableStatic()
-			data = request()
-			# ordenamiento: ESTO ES RELEVANTE
-			
+			data = requestUpdate(row[2])
+			print(data)
 			keyList= data.keys()
 			keyList = sorted(keyList)
-			#print(keyList)
-			#insercion
-			dimension = "dim-"
-			hechos = "hechos-"
 			for key in keyList:
 				print("KEY:{}".format(key))
 				if dimension in key:
@@ -212,12 +207,42 @@ def etl_process2():
 				print("\n\n")
 				print(table)
 				print(content)
-				distribution(target_cursor,table, content)
-				#insert(target_cnx, table, content)
-				#target_cnx.commit()
-				#insert(table, content['']) 
+				distributionUpdate(target_cnx, table, content)
+		else:
+			print("Carga Inicial")
+			# insercion de tablas estaticas
+			insertTableStatic(target_cnx)
+			data = requestCargaInitial()
+			# ordenamiento: ESTO ES RELEVANTE
+			
+			keyList= data.keys()
+			keyList = sorted(keyList)
+			#insercion
+			for key in keyList:
+				print("KEY:{}".format(key))
+				if dimension in key:
+					print("Dimension")
+					#picar string
+					table = key[len(dimension):]
+				elif hechos in key:
+					print("Hechos")
+					#picar string
+					table = key[len(hechos):]
+				content = data[key]
+				print("\n\n")
+				print(table)
+				print(content)
+				distributionCargaInitial(target_cnx, table, content)
 
-def request():
+		target_cursor.execute(last_update.update_query, [False, row[0]])
+		target_cnx.commit()
+		print("Se actualizo la fecha")
+	else:
+		print("Debe llenar un registro en la Tabla 'last_update'")
+	
+	target_cursor.close()
+
+def requestCargaInitial():
 	base_url = "http://127.0.0.1:8082"
 	path = "/estudiantes"
 	headers = {'content-type': 'application/json'}
@@ -238,77 +263,285 @@ def request():
 
 	return result
 	
-	#payload ="2018-09-26 11:01:00"
-	#path = f"/estudiantes/{payload}"
-	#r = requests.get(base_url + path, headers=headers)
-	#if r.status_code == requests.codes.ok:
-	#result = json.loads(r.text)
-	#print("\n")
-	#print("\n")
-	#student = result["estudiante"]
-	#for row in student:
-	#	print(row)
 
-#def process()
-def distribution(target_cursor, table: str, content: dict):
+def requestUpdate(lastUpdate):
+	base_url = "http://127.0.0.1:8082"
+	path = "/estudiantes"
+	headers = {'content-type': 'application/json'} 
+
+	path = f"/estudiantes/{lastUpdate}"
+	try:
+		result = ''
+		r = requests.get(base_url + path, headers=headers)
+		if r.status_code == requests.codes.ok:
+			result = json.loads(r.text)
+	except Exception as e:
+		abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))		
+	except r.raise_for_status() as e:
+		abort(404, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
+
+	return result
+
+
+def distributionCargaInitial(target_cnx, table: str, content: dict):
+	target_cursor = target_cnx.cursor()
+
 	if table == "estudiante":
-		nacionalidad = [content['nacionalidad']]
-		sexo = {"codigo": content['sexo']}
-		#status = {"codigo": content['status']}
-		target_cursor.execute("SELECT * FROM DIM_NACIONALIDAD")
-		row = target_cursor.fetchAll()
-		if row is not None:
-			target_cursor.execute("SELECT * FROM DIM_NACIONALIDAD WHERE codigo = %s", nacionalidad)
-			target_cursor.fetchone()
-		else:
-			target_cursor.execute("INSERT INTO DIM_NACIONALIDAD codigo VALUES (%s)", nacionalidad)	
-	else:
-		#todo normal	
+		items = content['items']
+		print(items)
+		for item in items:
+			# aqui deberian ir las verificaciones de cada item
+			nationalityCode = item['nacionalidad']
+			target_cursor.execute(nationalityQuery.get_query_code, [nationalityCode])
+			idNationality = target_cursor.fetchone()
+			print("nacionalidad: {}".format(idNationality))
+			sexCode = item['sexo']
+			target_cursor.execute(sexQuery.get_query_code, [sexCode])
+			idSex = target_cursor.fetchone()
+			print("sexo: {}".format(idSex))
+			# aqui iran todas las dimensiones que saldran de estudiantes
+			student = [
+				item['cedula'],  
+				item['nombre'], 
+				item['apellido'], 
+				item['fecha_nacimiento'],
+				item['telefono1'], 
+				item['telefono2'],
+				item['email'],
+				item['edo_procedencia']
+			]
+			target_cursor.execute(studentQuery.load_query, student)
+			target_cnx.commit()
+			target_cursor.execute(studentQuery.get_query_code, [item['cedula']])
+			idStudent = target_cursor.fetchone()
+			print(idStudent)
 
-def insertTableStatic(target_cursor):
-	sexParams = ["Masculino", "Femenino"]
-	target_cursor.executemany("INSERT INTO DIM_SEXO codigo VALUES (%s)", sexParams)
-	target_cursor.commit()
+			# insertar estudiante con sexo y nacionalidad...
+
+			target_cursor.execute(dedent("""\
+			INSERT INTO FACT_ESTUDIANTE_FACULTAD 
+				(id_estudiante, id_sexo, id_nacionalidad)
+			VALUES (%s, %s, %s)"""), [idStudent[0], idSex[0], idNationality[0]])
+			target_cnx.commit()
+	elif table == "carrera":
+		print("DEMAS TABLAS")
+		items = content['items']
+		for item in items:
+			insert(target_cursor, table, item)
+			target_cnx.commit()
+		print("Insercion finalizada")
+
+	elif table == "facultad":
+		print("DEMAS TABLAS")
+		items = content['items']
+		for item in items:
+			insert(target_cursor, table, item)
+			target_cnx.commit()
+		print("Insercion finalizada")
+	elif table == "estudiante-carrera-facultad":
+		items = content['items']
+		for item in items:
+			professionCode = item['carrera']
+			target_cursor.execute(professionQuery.get_query_code, [professionCode])
+			idProfession = target_cursor.fetchone()
+
+			facultyCode = item['facultad']
+			target_cursor.execute(facultyQuery.get_query_code, [facultyCode])
+			idFaculty = target_cursor.fetchone()
+
+			studentCode = item['estudiante']
+			target_cursor.execute(studentRelationship.get_query_code, [studentCode])
+			idFact = target_cursor.fetchone()
+			
+
+			target_cursor.execute(dedent("""\
+			UPDATE fact_estudiante_facultad
+			SET id_facultad=%s, id_carrera=%s
+			WHERE id=%s;"""), [idFaculty[0], idProfession[0], idFact[0]])
+			#insert(target_cursor, table, item)
+			target_cnx.commit()
+		print("Insercion finalizada")
+
+	target_cursor.close()
+
+
+def distributionUpdate(target_cnx, table: str, content: dict):
+	target_cursor = target_cnx.cursor()
+
+	if table == "estudiante":
+		items = content['items']
+		print(items)
+		print("Cargando estudiantes...")
+		for item in items:
+			# aqui deberian ir las verificaciones de cada item
+			nationalityCode = item['nacionalidad']
+			target_cursor.execute(nationalityQuery.get_query_code, [nationalityCode])
+			idNationality = target_cursor.fetchone()
+			print("nacionalidad: {}".format(idNationality))
+			sexCode = item['sexo']
+			target_cursor.execute(sexQuery.get_query_code, [sexCode])
+			idSex = target_cursor.fetchone()
+			print("sexo: {}".format(idSex))
+			# aqui iran todas las dimensiones que saldran de estudiantes
+			student = [
+				item['cedula'],  
+				item['nombre'], 
+				item['apellido'], 
+				item['fecha_nacimiento'],
+				item['telefono1'], 
+				item['telefono2'],
+				item['email'],
+				item['edo_procedencia']
+			]
+			target_cursor.execute(studentQuery.get_query_code, [item['cedula']])
+			idStudentExist = target_cursor.fetchone()
+			if idStudentExist is not None:
+				student.append(idStudentExist[0])
+				print(student)
+				target_cursor.execute(studentQuery.update_query, student)
+				target_cnx.commit()
+				target_cursor.execute(studentRelationship.get_query_code,[item['cedula']])
+				idFact = target_cursor.fetchone()
+				if idFact is not None:
+					target_cursor.execute(dedent("""\
+					UPDATE fact_estudiante_facultad
+					SET id_estudiante=%s, id_sexo=%s, id_nacionalidad=%s
+					WHERE id = %s"""), [idStudentExist[0], idSex[0], idNationality[0], idFact[0]])
+					target_cnx.commit()
+				else: 
+					print("No existe el registro")
+				
+			else:			
+				target_cursor.execute(studentQuery.load_query, student)
+				target_cnx.commit()
+				target_cursor.execute(studentQuery.get_query_code, [item['cedula']])
+				idStudent = target_cursor.fetchone()
+				target_cursor.execute(dedent("""\
+				INSERT INTO FACT_ESTUDIANTE_FACULTAD 
+					(id_estudiante, id_sexo, id_nacionalidad)
+				VALUES (%s, %s, %s)"""), [idStudent[0], idSex[0], idNationality[0]])
+			
+	elif table == "facultad":
+		print("DEMAS TABLAS")
+		print("Cargando facultad...")
+		items = content['items']
+		for item in items:
+			target_cursor.execute(facultyQuery.get_query_code, [item['nombre']])
+			row = target_cursor.fetchone()
+			if row is not None:
+				#params = list(item)
+				#params.append(row[0])
+				#target_cursor.execute(f"UPDATE DIM_{table} SET nombre = %s WHERE id = %s", params)
+				update(target_cursor, table, item, {"id": row[0]})
+			else: 
+				insert(target_cursor, table, item)
+			
+			target_cnx.commit()
+		print("Insercion finalizada")
+	
+	elif table == "carrera":
+		print("DEMAS TABLAS")
+		print("Cargando carrera...")
+		items = content['items']
+		for item in items:
+			target_cursor.execute(professionQuery.get_query_code, [item['nombre']])
+			row = target_cursor.fetchone()
+			if row is not None:
+				#params = list(item)
+				#params.append(row[0])
+				#target_cursor.execute(f"UPDATE DIM_{table} SET nombre = %s, tipo = %s WHERE id = %s", params)
+				update(target_cursor, table, item, {"id": row[0]})
+			else: 
+				insert(target_cursor, table, item)
+			
+			target_cnx.commit()
+		print("Insercion finalizada")
+
+	elif table == "estudiante-carrera-facultad":
+		print("Cargando relacion...")
+		items = content['items']
+		for item in items:
+			professionCode = item['carrera']
+			target_cursor.execute(professionQuery.get_query_code, [professionCode])
+			idProfession = target_cursor.fetchone()
+
+			facultyCode = item['facultad']
+			target_cursor.execute(facultyQuery.get_query_code, [facultyCode])
+			idFaculty = target_cursor.fetchone()
+			
+			studentCode = item['estudiante']
+
+			target_cursor.execute(studentQuery.get_query_code, [studentCode])
+			idStudent = target_cursor.fetchone()
+
+			target_cursor.execute(studentRelationship.get_query_code, [studentCode])
+			idFact = target_cursor.fetchone()
+
+			if idFact is not None:
+				target_cursor.execute(dedent("""\
+				UPDATE fact_estudiante_facultad
+				SET id_estudiante=%s, id_facultad=%s, id_carrera=%s
+				WHERE id=%s;"""), [idStudent[0], idFaculty[0], idProfession[0], idFact[0]])
+				target_cnx.commit()
+				print("Registro actualizado")
+			else:
+				print("Registro no existe")
+		print("Insercion finalizada")
+	target_cursor.close()
+
+
+def insertTableStatic(target_cnx):
+	target_cursor = target_cnx.cursor()
+	sexParams = [("Masculino",), ("Femenino",)]
+	#print(sexParams)
+	target_cursor.executemany(sexQuery.load_query, sexParams)
+	target_cnx.commit()
+	nationalityParams = [("Venezonalano",), ("Extranjero",)]
+	target_cursor.executemany(nationalityQuery.load_query, nationalityParams)
+	target_cnx.commit()
+	#statusParams = [("Activo1",), ("Inactivo1",)]
+	#target_cursor.executemany("INSERT INTO DIM_STATUS (codigo) VALUES (%s)", statusParams)
+	#target_cnx.commit()
+	
 
 
 def insert(cursor, table: str, datos: dict=None, columns=None, values: list=None):
-		"""
-		Inserta uno o varios registros en una tabla.
+	if datos is not None:
+		columns = []
+		values = []
+		for col, val in datos.items():
+			columns.append(col)
+			values.append(val)
 
-		:param table: Nombre de la tabla.
-		:param datos: Diccionario con las keys para los nombres de columnas y los valores para insertar.\n
-			Ej. {"id": 1, "first_name": "Jose", ...}\n
-			Este diccionario sobreescribe los valores de los parámetros columns y values.
-		:param columns: Columnas de la tabla donde se van a insertar los datos.\n
-			Puede ser un string separado por comas. ej. 'id, first_name, ...'\n
-			Puede ser una lista de string. ej. ['id', 'first_name', ...]\n
-		:param values: Lista de valores a insertar en la tabla.\n
-			Puede ser una lista de valores simples para un solo registro. ej. [1, 'Jose', ...]\n
-			Puede ser una lista de tuplas para insertar varios registros. ej. [(1, 'Jose', ...), (2, 'Jesus', ...), ...]
-		"""
-		#self.connect()
-		cursor = cursor.cursor()
-
-		if datos is not None:
-			columns = []
-			values = []
-			for col, val in datos.items():
-				columns.append(col)
-				values.append(val)
-
-		if isinstance(columns, str):
-			columns = "("+columns+")"
-		elif isinstance(columns, list):
-			columns = "("+", ".join(columns)+")"
+	if isinstance(columns, str):
+		columns = "("+columns+")"
+	elif isinstance(columns, list):
+		columns = "("+", ".join(columns)+")"
 
 
-		if isinstance(values[0], (list, tuple)):
-			marks = "(%s" + (",%s" * (len(values[0]) - 1)) + ")"
-			sql = f"insert into {table} {columns} values {marks}", values
-			cursor.execute(sql, values)
-		else:
-			marks = "(%s" + (",%s" * (len(values) - 1)) + ")"
-			sql = f"insert into {table} {columns} values {marks}"
-			cursor.execute(sql, values)	
+	if isinstance(values[0], (list, tuple)):
+		marks = "(%s" + (",%s" * (len(values[0]) - 1)) + ")"
+		sql = f"insert into dim_{table} {columns} values {marks}", values
+		cursor.execute(sql, values)
+	else:
+		marks = "(%s" + (",%s" * (len(values) - 1)) + ")"
+		sql = f"insert into dim_{table} {columns} values {marks}"
+		cursor.execute(sql, values)	
 
-		cursor.close()
+def update(cursor, table: str, datos: dict, where: dict):
+
+	sql = f"update {table} set "
+	values = []
+	for col, val in datos.items():
+		if val is not None:
+			sql += f"{col} = %s, "
+			values.append(val)
+
+	sql = sql.rstrip(', ')
+	sql += " where "
+	for col, val in where.items():
+		sql += f"{col} = %s and "
+		values.append(val)
+
+	sql = sql.rstrip(' and ')
+	cursor.execute(sql, values)

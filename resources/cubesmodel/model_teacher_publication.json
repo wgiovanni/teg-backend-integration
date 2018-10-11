@@ -1,0 +1,141 @@
+{
+    "dimensions": [
+        {
+         "name":"dim_docente",
+         "levels": [
+                {
+                    "name":"docente",
+                    "label":"Docente",
+                    "attributes": ["id", "cedula", "nombre", "apellido", "correo", "area_trabajo"],
+                    "label_attribute": "nombre"
+                }
+          ]
+        },
+        {
+          "name":"dim_facultad",
+          "levels": [
+            {
+              "name": "facultad",
+              "label":"Facultad",
+              "attributes": ["id", "nombre"],
+              "label_attribute": "nombre"
+            }
+          ]
+        },
+        {
+          "name":"dim_sexo",
+          "levels": [
+            {
+              "name": "sexo",
+              "label":"Sexo",
+              "key":"id",
+              "attributes": ["id", "codigo"],
+              "label_attribute": "codigo"
+            }
+          ]
+        }, 
+        {
+          "name": "dim_escalafon",
+          "levels": [
+            {
+              "name": "escalafon",
+              "label": "Escalafon",
+              "attributes": ["id", "nombre"],
+              "label_attribute": "nombre"
+            }
+          ]
+        },
+        {
+            "name": "dim_grado",
+            "levels": [
+              {
+                "name": "grado",
+                "label": "Grado",
+                "attributes": ["id", "nombre"],
+                "label_attribute": "nombre"
+              }
+            ]
+        },
+        {
+            "name": "dim_publicacion",
+            "levels": [
+              {
+                "name": "publicacion",
+                "label": "Publicacion",
+                "attributes": ["id", "autor", "titulo", "codigo", "fecha", "revista"],
+                "label_attribute": "titulo"
+              }
+            ]
+          }
+    ],
+    "cubes": [
+        {
+            "name": "fact_docente",
+            "dimensions": ["dim_docente", "dim_facultad", "dim_publicacion", "dim_sexo", "dim_grado", "dim_escalafon"],
+            "measures": [
+              {"name": "cantidad", "label": "Cantidad"},
+              {"name": "cantidad_citas","label": "Citas"}
+            ],
+            "aggregates": [
+              {
+                "name": "sumatoria",
+                "function": "count",
+                "measure": "cantidad"
+              },
+              {
+                "name": "sumatoria_citacion",
+                "function": "sum",
+                "measure": "cantidad_citas"
+              }
+            ],
+            "joins": [
+              {
+                "master": "fact_docente.id_docente",
+                "detail": "dim_docente.id"
+              },
+              {
+                "master": "fact_docente.id_facultad",
+                "detail": "dim_facultad.id"
+              },
+              {
+                "master": "fact_docente.id_publicacion",
+                "detail": "dim_publicacion.id"
+              },
+              {
+                "master": "fact_docente.id_sexo",
+                "detail": "dim_sexo.id"
+              },
+              {
+                "master": "fact_docente.id_grado",
+                "detail": "dim_grado.id"
+              },
+              {
+                "master": "fact_docente.id_escalafon",
+                "detail": "dim_escalafon.id"
+              }
+            ],
+            "mappings": {
+              "dim_docente.id": "dim_docente.id",
+              "dim_docente.cedula": "dim_docente.cedula",
+              "dim_docente.nombre": "dim_docente.nombre",
+              "dim_docente.apellido": "dim_docente.apellido",
+              "dim_docente.area_trabajo": "dim_docente.area_trabajo",
+              "dim_docente.correo": "dim_docente.correo",
+              "dim_facultad.id": "dim_facultad.id",
+              "dim_facultad.nombre": "dim_facultad.nombre",
+              "dim_publicacion.id": "dim_publicacion.id",
+              "dim_publicacion.codigo": "dim_publicacion.codigo",
+              "dim_publicacion.autor": "dim_publicacion.autor",
+              "dim_publicacion.titulo": "dim_publicacion.titulo",
+              "dim_publicacion.fecha": "dim_publicacion.fecha",
+              "dim_publicacion.revista": "dim_publicacion.revista",
+              "dim_sexo.id": "dim_sexo.id",
+              "dim_sexo.codigo": "dim_sexo.codigo",
+              "dim_grado.id": "dim_grado.id",
+              "dim_grado.nombre": "dim_grado.nombre",
+              "dim_escalafon.id": "dim_escalafon.id",
+              "dim_escalafon.nombre": "dim_escalafon.nombre"
+            }
+        }
+    ]
+}

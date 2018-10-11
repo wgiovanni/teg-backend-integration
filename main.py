@@ -10,8 +10,9 @@ from flask_restful import Api
 import mysql.connector
 
 # Resources
-from resources.StudentFaculty import Student, StudentMaleFaculty, StudentFemaleFaculty, StudentSexFaculty, StudentInternacionalFaculty, StudentNacionalFaculty, StudentNationalityFaculty, StudentProfessionFaculty, StudentProfessionConstantsFaculty
+from resources.Student import Student, StudentMaleFaculty, StudentFemaleFaculty, StudentSexFaculty, StudentInternacionalFaculty, StudentNacionalFaculty, StudentNationalityFaculty, StudentProfessionFaculty, StudentProfessionConstantsFaculty
 from resources.InscribedCourse import InscribedCourseStudent, InscribedCourseStudentFaculty
+from resources.Teacher import TeacherPublication
 # metodos
 from etl import etl_process, etl_process2
 
@@ -82,6 +83,10 @@ api.add_resource(StudentProfessionConstantsFaculty, '/estudiantes-carrera/<facul
 # Cube para las materias inscritas
 api.add_resource(InscribedCourseStudent, '/asignatura-inscrita-estudiante')
 api.add_resource(InscribedCourseStudentFaculty, '/asignatura-inscrita-estudiante/<faculty_code>')
+
+
+# docentes
+api.add_resource(TeacherPublication, '/profesor-publicacion')
 
 if __name__ == "__main__":
 	#main()

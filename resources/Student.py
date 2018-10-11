@@ -76,11 +76,44 @@ class StudentSexFaculty(BD, Resource):
     parser = reqparse.RequestParser()
     def get(self):
         try:
-            r = browser.aggregate(drilldown=["dim_sexo", "dim_facultad"])
+            params = "Femenino"
+            result = self.queryOne("SELECT * FROM DIM_SEXO WHERE CODIGO = %s", [params])
+            params1 = "Masculino"
+            result1 = self.queryOne("SELECT * FROM DIM_SEXO WHERE CODIGO = %s", [params1])
+            facultades = self.queryAll("SELECT nombre FROM DIM_FACULTAD")
+            if result is None:
+                abort(404, message="Resource {} doesn't exists".format(params))
+            if result1 is None:
+                abort(404, message="Resource {} doesn't exists".format(params1))
+            
+            cut = PointCut("dim_sexo", [result['id']])
+            cell = Cell(browser.cube, cuts = [cut])
+            r = browser.aggregate(cell, drilldown=["dim_sexo", "dim_facultad"])
+            cut = PointCut("dim_sexo", [result['id']])
+            cell = Cell(browser.cube, cuts = [cut])
+            r1 = browser.aggregate(cell, drilldown=["dim_sexo", "dim_facultad"])
             result = []
-            for row in r:
-                item = {"sexo": row['dim_sexo.codigo'], "facultad": row['dim_facultad.nombre'], "total": row['sumatoria']}
-                result.append(item)
+            item = {}
+            if r is not None and r1 is not None:
+                for row in r:
+                    item = {"facultad": row['dim_facultad.nombre']}
+                    for row1 in r1:
+                        if row['dim_facultad.nombre'] == row1['dim_facultad.nombre']:
+                            item["masculino"] = row1['sumatoria']
+                    item["femenino"] = row['sumatoria']
+                    if len(item) == 2:
+                        item["masculino"] = 0
+                    result.append(item)
+                flag = False
+                for f in facultades:
+                    for r in result:
+                        if r['facultad'] == f['nombre']:
+                            flag = True
+                    if flag == False:
+                        item = {"facultad": f['nombre'], "masculino": 0, "femenino": 0}
+                        result.append(item)
+                    flag = False
+                #print(result) 
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 

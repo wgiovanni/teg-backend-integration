@@ -12,7 +12,7 @@ import mysql.connector
 # Resources
 from resources.Student import Student, StudentMaleFaculty, StudentFemaleFaculty, StudentSexFaculty, StudentInternacionalFaculty, StudentNacionalFaculty, StudentNationalityFaculty, StudentProfessionFaculty, StudentProfessionConstantsFaculty
 from resources.InscribedCourse import InscribedCourseStudent, InscribedCourseStudentFaculty
-from resources.Teacher import TeacherPublication
+from resources.Teacher import TeacherPublication, TeacherPublicationFaculty, TeacherWithDoctorate
 # metodos
 from etl import etl_process, etl_process2
 
@@ -86,8 +86,9 @@ api.add_resource(InscribedCourseStudentFaculty, '/asignatura-inscrita-estudiante
 
 
 # docentes
+# pulicaciones por docente
 api.add_resource(TeacherPublication, '/profesor-publicacion')
-
+api.add_resource(TeacherWithDoctorate, '/profesor-doctorado')
 if __name__ == "__main__":
 	#main()
 	app.run(debug=True)

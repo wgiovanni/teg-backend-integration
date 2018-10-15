@@ -1,0 +1,132 @@
+{
+    "dimensions": [
+        {
+         "name":"dim_docente",
+         "levels": [
+                {
+                    "name":"docente",
+                    "label":"Docente",
+                    "attributes": ["id", "cedula", "nombre", "apellido", "correo", "area_trabajo"],
+                    "label_attribute": "nombre"
+                }
+          ]
+        },
+        {
+          "name":"dim_facultad",
+          "levels": [
+            {
+              "name": "facultad",
+              "label":"Facultad",
+              "attributes": ["id", "nombre"],
+              "label_attribute": "nombre"
+            }
+          ]
+        },
+        {
+            "name":"dim_sexo",
+            "levels": [
+              {
+                "name": "sexo",
+                "label":"Sexo",
+                "key":"id",
+                "attributes": ["id", "codigo"],
+                "label_attribute": "codigo"
+              }
+            ]
+        },
+        {
+            "name": "dim_nacionalidad",
+            "levels": [
+              {
+                "name": "nacionalidad",
+                "label": "Nacionalidad",
+                "attributes": ["id", "codigo"],
+                "label_attribute": "codigo"
+              }
+            ]
+        },
+        {
+            "name": "dim_grado",
+            "levels": [
+              {
+                "name": "grado",
+                "label": "Grado",
+                "attributes": ["id", "nombre"],
+                "label_attribute": "nombre"
+              }
+            ]
+        },
+        {
+            "name": "dim_escalafon",
+            "levels": [
+              {
+                "name": "escalafon",
+                "label": "Escalafon",
+                "attributes": ["id", "nombre"],
+                "label_attribute": "nombre"
+              }
+            ]
+        }
+    ],
+    "cubes": [
+        {
+            "name": "fact_docente",
+            "dimensions": ["dim_docente", "dim_facultad", "dim_sexo", "dim_grado", "dim_escalafon", "dim_nacionalidad"],
+            "measures": [
+                {"name": "cantidad", "label": "Cantidad"}
+            ],
+            "aggregates": [
+                {
+                    "name": "sumatoria",
+                    "function": "count",
+                    "measure": "cantidad"
+                }
+            ],
+            "joins": [
+                {
+                    "master": "fact_docente.id_docente",
+                    "detail": "dim_docente.id"
+                },
+                {
+                    "master": "fact_docente.id_facultad",
+                    "detail": "dim_facultad.id"
+                },
+                {
+                    "master": "fact_docente.id_sexo",
+                    "detail": "dim_sexo.id"
+                },
+                {
+                    "master": "fact_docente.id_grado",
+                    "detail": "dim_grado.id"
+                },
+                {
+                    "master": "fact_docente.id_nacionalidad",
+                    "detail": "dim_nacionalidad.id"
+                },
+                {
+                    "master": "fact_docente.id_escalafon",
+                    "detail": "dim_escalafon.id"
+                }
+
+            ],
+            "mappings": {
+              "dim_docente.id": "dim_docente.id",
+              "dim_docente.cedula": "dim_docente.cedula",
+              "dim_docente.nombre": "dim_docente.nombre",
+              "dim_docente.apellido": "dim_docente.apellido",
+              "dim_docente.area_trabajo": "dim_docente.area_trabajo",
+              "dim_docente.correo": "dim_docente.correo",
+              "dim_facultad.id": "dim_facultad.id",
+              "dim_facultad.nombre": "dim_facultad.nombre",
+              "dim_sexo.id": "dim_sexo.id",
+              "dim_sexo.codigo": "dim_sexo.codigo",
+              "dim_nacionalidad.id": "dim_nacionalidad.id",
+              "dim_nacionalidad.codigo": "dim_nacionalidad.codigo",
+              "dim_grado.id": "dim_grado.id",
+              "dim_grado.nombre": "dim_grado.nombre",
+              "dim_escalafon.id": "dim_escalafon.id",
+              "dim_escalafon.nombre": "dim_escalafon.nombre"
+            }
+        }
+    ]
+}

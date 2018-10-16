@@ -13,7 +13,7 @@ import mysql.connector
 from resources.Student import Student, StudentMaleFaculty, StudentFemaleFaculty, StudentSexFaculty, StudentInternacionalFaculty, StudentNacionalFaculty, StudentNationalityFaculty, StudentProfessionFaculty, StudentProfessionConstantsFaculty
 from resources.InscribedCourse import InscribedCourseStudent, InscribedCourseStudentFaculty
 from resources.TeacherPublication import TeacherPublication, TeacherPublicationFaculty
-from resources.Teacher import TeacherWithDoctorate
+from resources.Teacher import TeacherWithDoctorateFaculty, TeacherGradeFaculty, TeacherWithDoctorate, TeacherInternacionals, TeacherNational
 # metodos
 from etl import etl_process, etl_process2
 
@@ -79,18 +79,29 @@ api.add_resource(StudentNationalityFaculty, '/estudiantes-nacionalidad-facultad'
 # cantidad de estudiantes por carrera y por facultad
 api.add_resource(StudentProfessionFaculty, '/estudiantes-carrera-facultad')
 # cantidad de estudiantes por carrera, dada la facultad
-api.add_resource(StudentProfessionConstantsFaculty, '/estudiantes-carrera/<faculty_code>')
+api.add_resource(StudentProfessionConstantsFaculty, '/estudiantes-carrera/<facultad_codigo>')
 
 # Cube para las materias inscritas
 api.add_resource(InscribedCourseStudent, '/asignatura-inscrita-estudiante')
-api.add_resource(InscribedCourseStudentFaculty, '/asignatura-inscrita-estudiante/<faculty_code>')
+api.add_resource(InscribedCourseStudentFaculty, '/asignatura-inscrita-estudiante/<facultad_codigo>')
 
 
 # docentes
 # pulicaciones por docente
 api.add_resource(TeacherPublication, '/profesor-publicacion')
+# cantidad de publicaciones por facultad
 api.add_resource(TeacherPublicationFaculty, '/profesor-publicacion-facultad')
-api.add_resource(TeacherWithDoctorate, '/profesor-doctorado')
+# cantidad de profesores con doctorado o phd por facultad
+api.add_resource(TeacherWithDoctorateFaculty, '/profesor-doctorado-facultad')
+# cantidad de profesores por facultad, dado un grado
+api.add_resource(TeacherGradeFaculty, '/profesor-grado-facultad/<grado_codigo>')
+# proporcion de profesores con doctorado (total doctorado/total profesores)
+api.add_resource(TeacherWithDoctorate, '/profesor-doctorado-proporcion')
+# cantidad de profesores internacionales 
+api.add_resource(TeacherInternacionals, '/profesor-internacional')
+# cantidad de profesores nacionales 
+api.add_resource(TeacherNational, '/profesor-nacional')
+
 if __name__ == "__main__":
 	#main()
 	app.run(debug=True)

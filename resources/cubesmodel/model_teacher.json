@@ -1,15 +1,15 @@
 {
     "dimensions": [
         {
-         "name":"dim_docente",
-         "levels": [
+            "name":"dim_docente",
+            "levels": [
                 {
                     "name":"docente",
                     "label":"Docente",
                     "attributes": ["id", "cedula", "nombre", "apellido", "correo", "area_trabajo"],
                     "label_attribute": "nombre"
                 }
-          ]
+            ]
         },
         {
           "name":"dim_facultad",

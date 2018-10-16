@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 16-10-2018 a las 01:27:13
+-- Tiempo de generación: 16-10-2018 a las 23:51:34
 -- Versión del servidor: 10.1.34-MariaDB
 -- Versión de PHP: 7.2.8
 
@@ -354,6 +354,15 @@ CREATE TABLE `fact_docente` (
   `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `fact_docente`
+--
+
+INSERT INTO `fact_docente` (`id`, `id_docente`, `id_sexo`, `id_grado`, `id_escalafon`, `id_facultad`, `id_nacionalidad`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
+(1, 1, 4, 3, 5, 8, 3, 1, '2018-10-16 18:43:14', '2018-10-16 18:43:14'),
+(2, 2, 4, 3, 5, 8, 3, 1, '2018-10-16 18:43:14', '2018-10-16 18:43:14'),
+(3, 3, 4, 1, 5, 1, 3, 1, '2018-10-16 18:43:35', '2018-10-16 18:43:35');
 
 -- --------------------------------------------------------
 
@@ -750,7 +759,7 @@ ALTER TABLE `fact_asignatura_inscrita`
 -- AUTO_INCREMENT de la tabla `fact_docente`
 --
 ALTER TABLE `fact_docente`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_docente_publicacion`

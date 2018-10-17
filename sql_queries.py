@@ -238,9 +238,10 @@ class SqlLastUpdate:
 		self.update_query = update_query
 
 class SqlTableStatic:
-	def __init__(self, get_query_code, load_query):
+	def __init__(self, get_query_code, load_query, get_verify):
 		self.get_query_code = get_query_code
 		self.load_query = load_query
+		self.get_verify = get_verify
 
 class SqlStudent:
 	def __init__(self, get_query_code, load_query, update_query):
@@ -330,11 +331,17 @@ get_nationality_code = dedent("""\
 insert_nationality = dedent("""\
 	INSERT INTO dim_nacionalidad (codigo) VALUES (%s)""")
 
+get_nationality_code_verify = dedent("""\
+	SELECT id FROM dim_nacionalidad WHERE codigo = %s OR codigo = %s""")	
+
 get_sex_code = dedent("""\
 	SELECT id FROM dim_sexo WHERE codigo = %s""") 
 
 insert_sex = dedent("""\
 	INSERT INTO dim_sexo (codigo) VALUES (%s)""")
+
+get_sex_code_verify = dedent("""\
+	SELECT id FROM dim_sexo WHERE codigo = %s OR codigo = %s""")
 
 # consultas para estudiante
 get_student_code = dedent("""\
@@ -365,8 +372,8 @@ get_relationship_student = dedent("""\
 	INNER JOIN dim_estudiante AS e 
 	ON (fact.id_estudiante = e.id) WHERE cedula = %s""") 
 
-nationalityQuery = SqlTableStatic(get_nationality_code, insert_nationality)
-sexQuery = SqlTableStatic(get_sex_code, insert_sex)
+nationalityQuery = SqlTableStatic(get_nationality_code, insert_nationality, get_nationality_code_verify)
+sexQuery = SqlTableStatic(get_sex_code, insert_sex, get_sex_code_verify)
 studentQuery = SqlStudent(get_student_code, insert_student, update_student)
 professionQuery = SqlTableSameParse(get_profession_code)
 facultyQuery = SqlTableSameParse(get_faculty_code)

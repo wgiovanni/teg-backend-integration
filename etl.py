@@ -212,27 +212,31 @@ def etl_process2():
 			print("Carga Inicial")
 			# insercion de tablas estaticas
 			insertTableStatic(target_cnx)
-			data = requestCargaInitial()
-			# ordenamiento: ESTO ES RELEVANTE
-			
-			keyList= data.keys()
-			keyList = sorted(keyList)
-			#insercion
-			for key in keyList:
-				print("KEY:{}".format(key))
-				if dimension in key:
-					print("Dimension")
-					#picar string
-					table = key[len(dimension):]
-				elif hechos in key:
-					print("Hechos")
-					#picar string
-					table = key[len(hechos):]
-				content = data[key]
-				print("\n\n")
-				print(table)
-				print(content)
-				distributionCargaInitial(target_cnx, table, content)
+			dataList = requestCargaInitial()
+			print(dataList)
+			print("\n\n")
+			for data in dataList:
+				print(data)
+				print("\n")
+				# ordenamiento: ESTO ES RELEVANTE
+				keyList= data.keys()
+				keyList = sorted(keyList)
+				#insercion
+				for key in keyList:
+					print("KEY:{}".format(key))
+					if dimension in key:
+						print("Dimension")
+						#picar string
+						table = key[len(dimension):]
+					elif hechos in key:
+						print("Hechos")
+						#picar string
+						table = key[len(hechos):]
+					content = data[key]
+					print("\n\n")
+					print(table)
+					print(content)
+					distributionCargaInitial(target_cnx, table, content)
 
 		target_cursor.execute(last_update.update_query, [False, row[0]])
 		target_cnx.commit()
@@ -243,23 +247,21 @@ def etl_process2():
 	target_cursor.close()
 
 def requestCargaInitial():
-	base_url = "http://127.0.0.1:8082"
-	path = "/estudiantes"
+	base_url = "http://127.0.0.1:"
 	headers = {'content-type': 'application/json'}
-
-	try:
-		result = ''
-		r = requests.get(base_url + path, headers=headers)
-		if r.status_code == requests.codes.ok:
-			result = json.loads(r.text)
-			#
-			#student = result["estudiante"]
-			#for row in student:
-			#	print(row)
-	except Exception as e:
-		abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))		
-	except r.raise_for_status() as e:
-		abort(404, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
+	pathList = []
+	pathList.append("8082/estudiantes")
+	pathList.append("8082/profesores")
+	result = []
+	for path in pathList:
+		try:
+			r = requests.get(base_url + path, headers=headers)
+			if r.status_code == requests.codes.ok:
+				result.append(json.loads(r.text))
+		except Exception as e:
+			abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))		
+		except r.raise_for_status() as e:
+			abort(404, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
 	return result
 	
@@ -289,11 +291,15 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 	if table == "estudiante":
 		items = content['items']
 		print(items)
+		print("\n")
 		for item in items:
 			# aqui deberian ir las verificaciones de cada item
+			print(item)
 			nationalityCode = item['nacionalidad']
 			target_cursor.execute(nationalityQuery.get_query_code, [nationalityCode])
 			idNationality = target_cursor.fetchone()
+			print(idNationality)
+			#if idNationality[0] is not None:
 			print("nacionalidad: {}".format(idNationality))
 			sexCode = item['sexo']
 			target_cursor.execute(sexQuery.get_query_code, [sexCode])
@@ -361,6 +367,8 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 			#insert(target_cursor, table, item)
 			target_cnx.commit()
 		print("Insercion finalizada")
+	elif table == "docente":
+		print("DOCENTE:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
 
 	target_cursor.close()
 
@@ -492,13 +500,25 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 
 def insertTableStatic(target_cnx):
 	target_cursor = target_cnx.cursor()
-	sexParams = [("Masculino",), ("Femenino",)]
-	#print(sexParams)
-	target_cursor.executemany(sexQuery.load_query, sexParams)
-	target_cnx.commit()
-	nationalityParams = [("Venezolano",), ("Extranjero",)]
-	target_cursor.executemany(nationalityQuery.load_query, nationalityParams)
-	target_cnx.commit()
+	male = "Masculino"
+	female = "Femenino"
+	sexParams = [(male,), (female,)]
+	target_cursor.execute(sexQuery.get_verify, [male, female])
+	sexList = target_cursor.fetchall()
+	print(sexList)
+	if len(sexList) != 2:
+		target_cursor.executemany(sexQuery.load_query, sexParams)
+		target_cnx.commit()
+	
+	national = "Venezolano"
+	international = "Extranjero"
+	nationalityParams = [(national,), (international,)]
+	target_cursor.execute(nationalityQuery.get_verify, [national, international])
+	nationalityList = target_cursor.fetchall()
+	print(nationalityList)
+	if len(nationalityList) != 2:
+		target_cursor.executemany(nationalityQuery.load_query, nationalityParams)
+		target_cnx.commit()
 	#statusParams = [("Activo1",), ("Inactivo1",)]
 	#target_cursor.executemany("INSERT INTO DIM_STATUS (codigo) VALUES (%s)", statusParams)
 	#target_cnx.commit()

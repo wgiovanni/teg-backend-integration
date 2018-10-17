@@ -39,14 +39,19 @@ def main():
 	target_cnx.close()
 
 def sensor():
+	#print(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) # Se obtiene local para la actualizacion de la data cuando se ejecute el job
+	print("Scheduler esta vivo!000000000000000000000")
+
+def sensor1():
 	print(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) # Se obtiene local para la actualizacion de la data cuando se ejecute el job
-	print("Scheduler esta vivo!")
+	print("Scheduler esta vivo11111111111111111111111!")
 #def extraction():
 #	etl_process2()
 
 #sched = BackgroundScheduler(deamon=True)
 #sched.add_job(main, 'interval', minutes=1)
-#sched.add_job(extraction, 'interval', minutes=1)
+#sched.add_job(sensor, trigger='interval', seconds=10)
+#sched.add_job(sensor1, 'interval', seconds=20)
 #sched.start()
 
 app = Flask(__name__)
@@ -58,6 +63,13 @@ CORS(app)
 def extraction():
 	#target_cnx = mysql.connector.connect(**datawarehouse_db_config)
 	etl_process2()
+	
+	return "Hola mundo"
+
+@app.route('/profesor')
+def extractionProfesor():
+	#target_cnx = mysql.connector.connect(**datawarehouse_db_config)
+	etl_process_teachers()
 	
 	return "Hola mundo"
 

@@ -232,7 +232,7 @@ class SqlQueryFact:
 		self.type_table = type_table
 		self.tables = tables
 
-class SqlLastUpdate:
+class SqlSystemParameter:
 	def __init__(self, get_query, update_query):
 		self.get_query = get_query
 		self.update_query = update_query
@@ -243,7 +243,7 @@ class SqlTableStatic:
 		self.load_query = load_query
 		self.get_verify = get_verify
 
-class SqlStudent:
+class SqlFact:
 	def __init__(self, get_query_code, load_query, update_query):
 		self.get_query_code = get_query_code
 		self.load_query = load_query
@@ -315,13 +315,13 @@ postgresql_queries = [
 
 # Querys para tablas donde se almacena la informacion de los estudiantes 
 # consultas para la actualizacion
-get_last_update = dedent("""\
-	SELECT * FROM last_update""")
+get_system_parameter = dedent("""\
+	SELECT * FROM parametro_sistema WHERE codigo = %s""")
 
-update_last_update = dedent("""\
-	UPDATE last_update SET is_load_initial=%s, last_update=NOW() WHERE id = %s""")
+update_system_parameter = dedent("""\
+	UPDATE parametro_sistema SET definicion=%s, fecha_actualizacion=NOW() WHERE id = %s""")
 
-last_update = SqlLastUpdate(get_last_update, update_last_update)
+systemParameter = SqlSystemParameter(get_system_parameter, update_system_parameter)
 
 # consultas para tablas estaticas
 
@@ -361,7 +361,7 @@ update_student = dedent("""\
 get_profession_code = dedent("""\
 	SELECT id FROM dim_carrera WHERE nombre = %s""")
 
-# consultas para faculty
+# consultas para facultad
 get_faculty_code = dedent("""\
 	SELECT id FROM dim_facultad WHERE nombre = %s""")
 
@@ -370,13 +370,40 @@ get_relationship_student = dedent("""\
 	SELECT fact.id 
 	FROM fact_estudiante_facultad AS fact 
 	INNER JOIN dim_estudiante AS e 
-	ON (fact.id_estudiante = e.id) WHERE cedula = %s""") 
+	ON (fact.id_estudiante = e.id) WHERE cedula = %s""")
+
+# consulta para escalafon
+get_scale_code = dedent("""\
+	SELECT id FROM dim_escalafon WHERE nombre = %s""")
+
+# consultas para docente
+get_teacher_code = dedent("""\
+	SELECT id FROM dim_docente WHERE cedula = %s""")
+
+insert_teacher = dedent("""\
+	INSERT INTO dim_docente
+		(cedula, nombre, apellido, correo, area_trabajo)
+	VALUES (%s, %s, %s, %s, %s)""")
+
+update_teacher = dedent("""\
+	UPDATE dim_docente
+	SET cedula = %s, nombre=%s, apellido=%s,  correo=%s, area_trabajo=%s
+	WHERE id=%s""")
+
+# consulta para publicacion
+get_publication_code = dedent("""\
+	SELECT id FROM dim_publicacion WHERE codigo = %s""")
+
+
 
 nationalityQuery = SqlTableStatic(get_nationality_code, insert_nationality, get_nationality_code_verify)
 sexQuery = SqlTableStatic(get_sex_code, insert_sex, get_sex_code_verify)
-studentQuery = SqlStudent(get_student_code, insert_student, update_student)
+studentQuery = SqlFact(get_student_code, insert_student, update_student)
+teacherQuery = SqlFact(get_teacher_code, insert_teacher, update_teacher)
 professionQuery = SqlTableSameParse(get_profession_code)
 facultyQuery = SqlTableSameParse(get_faculty_code)
+scaleQuery = SqlTableSameParse(get_scale_code)
+publicationQuery = SqlTableSameParse(get_publication_code)
 studentRelationship = SqlFactRelationship(get_relationship_student)
 
 

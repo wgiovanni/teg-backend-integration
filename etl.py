@@ -8,7 +8,7 @@ import simplejson as json
 import requests
 from common.BD import BD
 from db_credentials import datawarehouse_db_config
-from sql_queries import last_update, nationalityQuery, sexQuery, studentQuery, professionQuery, facultyQuery, studentRelationship
+from sql_queries import systemParameter, nationalityQuery, sexQuery, studentQuery, teacherQuery, professionQuery, facultyQuery, publicationQuery, scaleQuery, studentRelationship
 # variables
 from variables import datawarehouse_name
 
@@ -21,7 +21,7 @@ def etl(query, source_cnx, target_cnx):
 	target_cursor = target_cnx.cursor()
 	target_cursor.execute("USE {}".format(datawarehouse_name))
 	target_cursor.execute()
-	row = target_cursor.fetchone(last_update.get_query)
+	row = target_cursor.fetchone(systemParameter.get_query)
 
 	if query.type_table == "DIM":
 
@@ -179,17 +179,17 @@ def etl_process2():
 	target_cnx = mysql.connector.connect(**datawarehouse_db_config)
 	target_cursor = target_cnx.cursor()
 	target_cursor.execute("USE {}".format(datawarehouse_name))
-	target_cursor.execute(last_update.get_query)
+	target_cursor.execute(systemParameter.get_query, ["CARGA_INICIAL_ACTUALIZACION"])
 	row = target_cursor.fetchone()
 	print(row)
 	dimension = "dim-"
 	hechos = "hechos-"
 	table = ''
 	if row is not None:
-		if row[1] == False:
+		if row[4] == False:
 			#actualizacion
 			print("Actualizacion")
-			data = requestUpdate(row[2])
+			data = requestUpdate(row[6])
 			print(data)
 			keyList= data.keys()
 			keyList = sorted(keyList)
@@ -212,7 +212,7 @@ def etl_process2():
 			print("Carga Inicial")
 			# insercion de tablas estaticas
 			insertTableStatic(target_cnx)
-			dataList = requestCargaInitial()
+			dataList = requestCargaInitial(target_cnx)
 			print(dataList)
 			print("\n\n")
 			for data in dataList:
@@ -238,7 +238,7 @@ def etl_process2():
 					print(content)
 					distributionCargaInitial(target_cnx, table, content)
 
-		target_cursor.execute(last_update.update_query, [False, row[0]])
+		target_cursor.execute(systemParameter.update_query, [False, row[0]])
 		target_cnx.commit()
 		print("Se actualizo la fecha")
 	else:
@@ -246,16 +246,21 @@ def etl_process2():
 	
 	target_cursor.close()
 
-def requestCargaInitial():
-	base_url = "http://127.0.0.1:"
+def requestCargaInitial(target_cnx):
+	
 	headers = {'content-type': 'application/json'}
 	pathList = []
-	pathList.append("8082/estudiantes")
-	pathList.append("8082/profesores")
+	target_cursor = target_cnx.cursor()
+	target_cursor.execute(systemParameter.get_query, ["RUTA_CARGA_INICIAL_ESTUDIANTES"])
+	endPointStudent = target_cursor.fetchone()
+	target_cursor.execute(systemParameter.get_query, ["RUTA_CARGA_INICIAL_PROFESORES"])
+	endPointTeacher = target_cursor.fetchone()
+	pathList.append(endPointStudent[4])
+	pathList.append(endPointTeacher[4])
 	result = []
 	for path in pathList:
 		try:
-			r = requests.get(base_url + path, headers=headers)
+			r = requests.get(path, headers=headers)
 			if r.status_code == requests.codes.ok:
 				result.append(json.loads(r.text))
 		except Exception as e:
@@ -341,8 +346,13 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 		print("DEMAS TABLAS")
 		items = content['items']
 		for item in items:
-			insert(target_cursor, table, item)
-			target_cnx.commit()
+			target_cursor.execute(facultyQuery.get_query_code, [item['nombre']])
+			faculty = target_cursor.fetchone()
+			if faculty is None:
+				insert(target_cursor, table, item)
+				target_cnx.commit()
+			else: 
+				print("Ya existe {}".format(item['nombre']))
 		print("Insercion finalizada")
 	elif table == "estudiante-carrera-facultad":
 		items = content['items']
@@ -369,7 +379,74 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 		print("Insercion finalizada")
 	elif table == "docente":
 		print("DOCENTE:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
+		items = content['items']
+		print(items)
+		print("\n")
+		for item in items:
+			nationalityCode = item['nacionalidad']
+			if nationalityCode == "V":
+				nationalityCode = "Venezolano"
+			else:
+				nationalityCode = "Extranjero"
+			target_cursor.execute(nationalityQuery.get_query_code, [nationalityCode])
+			idNationality = target_cursor.fetchone()
+			print(idNationality)
+			#if idNationality[0] is not None:
+			print("nacionalidad: {}".format(idNationality))
+			sexCode = item['sexo']
+			target_cursor.execute(sexQuery.get_query_code, [sexCode])
+			idSex = target_cursor.fetchone()
+			print("sexo: {}".format(idSex))
 
+			teacher = [
+				item['cedula'],  
+				item['nombre'], 
+				item['apellido'], 
+				item['area_trabajo'],
+				item['correo']
+			]
+			target_cursor.execute(teacherQuery.load_query, teacher)
+			target_cnx.commit()
+		print("INSERCION DOCENTE FINALIZADA")
+
+	elif table == "escalafon":
+		print("DEMAS TABLAS")
+		items = content['items']
+		for item in items:
+			target_cursor.execute(scaleQuery.get_query_code, [item['nombre']])
+			scale = target_cursor.fetchone()
+			if scale is None:
+				insert(target_cursor, table, item)
+				target_cnx.commit()
+			else: 
+				print("Ya existe {}".format(item['nombre']))
+		print("Insercion finalizada")
+	elif table == "publicacion":
+		items = content['items']
+		for item in items:
+			insert(target_cursor, table, item)
+			target_cnx.commit()
+			print("Insercion finalizada")
+	elif table == "docente-publicacion":
+		items = content['items']
+		for item in items:
+			target_cursor.execute(teacherQuery.get_query_code, [item['cedula']])
+			idTeacher = target_cursor.fetchone()
+
+			target_cursor.execute(facultyQuery.get_query_code, [item['facultad']])
+			idFaculty = target_cursor.fetchone()
+
+			target_cursor.execute(publicationQuery.get_query_code, [item['publicacion']])
+			idPublication = target_cursor.fetchone()
+
+			if idTeacher is not None and idFaculty is not None and idPublication is not None: 
+				target_cursor.execute(dedent("""\
+					INSERT INTO FACT_DOCENTE_PUBLICACION 
+						(id_docente, id_publicacion, id_facultad, cantidad_citas)
+					VALUES (%s, %s, %s, %s)"""), [idTeacher[0], idPublication[0], idFaculty[0], item['citas']])
+				target_cnx.commit()
+				print("INSERTO DOCENTE, PUBLICACION Y FACULTAD")
+	
 	target_cursor.close()
 
 

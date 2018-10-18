@@ -1,17 +1,17 @@
 from db_credentials import datawarehouse_db_config
 import mysql.connector
 from flask import make_response
-from flask_restful import reqparse
+import pymysql
 
 class BD:
     conn = None
-    representations = {'application/json': make_response}
-    parser = reqparse.RequestParser()
-    
+
     def connect(self):
         """Consulta las propiedades de conexión del archivo user.properties en la sección [DB]
         y crea la conexión a la base de datos. Esto se realiza una sola vez por cada instancia de la clase."""
         self.conn = mysql.connector.connect(**datawarehouse_db_config)
+        #self.conn = pymysql.connect(**datawarehouse_db_config)
+
 
     def queryAll(self, sql: str, params: list=[], columns: list=None):
         """
@@ -93,10 +93,57 @@ class BD:
         if isinstance(values[0], (list, tuple)):
             marks = "(%s" + (",%s" * (len(values[0]) - 1)) + ")"
             sql = f"insert into {table} {columns} values {marks}", values
+            print(sql)
             cursor.execute(sql, values)
         else:
             marks = "(%s" + (",%s" * (len(values) - 1)) + ")"
             sql = f"insert into {table} {columns} values {marks}"
+            print(sql)
             cursor.execute(sql, values)	
 
         cursor.close()
+
+    def update(self, table: str, datos: dict, where: dict):
+        """
+        Actualiza uno o varios registros en una tabla.
+
+        :param table: Nombre de la tabla.
+        :param datos: Diccionario con las keys para los nombres de columnas y los nuevos valores los registros.\n
+            Ej. {"id": 1, "first_name": "Jose", ...}.
+        :param where: Diccionario con los datos para la condición del update.\n
+            Ej. {"id": 1, ...}.
+        """
+        self.connect()
+        cursor = self.conn.cursor()
+
+        sql = f"update {table} set "
+        values = []
+        for col, val in datos.items():
+            if val is not None:
+                sql += f"{col} = %s, "
+                values.append(val)
+
+        sql = sql.rstrip(', ')
+        sql += " where "
+        for col, val in where.items():
+            sql += f"{col} = %s and "
+            values.append(val)
+
+        sql = sql.rstrip(' and ')
+        cursor.execute(sql, values)
+        cursor.close()
+
+    def remove(self, sql: str, params: list):
+        print("Entro")
+        self.connect()
+        cursor = self.conn.cursor()
+        cursor.execute(sql, params)
+        cursor.close()
+
+
+    def commit(self):
+        print("Entro")
+        self.conn.commit()
+
+    def rollback():
+        self.conn.rollback()

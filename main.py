@@ -10,6 +10,7 @@ from flask_restful import Api
 import mysql.connector
 
 # Resources
+from resources.SystemParameter import SystemParameterList, SystemParameter
 from resources.Student import Student, StudentMaleFaculty, StudentFemaleFaculty, StudentSexFaculty, StudentInternacionalFaculty, StudentNacionalFaculty, StudentNationalityFaculty, StudentProfessionFaculty, StudentProfessionConstantsFaculty
 from resources.InscribedCourse import InscribedCourseStudent, InscribedCourseStudentFaculty
 from resources.TeacherPublication import TeacherPublication, TeacherPublicationFaculty
@@ -73,6 +74,9 @@ def extractionProfesor():
 	
 	return "Hola mundo"
 
+# route para parametros del sistema
+api.add_resource(SystemParameterList, '/parametroSistema')
+api.add_resource(SystemParameter, '/parametroSistema/<systemParameter_id>')
 
 # cantidad de estudiantes totales
 api.add_resource(Student, '/estudiantes')

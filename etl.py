@@ -8,7 +8,7 @@ import simplejson as json
 import requests
 from common.BD import BD
 from db_credentials import datawarehouse_db_config
-from sql_queries import systemParameter, nationalityQuery, sexQuery, studentQuery, teacherQuery, professionQuery, facultyQuery, publicationQuery, scaleQuery, studentRelationship
+from sql_queries import systemParameter, nationalityQuery, sexQuery, studentQuery, teacherQuery, professionQuery, facultyQuery, publicationQuery, scaleQuery, studentRelationship, gradeQuery, teacherFacultyRelationship
 # variables
 from variables import datawarehouse_name
 
@@ -323,6 +323,7 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 			]
 			target_cursor.execute(studentQuery.load_query, student)
 			target_cnx.commit()
+
 			target_cursor.execute(studentQuery.get_query_code, [item['cedula']])
 			idStudent = target_cursor.fetchone()
 			print(idStudent)
@@ -338,8 +339,13 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 		print("DEMAS TABLAS")
 		items = content['items']
 		for item in items:
-			insert(target_cursor, table, item)
-			target_cnx.commit()
+			target_cursor.execute(professionQuery.get_query_code, [item['nombre']])
+			profession = target_cursor.fetchone()
+			if profession is None:
+				insert(target_cursor, table, item)
+				target_cnx.commit()
+			else: 
+				print("Ya existe {}".format(item['nombre']))
 		print("Insercion finalizada")
 
 	elif table == "facultad":
@@ -398,6 +404,16 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 			idSex = target_cursor.fetchone()
 			print("sexo: {}".format(idSex))
 
+			scaleCode = item['escalafon']
+			target_cursor.execute(scaleQuery.get_query_code, [scaleCode])
+			idScale = target_cursor.fetchone()
+			print("escalafon: {}".format(idScale))
+
+			gradeCode = item['grado']
+			target_cursor.execute(gradeQuery.get_query_code, [gradeCode])
+			idGrade = target_cursor.fetchone()
+			print("grado: {}".format(idGrade))
+
 			teacher = [
 				item['cedula'],  
 				item['nombre'], 
@@ -406,6 +422,18 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 				item['correo']
 			]
 			target_cursor.execute(teacherQuery.load_query, teacher)
+			target_cnx.commit()
+
+			target_cursor.execute(teacherQuery.get_query_code, [item['cedula']])
+			idTeacher = target_cursor.fetchone()
+			print(idTeacher)
+
+			# insertar estudiante con sexo y nacionalidad...
+
+			target_cursor.execute(dedent("""\
+			INSERT INTO FACT_DOCENTE_FACULTAD 
+				(id_docente, id_sexo, id_nacionalidad, id_escalafon, id_grado)
+			VALUES (%s, %s, %s, %s, %s)"""), [idTeacher[0], idSex[0], idNationality[0], idScale[0], idGrade[0]])
 			target_cnx.commit()
 		print("INSERCION DOCENTE FINALIZADA")
 
@@ -446,6 +474,23 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 					VALUES (%s, %s, %s, %s)"""), [idTeacher[0], idPublication[0], idFaculty[0], item['citas']])
 				target_cnx.commit()
 				print("INSERTO DOCENTE, PUBLICACION Y FACULTAD")
+	elif table == "docente-facultad":
+		items = content['items']
+		for item in items:
+			target_cursor.execute(teacherFacultyRelationship.get_query_code, [item['cedula']])
+			idFact = target_cursor.fetchone()
+
+			target_cursor.execute(facultyQuery.get_query_code, [item['facultad']])
+			idFaculty = target_cursor.fetchone()
+
+			if idFact is not None and idFaculty is not None: 
+				target_cursor.execute(dedent("""\
+					UPDATE fact_docente_facultad
+					SET id_facultad=%s
+					WHERE id=%s;"""), [idFaculty[0], idFact[0]])
+				target_cnx.commit()
+				print("INSERTO DOCENTE, PUBLICACION Y FACULTAD")
+
 	
 	target_cursor.close()
 

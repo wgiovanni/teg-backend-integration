@@ -10,7 +10,7 @@ from datetime import datetime
 workspace = Workspace()
 workspace.register_default_store("sql", url="mysql+mysqlconnector://root@localhost/prueba")
 workspace.import_model("resources/cubesmodel/model_teacher.json")
-browser = workspace.browser("fact_docente")
+browser = workspace.browser("fact_docente_facultad")
 
 class TeacherWithDoctorateFaculty(BD, Resource):
     representations = {'application/json': make_response}

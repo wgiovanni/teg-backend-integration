@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 18-10-2018 a las 23:33:05
+-- Tiempo de generación: 20-10-2018 a las 13:09:01
 -- Versión del servidor: 10.1.34-MariaDB
 -- Versión de PHP: 7.2.8
 
@@ -110,9 +110,9 @@ CREATE TABLE `dim_docente` (
 --
 
 INSERT INTO `dim_docente` (`id`, `cedula`, `nombre`, `apellido`, `correo`, `area_trabajo`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(19, '545511', 'Marilyn', 'Guigni', 'investigacion', 'marilyngiugni@gmail.com', '2018-10-18 21:28:48', '2018-10-18 21:28:48'),
-(20, '1515515', 'Dessiree', 'Delgado', 'investigacion', 'desidelgado@gmail.com', '2018-10-18 21:28:48', '2018-10-18 21:28:48'),
-(21, '11356034', 'Mirella', 'Herrera', 'investigacion', 'mirella.herrera@gmail.com', '2018-10-18 21:28:48', '2018-10-18 21:28:48');
+(33, '545511', 'Marilyn', 'Guigni', 'investigacion', 'marilyngiugni@gmail.com', '2018-10-19 22:23:43', '2018-10-19 22:23:43'),
+(34, '1515515', 'Dessiree', 'Delgado', 'investigacion', 'desidelgado@gmail.com', '2018-10-19 22:23:43', '2018-10-19 22:23:43'),
+(35, '11356034', 'Mirella', 'Herrera', 'investigacion', 'mirella.herrera@gmail.com', '2018-10-19 22:23:43', '2018-10-19 22:23:43');
 
 -- --------------------------------------------------------
 
@@ -163,12 +163,12 @@ CREATE TABLE `dim_estudiante` (
 --
 
 INSERT INTO `dim_estudiante` (`id`, `cedula`, `nombre`, `apellido`, `fecha_nacimiento`, `telefono1`, `telefono2`, `email`, `edo_procedencia`, `created_date`, `updated_date`) VALUES
-(112, '22422883', 'Wilkel', 'Apellido', '1995-05-24', '0412-76558802', '0245-3351406', 'wilkelgiovanni@gmail.com', 'Carabobo', '2018-10-18 21:28:47', '2018-10-18 21:28:47'),
-(113, '26011707', 'Alba', 'Silva', '1997-03-01', '0241-2051334', '0412-1308522', 'andreadellepere_3@hotmail.com', 'Carabobo', '2018-10-18 21:28:47', '2018-10-18 21:28:47'),
-(114, '27855129', 'Ana', 'Sanchez', '1999-09-22', '0241-8481233', '0426-3437317', 'anasanchez@gmail.com', 'Carabobo', '2018-10-18 21:28:47', '2018-10-18 21:28:47'),
-(115, '13381615', 'Luis', 'Servita', '1976-07-07', '02418140120', '04265413615', 'luisservita777@gmail.com', 'Carabobo', '2018-10-18 21:28:47', '2018-10-18 21:28:47'),
-(116, '22345223', 'Alejandro', 'Giovanni', '1995-05-24', '0215545', '155455515', 'alejandro@gmail.com', 'Carabobo', '2018-10-18 21:28:47', '2018-10-18 21:28:47'),
-(117, '22345243', 'Alejandro2', 'Giovanni2', '1995-05-24', '0215545', '155455515', 'alejandro2@gmail.com', 'Carabobo', '2018-10-18 21:28:47', '2018-10-18 21:28:47');
+(148, '22422883', 'Wilkel', 'Apellido', '1995-05-24', '0412-76558802', '0245-3351406', 'wilkelgiovanni@gmail.com', 'Carabobo', '2018-10-19 22:23:43', '2018-10-19 22:23:43'),
+(149, '26011707', 'Alba', 'Silva', '1997-03-01', '0241-2051334', '0412-1308522', 'andreadellepere_3@hotmail.com', 'Carabobo', '2018-10-19 22:23:43', '2018-10-19 22:23:43'),
+(150, '27855129', 'Ana', 'Sanchez', '1999-09-22', '0241-8481233', '0426-3437317', 'anasanchez@gmail.com', 'Carabobo', '2018-10-19 22:23:43', '2018-10-19 22:23:43'),
+(151, '13381615', 'Luis', 'Servita', '1976-07-07', '02418140120', '04265413615', 'luisservita777@gmail.com', 'Carabobo', '2018-10-19 22:23:43', '2018-10-19 22:23:43'),
+(152, '22345223', 'Alejandro', 'Giovanni', '1995-05-24', '0215545', '155455515', 'alejandro@gmail.com', 'Carabobo', '2018-10-19 22:23:43', '2018-10-19 22:23:43'),
+(153, '22345243', 'Alejandro2', 'Giovanni2', '1995-05-24', '0215545', '155455515', 'alejandro2@gmail.com', 'Carabobo', '2018-10-19 22:23:43', '2018-10-19 22:23:43');
 
 -- --------------------------------------------------------
 
@@ -261,9 +261,9 @@ CREATE TABLE `dim_publicacion` (
 --
 
 INSERT INTO `dim_publicacion` (`id`, `tipo`, `autor`, `titulo`, `codigo`, `fecha`, `revista`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(16, 'Tipo1', 'Mirella Herrera', 'Titulo de la publicacion1', '1', '2012-05-30', 'Revista Cientifica', '2018-10-18 21:28:48', '2018-10-18 21:28:48'),
-(17, 'Tipo1', 'Desiree Delgado, Mirella Herrera', 'Titulo de la publicacion2', '2', '2013-08-30', 'Revista Cientifica2', '2018-10-18 21:28:48', '2018-10-18 21:28:48'),
-(18, 'Tipo2', 'Desiree Delgado', 'Titulo de la publicacion3', '3', '2014-10-10', 'Revista Cientifica', '2018-10-18 21:28:48', '2018-10-18 21:28:48');
+(25, 'Tipo1', 'Mirella Herrera', 'Titulo de la publicacion1', '1', '2012-05-30', 'Revista Cientifica', '2018-10-19 22:23:43', '2018-10-19 22:23:43'),
+(26, 'Tipo1', 'Desiree Delgado, Mirella Herrera', 'Titulo de la publicacion2', '2', '2013-08-30', 'Revista Cientifica2', '2018-10-19 22:23:43', '2018-10-19 22:23:43'),
+(27, 'Tipo2', 'Desiree Delgado', 'Titulo de la publicacion3', '3', '2014-10-10', 'Revista Cientifica', '2018-10-19 22:23:43', '2018-10-19 22:23:43');
 
 -- --------------------------------------------------------
 
@@ -339,21 +339,30 @@ CREATE TABLE `fact_asignatura_inscrita` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `fact_docente`
+-- Estructura de tabla para la tabla `fact_docente_facultad`
 --
 
-CREATE TABLE `fact_docente` (
+CREATE TABLE `fact_docente_facultad` (
   `id` int(11) NOT NULL,
   `id_docente` int(11) NOT NULL,
   `id_sexo` int(11) NOT NULL,
   `id_grado` int(11) NOT NULL,
   `id_escalafon` int(11) NOT NULL,
-  `id_facultad` int(11) NOT NULL,
+  `id_facultad` int(11) DEFAULT NULL,
   `id_nacionalidad` int(11) NOT NULL,
   `cantidad` int(11) NOT NULL DEFAULT '1',
   `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `fact_docente_facultad`
+--
+
+INSERT INTO `fact_docente_facultad` (`id`, `id_docente`, `id_sexo`, `id_grado`, `id_escalafon`, `id_facultad`, `id_nacionalidad`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
+(4, 33, 7, 1, 10, 57, 13, 1, '2018-10-19 22:23:43', '2018-10-19 22:23:43'),
+(5, 34, 7, 3, 10, 64, 13, 1, '2018-10-19 22:23:43', '2018-10-19 22:23:43'),
+(6, 35, 6, 3, 10, 64, 13, 1, '2018-10-19 22:23:43', '2018-10-19 22:23:43');
 
 -- --------------------------------------------------------
 
@@ -363,10 +372,10 @@ CREATE TABLE `fact_docente` (
 
 CREATE TABLE `fact_docente_publicacion` (
   `id` int(11) NOT NULL,
-  `id_docente` int(11) DEFAULT NULL,
-  `id_publicacion` int(11) DEFAULT NULL,
-  `id_facultad` int(11) DEFAULT NULL,
-  `cantidad_citas` int(11) DEFAULT '0',
+  `id_docente` int(11) NOT NULL,
+  `id_publicacion` int(11) NOT NULL,
+  `id_facultad` int(11) NOT NULL,
+  `cantidad_citas` int(11) NOT NULL DEFAULT '0',
   `cantidad` int(11) NOT NULL DEFAULT '1',
   `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -377,10 +386,10 @@ CREATE TABLE `fact_docente_publicacion` (
 --
 
 INSERT INTO `fact_docente_publicacion` (`id`, `id_docente`, `id_publicacion`, `id_facultad`, `cantidad_citas`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(12, 21, 17, 64, 2, 1, '2018-10-18 21:28:48', '2018-10-18 21:28:48'),
-(13, 20, 17, 64, 2, 1, '2018-10-18 21:28:48', '2018-10-18 21:28:48'),
-(14, 21, 16, 64, 2, 1, '2018-10-18 21:28:48', '2018-10-18 21:28:48'),
-(15, 20, 18, 64, 1, 1, '2018-10-18 21:28:48', '2018-10-18 21:28:48');
+(1, 35, 26, 64, 2, 1, '2018-10-19 22:23:43', '2018-10-19 22:23:43'),
+(2, 34, 26, 64, 2, 1, '2018-10-19 22:23:43', '2018-10-19 22:23:43'),
+(3, 35, 25, 64, 2, 1, '2018-10-19 22:23:43', '2018-10-19 22:23:43'),
+(4, 34, 27, 64, 1, 1, '2018-10-19 22:23:43', '2018-10-19 22:23:43');
 
 -- --------------------------------------------------------
 
@@ -403,12 +412,12 @@ CREATE TABLE `fact_estudiante_facultad` (
 --
 
 INSERT INTO `fact_estudiante_facultad` (`id`, `id_estudiante`, `id_facultad`, `id_carrera`, `id_sexo`, `id_nacionalidad`, `cantidad`) VALUES
-(37, 112, 64, 117, 6, 13, 1),
-(38, 113, 64, 117, 7, 13, 1),
-(39, 114, 64, 118, 7, 13, 1),
-(40, 115, 64, 119, 7, 13, 1),
-(41, 116, 64, 120, 6, 13, 1),
-(42, 117, 64, 120, 6, 13, 1);
+(7, 148, 64, 117, 6, 13, 1),
+(8, 149, 64, 117, 7, 13, 1),
+(9, 150, 64, 118, 7, 13, 1),
+(10, 151, 64, 119, 7, 13, 1),
+(11, 152, 64, 120, 6, 13, 1),
+(12, 153, 64, 120, 6, 13, 1);
 
 -- --------------------------------------------------------
 
@@ -450,7 +459,7 @@ CREATE TABLE `parametro_sistema` (
 --
 
 INSERT INTO `parametro_sistema` (`id`, `codigo`, `nombre`, `descripcion`, `definicion`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(1, 'CARGA_INICIAL_ACTUALIZACION', 'CARGA_INICIAL_ACTUALIZACION', 'Parametro que toma valores boleanos para la carga inicial (1) y la actualizacion (0, toma la fecha de actualizacion)', '0', '2018-10-18 20:35:32', '2018-10-18 21:28:48'),
+(1, 'CARGA_INICIAL_ACTUALIZACION', 'CARGA_INICIAL_ACTUALIZACION', 'Parametro que toma valores boleanos para la carga inicial (1) y la actualizacion (0, toma la fecha de actualizacion)', '0', '2018-10-18 20:35:32', '2018-10-19 22:23:43'),
 (2, 'RUTA_CARGA_INICIAL_ESTUDIANTES', 'RUTA_CARGA_INICIAL_ESTUDIANTES', 'Endpoint o ruta para la carga inicial del modulo de estudiantes', 'http://127.0.0.1:8082/estudiantes', '2018-10-18 20:38:51', '2018-10-18 20:38:51'),
 (3, 'RUTA_CARGA_INICIAL_PROFESORES', 'RUTA_CARGA_INICIAL_PROFESORES', 'Endpoint o ruta para la carga inicial del modulo de profesores', 'http://127.0.0.1:8082/profesores', '2018-10-18 20:40:26', '2018-10-18 20:40:26'),
 (4, 'RUTA_CARGA_INICIAL_EGRESADOS', 'RUTA_CARGA_INICIAL_EGRESADOS', 'Endpoint o ruta para la carga inicial del modulo de egresados', 'http://127.0.0.1:8082/egresados', '2018-10-18 21:31:21', '2018-10-18 21:31:21');
@@ -625,9 +634,9 @@ ALTER TABLE `fact_asignatura_inscrita`
   ADD KEY `id_facultad` (`id_facultad`);
 
 --
--- Indices de la tabla `fact_docente`
+-- Indices de la tabla `fact_docente_facultad`
 --
-ALTER TABLE `fact_docente`
+ALTER TABLE `fact_docente_facultad`
   ADD PRIMARY KEY (`id`),
   ADD KEY `id_docente` (`id_docente`),
   ADD KEY `id_sexo` (`id_sexo`),
@@ -718,7 +727,7 @@ ALTER TABLE `dim_carrera`
 -- AUTO_INCREMENT de la tabla `dim_docente`
 --
 ALTER TABLE `dim_docente`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_escalafon`
@@ -730,7 +739,7 @@ ALTER TABLE `dim_escalafon`
 -- AUTO_INCREMENT de la tabla `dim_estudiante`
 --
 ALTER TABLE `dim_estudiante`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=118;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=154;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_facultad`
@@ -754,7 +763,7 @@ ALTER TABLE `dim_nacionalidad`
 -- AUTO_INCREMENT de la tabla `dim_publicacion`
 --
 ALTER TABLE `dim_publicacion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_sexo`
@@ -781,22 +790,22 @@ ALTER TABLE `fact_asignatura_inscrita`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `fact_docente`
+-- AUTO_INCREMENT de la tabla `fact_docente_facultad`
 --
-ALTER TABLE `fact_docente`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `fact_docente_facultad`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_docente_publicacion`
 --
 ALTER TABLE `fact_docente_publicacion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_estudiante_facultad`
 --
 ALTER TABLE `fact_estudiante_facultad`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `last_update`
@@ -843,23 +852,23 @@ ALTER TABLE `fact_asignatura_inscrita`
   ADD CONSTRAINT `fact_asignatura_inscrita_ibfk_5` FOREIGN KEY (`id_status`) REFERENCES `dim_status` (`id`);
 
 --
--- Filtros para la tabla `fact_docente`
+-- Filtros para la tabla `fact_docente_facultad`
 --
-ALTER TABLE `fact_docente`
-  ADD CONSTRAINT `fact_docente_ibfk_1` FOREIGN KEY (`id_escalafon`) REFERENCES `dim_escalafon` (`id`),
-  ADD CONSTRAINT `fact_docente_ibfk_2` FOREIGN KEY (`id_facultad`) REFERENCES `dim_facultad` (`id`),
-  ADD CONSTRAINT `fact_docente_ibfk_3` FOREIGN KEY (`id_grado`) REFERENCES `dim_grado` (`id`),
-  ADD CONSTRAINT `fact_docente_ibfk_4` FOREIGN KEY (`id_sexo`) REFERENCES `dim_sexo` (`id`),
-  ADD CONSTRAINT `fact_docente_ibfk_5` FOREIGN KEY (`id_nacionalidad`) REFERENCES `dim_nacionalidad` (`id`),
-  ADD CONSTRAINT `fact_docente_ibfk_6` FOREIGN KEY (`id_docente`) REFERENCES `dim_docente` (`id`);
+ALTER TABLE `fact_docente_facultad`
+  ADD CONSTRAINT `fact_docente_facultad_ibfk_1` FOREIGN KEY (`id_escalafon`) REFERENCES `dim_escalafon` (`id`),
+  ADD CONSTRAINT `fact_docente_facultad_ibfk_2` FOREIGN KEY (`id_facultad`) REFERENCES `dim_facultad` (`id`),
+  ADD CONSTRAINT `fact_docente_facultad_ibfk_3` FOREIGN KEY (`id_grado`) REFERENCES `dim_grado` (`id`),
+  ADD CONSTRAINT `fact_docente_facultad_ibfk_4` FOREIGN KEY (`id_sexo`) REFERENCES `dim_sexo` (`id`),
+  ADD CONSTRAINT `fact_docente_facultad_ibfk_5` FOREIGN KEY (`id_nacionalidad`) REFERENCES `dim_nacionalidad` (`id`),
+  ADD CONSTRAINT `fact_docente_facultad_ibfk_6` FOREIGN KEY (`id_docente`) REFERENCES `dim_docente` (`id`);
 
 --
 -- Filtros para la tabla `fact_docente_publicacion`
 --
 ALTER TABLE `fact_docente_publicacion`
   ADD CONSTRAINT `fact_docente_publicacion_ibfk_1` FOREIGN KEY (`id_docente`) REFERENCES `dim_docente` (`id`),
-  ADD CONSTRAINT `fact_docente_publicacion_ibfk_4` FOREIGN KEY (`id_publicacion`) REFERENCES `dim_publicacion` (`id`),
-  ADD CONSTRAINT `fact_docente_publicacion_ibfk_5` FOREIGN KEY (`id_facultad`) REFERENCES `dim_facultad` (`id`);
+  ADD CONSTRAINT `fact_docente_publicacion_ibfk_2` FOREIGN KEY (`id_facultad`) REFERENCES `dim_facultad` (`id`),
+  ADD CONSTRAINT `fact_docente_publicacion_ibfk_3` FOREIGN KEY (`id_publicacion`) REFERENCES `dim_publicacion` (`id`);
 
 --
 -- Filtros para la tabla `fact_estudiante_facultad`

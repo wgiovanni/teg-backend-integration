@@ -70,7 +70,7 @@
     ],
     "cubes": [
         {
-            "name": "fact_docente",
+            "name": "fact_docente_facultad",
             "dimensions": ["dim_docente", "dim_facultad", "dim_sexo", "dim_grado", "dim_escalafon", "dim_nacionalidad"],
             "measures": [
                 {"name": "cantidad", "label": "Cantidad"}

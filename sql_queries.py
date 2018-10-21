@@ -379,6 +379,15 @@ get_relationship_docente_facultad = dedent("""\
 	INNER JOIN dim_docente AS d 
 	ON (fact.id_docente = d.id) WHERE cedula = %s""")
 
+get_relationship_docente_publication = dedent("""\
+	SELECT fact.id 
+	FROM fact_docente_publicacion AS fact 
+	INNER JOIN dim_docente AS d 
+	ON (fact.id_docente = d.id) 
+	INNER JOIN dim_publicacion AS p
+	ON (fact.id_publicacion = p.id) 
+	WHERE d.cedula = %s AND p.codigo = %s""")
+
 # consulta para escalafon
 get_scale_code = dedent("""\
 	SELECT id FROM dim_escalafon WHERE nombre = %s""")
@@ -419,6 +428,7 @@ gradeQuery = SqlTableSameParse(get_grade_code)
 publicationQuery = SqlTableSameParse(get_publication_code)
 studentRelationship = SqlFactRelationship(get_relationship_student)
 teacherFacultyRelationship = SqlFactRelationship(get_relationship_docente_facultad)
+teacherPublicationRelationship = SqlFactRelationship(get_relationship_docente_publication)
 
 
 

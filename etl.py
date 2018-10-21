@@ -8,10 +8,11 @@ import simplejson as json
 import requests
 from common.BD import BD
 from db_credentials import datawarehouse_db_config
-from sql_queries import systemParameter, nationalityQuery, sexQuery, studentQuery, teacherQuery, professionQuery, facultyQuery, publicationQuery, scaleQuery, studentRelationship, gradeQuery, teacherFacultyRelationship, teacherPublicationRelationship
+from sql_queries import systemParameter, nationalityQuery, sexQuery, studentQuery, teacherQuery, professionQuery, facultyQuery, publicationQuery, scaleQuery, studentRelationship, gradeQuery, teacherFacultyRelationship, teacherPublicationRelationship, graduateQuery, studiosUcQuery
 from constants import LOAD_INITIAL_UPDATE, ENDPOINT_LOAD_STUDENTS, ENDPOINT_LOAD_TEACHERS, ENDPOINT_LOAD_GRADUATES, CONTENT_TYPE
-from constants import DIMENSION, FACT, ITEMS, STUDENT, PROFESSION, FACULTY, STUDENT_PROFESSION_FACULTY, TEACHER, SCALE, GRADE, PUBLICATION, TEACHER_PUBLICATION, TEACHER_FACULTY
-from constants import NACIONALITY_ATTRIBUTE, SEX_ATTRIBUTE, IDENTIFICATION_CARD, FIRST_NAME_ATRIBUTE, LAST_NAME_ATRIBUTE, BIRTH_DATE_ATTRIBUTE, PHONE_ONE_ATTRIBUTE, PHONE_TWO_ATTRIBUTE, EMAIL_ATTRIBUTE, STATE_PROVENANCE_ATTRIBUTE, WORK_AREA_ATTRIBUTE, CITE_ATTRIBUTE
+from constants import DIMENSION, FACT, ITEMS
+from constants import STUDENT, PROFESSION, FACULTY, STUDENT_PROFESSION_FACULTY, TEACHER, SCALE, GRADE, PUBLICATION, TEACHER_PUBLICATION, TEACHER_FACULTY, GRADUATE, STUDIOS_UC
+from constants import NACIONALITY_ATTRIBUTE, SEX_ATTRIBUTE, IDENTIFICATION_CARD, FIRST_NAME_ATRIBUTE, LAST_NAME_ATRIBUTE, BIRTH_DATE_ATTRIBUTE, PHONE_ONE_ATTRIBUTE, PHONE_TWO_ATTRIBUTE, EMAIL_ATTRIBUTE, STATE_PROVENANCE_ATTRIBUTE, WORK_AREA_ATTRIBUTE, CITE_ATTRIBUTE, USER_NAME_ATTRIBUTE
 from constants import MALE, FEMALE, NATIONAL, INTERNACIONAL
 # variables
 from variables import datawarehouse_name
@@ -261,12 +262,12 @@ def requestCargaInitial(target_cnx):
 	endPointStudent = target_cursor.fetchone()
 	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_TEACHERS])
 	endPointTeacher = target_cursor.fetchone()
-	#target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_GRADUATES])
-	#endPointGraduated = target_cursor.fetchone()
-	pathList.append(endPointStudent[4])
-	pathList.append(endPointTeacher[4])
-	print(pathList)
-	#pathList.append(endPointGraduated[4])
+	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_GRADUATES])
+	endPointGraduated = target_cursor.fetchone()
+	#pathList.append(endPointStudent[4])
+	#pathList.append(endPointTeacher[4])
+	#print(pathList)
+	pathList.append(endPointGraduated[4])
 	result = []
 	for path in pathList:
 		try:
@@ -289,12 +290,12 @@ def requestUpdate(target_cnx, lastUpdate):
 	endPointStudent = target_cursor.fetchone()
 	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_TEACHERS])
 	endPointTeacher = target_cursor.fetchone()
-	#target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_GRADUATES])
-	#endPointGraduated = target_cursor.fetchone()
+	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_GRADUATES])
+	endPointGraduated = target_cursor.fetchone()
 	pathList.append(endPointStudent[4]+"/{}".format(lastUpdate))
 	pathList.append(endPointTeacher[4]+"/{}".format(lastUpdate))
-	#pathList.append(endPointGraduated[4]) 
-	print(pathList)
+	pathList.append(endPointGraduated[4]) 
+	#print(pathList)
 	result = []
 	for path in pathList:
 		try:
@@ -521,8 +522,44 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 					WHERE id=%s;"""), [idFaculty[0], idFact[0]])
 				target_cnx.commit()
 				print("INSERTO DOCENTE, PUBLICACION Y FACULTAD")
+	elif table == GRADUATE:
+		items = content[ITEMS]
+		for item in items:
+			graduate = [
+				item['nombreusuario'],  
+				item['primernombre'], 
+				item['segundonombre'], 
+				item['primerapellido'],
+				item['segundoapellido'], 
+				item['descripcion'],
+				item['intereses'],
+				item['email'],
+				item['telefono'],
+				item['identificacion']
+			]
+			target_cursor.execute(graduateQuery.load_query, graduate)
+			target_cnx.commit()
+		print("INSERCION EGRESADOS")
 
-	
+	elif table == STUDIOS_UC:
+		items = content[ITEMS]
+		for item in items:
+			print(item)
+			item = {
+				"titulo": item['titulo'],
+				"anho_grado": item['anhogrado'],
+				"url_certificacion": item['urlcertificacion'],
+				"codigo": item['codigo']
+			}
+			target_cursor.execute(studiosUcQuery.get_query_code, [item['codigo']])
+			studiosUc = target_cursor.fetchone()
+			if studiosUc is None:
+				insert(target_cursor, table, item)
+				target_cnx.commit()
+			else: 
+				print("Ya existe {}".format(item['codigo']))
+		print("INSERCION ESTUDIOS UC")
+
 	target_cursor.close()
 
 

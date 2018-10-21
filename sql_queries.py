@@ -413,7 +413,35 @@ update_teacher = dedent("""\
 # consulta para publicacion
 get_publication_code = dedent("""\
 	SELECT id FROM dim_publicacion WHERE codigo = %s""")
+
+
+# consultas para egresados
+get_graduate_code = dedent("""\
+	SELECT id FROM dim_egresado WHERE nombre_usuario = %s""")
+
+insert_graduate = dedent("""\
+	INSERT INTO dim_egresado
+		(nombre_usuario, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, descripcion, intereses, correo, telefono, identificacion)
+	VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""")
+
+update_graduate = dedent("""\
+	UPDATE dim_docente
+	SET nombre_usuario=%s, primer_nombre=%s, segundo_nombre=%s, primer_apellido=%s, segundo_apellido=%s, descripcion=%s, intereses=%s, correo=%s, telefono=%s, identificacion=%s
+	WHERE id=%s""")
 	
+# consultas para estudios uc
+get_estudiosUc_code = dedent("""\
+	SELECT id FROM dim_estudiosuc WHERE codigo = %s""")
+
+insert_estudiosUc = dedent("""\
+	INSERT INTO dim_estudiosuc
+		(titulo, ano_grado, url_certificacion, codigo)
+	VALUES (%s, %s, %s, %s)""")
+
+update_estudiosUc = dedent("""\
+	UPDATE dim_estudiosuc
+	SET titulo=%s, ano_grado=%s, url_certificacion=%s, codigo=%s
+	WHERE id=%s""")
 
 
 
@@ -421,6 +449,8 @@ nationalityQuery = SqlTableStatic(get_nationality_code, insert_nationality, get_
 sexQuery = SqlTableStatic(get_sex_code, insert_sex, get_sex_code_verify)
 studentQuery = SqlFact(get_student_code, insert_student, update_student)
 teacherQuery = SqlFact(get_teacher_code, insert_teacher, update_teacher)
+graduateQuery = SqlFact(get_graduate_code, insert_graduate, update_graduate)
+studiosUcQuery = SqlFact(get_estudiosUc_code, insert_estudiosUc, update_estudiosUc)
 professionQuery = SqlTableSameParse(get_profession_code)
 facultyQuery = SqlTableSameParse(get_faculty_code)
 scaleQuery = SqlTableSameParse(get_scale_code)

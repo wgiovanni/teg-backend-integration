@@ -8,7 +8,10 @@ import simplejson as json
 import requests
 from common.BD import BD
 from db_credentials import datawarehouse_db_config
-from sql_queries import systemParameter, nationalityQuery, sexQuery, studentQuery, teacherQuery, professionQuery, facultyQuery, publicationQuery, scaleQuery, studentRelationship, gradeQuery, teacherFacultyRelationship, teacherPublicationRelationship, graduateQuery, studiosUcQuery
+from sql_queries import systemParameter, nationalityQuery, sexQuery, studentQuery, teacherQuery, professionQuery, facultyQuery 
+from sql_queries import publicationQuery, scaleQuery, studentRelationship, gradeQuery, teacherFacultyRelationship, teacherPublicationRelationship
+from sql_queries import graduateQuery, studiosUcQuery, certificationQuery, coursesQuery, educationQuery, educationQuery, patentsQuery
+from sql_queries import jobsQuery, volunteeringQuery
 from constants import LOAD_INITIAL_UPDATE, ENDPOINT_LOAD_STUDENTS, ENDPOINT_LOAD_TEACHERS, ENDPOINT_LOAD_GRADUATES, CONTENT_TYPE
 from constants import DIMENSION, FACT, ITEMS
 from constants import STUDENT, PROFESSION, FACULTY, STUDENT_PROFESSION_FACULTY, TEACHER, SCALE, GRADE, PUBLICATION, TEACHER_PUBLICATION, TEACHER_FACULTY, GRADUATE, STUDIOS_UC
@@ -525,26 +528,40 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 	elif table == GRADUATE:
 		items = content[ITEMS]
 		for item in items:
-			graduate = [
-				item['nombreusuario'],  
-				item['primernombre'], 
-				item['segundonombre'], 
-				item['primerapellido'],
-				item['segundoapellido'], 
-				item['descripcion'],
-				item['intereses'],
-				item['email'],
-				item['telefono'],
-				item['identificacion']
-			]
-			target_cursor.execute(graduateQuery.load_query, graduate)
-			target_cnx.commit()
+			graduateCode = item['nombreusuario']
+			target_cursor.execute(graduateQuery.get_query_code, [graduateCode])
+			idGraduate = target_cursor.fetchone()
+			#print(idGraduate)
+			if idGraduate is None:
+				graduate = [
+					item['nombreusuario'],  
+					item['primernombre'], 
+					item['segundonombre'], 
+					item['primerapellido'],
+					item['segundoapellido'], 
+					item['descripcion'],
+					item['intereses'],
+					item['email'],
+					item['telefono'],
+					item['identificacion']
+				]
+				target_cursor.execute(graduateQuery.load_query, graduate)
+				target_cnx.commit()
+			else: 
+				print("Ya existe el EGRESADO")
 		print("INSERCION EGRESADOS")
 
 	elif table == STUDIOS_UC:
 		items = content[ITEMS]
 		for item in items:
 			print(item)
+
+			target_cursor.execute(facultyQuery.get_query_code, [item[FACULTY]])
+			idFaculty = target_cursor.fetchone()
+
+			target_cursor.execute(professionQuery.get_query_code, [item[PROFESSION]])
+			idProfession = target_cursor.fetchone()
+
 			item = {
 				"titulo": item['titulo'],
 				"anho_grado": item['anhogrado'],
@@ -558,7 +575,207 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 				target_cnx.commit()
 			else: 
 				print("Ya existe {}".format(item['codigo']))
+
+			#target_cursor.execute(studiosUcQuery.get_query_code, [item['codigo']])
+			#idStudiosUc = target_cursor.fetchone()
+			#print(idStudiosUc)
+			
 		print("INSERCION ESTUDIOS UC")
+	elif table == 'egresado-estudiosuc':
+		items = content[ITEMS]
+		for item in items:
+			#print(item)
+			target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
+			idGraduate = target_cursor.fetchone()
+			studiosUcList = item["estudiosuc"]
+			if studiosUcList is not None:
+				for i in studiosUcList:
+					studiosUcCode = i['codigo']
+					facultyCode = i['facultad']
+					professionCode = i['carrera']
+
+					target_cursor.execute(studiosUcQuery.get_query_code, [studiosUcCode])
+					idStudiosUc = target_cursor.fetchone()
+
+					target_cursor.execute(facultyQuery.get_query_code, [facultyCode])
+					idFaculty = target_cursor.fetchone()
+
+					target_cursor.execute(professionQuery.get_query_code, [professionCode])
+					idProfession = target_cursor.fetchone()
+
+					if idStudiosUc is not None and idFaculty is not None and idProfession is not None and idGraduate is not None:
+						target_cursor.execute(dedent("""\
+						INSERT INTO FACT_EGRESADO_ESTUDIOSUC 
+							(id_egresado, id_estudiosuc, id_facultad, id_carrera)
+						VALUES (%s, %s, %s, %s)"""), [idGraduate[0], idStudiosUc[0], idFaculty[0], idProfession[0]])
+						target_cnx.commit()
+					else: 
+						print("Error")
+
+	elif table == "certificacion":
+		items = content[ITEMS]
+		for item in items:
+			item = {
+				"codigo": item['codigo'],
+				"nombre_certificacion": item['nombrecertificacion'],
+				"descripcion": item['descripcion'],
+				"url_certificacion": item['urlcertificacion']
+			}
+			target_cursor.execute(certificationQuery.get_query_code, [item['codigo']])
+			certification = target_cursor.fetchone()
+			if certification is None:
+				insert(target_cursor, table, item)
+				target_cnx.commit()
+			else: 
+				print("Ya existe {}".format(item['codigo']))
+		
+	elif table == "egresado-certificacion":
+		items = content[ITEMS]
+		for item in items:
+			target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
+			idGraduate = target_cursor.fetchone()
+			certificationList = item["certificacion"]
+			if certificationList is not None:
+				for i in certificationList:
+					certificationCode = i['codigo']
+
+					target_cursor.execute(certificationQuery.get_query_code, [certificationCode])
+					idCertification = target_cursor.fetchone()
+
+					if idCertification is not None and idGraduate is not None:
+						target_cursor.execute(dedent("""\
+						INSERT INTO FACT_EGRESADO_CERTIFICACION
+							(id_egresado, id_certificacion)
+						VALUES (%s, %s)"""), [idGraduate[0], idCertification[0]])
+						target_cnx.commit()
+					else: 
+						print("Error")
+
+	elif table == "cursos":
+		items = content[ITEMS]
+		for item in items:
+			target_cursor.execute(coursesQuery.get_query_code, [item['codigo']])
+			courses = target_cursor.fetchone()
+			if courses is None:
+				insert(target_cursor, table, item)
+				target_cnx.commit()
+			else: 
+				print("Ya existe {}".format(item['codigo']))
+	elif table == "egresado-cursos":
+		items = content[ITEMS]
+		for item in items:
+			target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
+			idGraduate = target_cursor.fetchone()
+			coursesList = item["cursos"]
+			if coursesList is not None:
+				for i in coursesList:
+					coursesCode = i['codigo']
+
+					target_cursor.execute(coursesQuery.get_query_code, [coursesCode])
+					idCourses = target_cursor.fetchone()
+
+					if idCourses is not None and idGraduate is not None:
+						target_cursor.execute(dedent("""\
+						INSERT INTO FACT_EGRESADO_CURSOS
+							(id_egresado, id_cursos)
+						VALUES (%s, %s)"""), [idGraduate[0], idCourses[0]])
+						target_cnx.commit()
+					else: 
+						print("Error")
+
+	elif table == "educacion":
+		items = content[ITEMS]
+		for item in items:
+			item = {
+				"codigo": item['codigo'],
+				"instituto": item['instituto'],
+				"campo_estudio": item['campoestudio'],
+				"titulo_obtenido": item['tituloobtenido'],
+				"url_certificacion": item['urlcertificacion']
+			}
+			target_cursor.execute(educationQuery.get_query_code, [item['codigo']])
+			education = target_cursor.fetchone()
+			if education is None:
+				insert(target_cursor, table, item)
+				target_cnx.commit()
+			else: 
+				print("Ya existe {}".format(item['codigo']))
+	elif table == "egresado-educacion":
+		items = content[ITEMS]
+		for item in items:
+			target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
+			idGraduate = target_cursor.fetchone()
+			educationList = item["educacion"]
+			if educationList is not None:
+				for i in educationList:
+					educationCode = i['codigo']
+
+					target_cursor.execute(educationQuery.get_query_code, [educationCode])
+					idEducation = target_cursor.fetchone()
+
+					if idEducation is not None and idGraduate is not None:
+						target_cursor.execute(dedent("""\
+						INSERT INTO FACT_EGRESADO_EDUCACION
+							(id_egresado, id_educacion)
+						VALUES (%s, %s)"""), [idGraduate[0], idEducation[0]])
+						target_cnx.commit()
+					else: 
+						print("Error")
+
+	elif table == "patentes":
+		items = content[ITEMS]
+		for item in items:
+			item = {
+				"codigo": item['codigo'],
+				"titulo": item['titulo'],
+				"descripcion": item['descripcion'],
+				"numero": item['numero'],
+				"inventores": item['inventores'],
+				"fecha": item['fecha'],
+				"url": item['url']
+			}
+			target_cursor.execute(patentsQuery.get_query_code, [item['codigo']])
+			patents = target_cursor.fetchone()
+			if patents is None:
+				insert(target_cursor, table, item)
+				target_cnx.commit()
+			else: 
+				print("Ya existe {}".format(item['codigo']))
+
+	elif table == "trabajos":
+		items = content[ITEMS]
+		for item in items:
+			item = {
+				"codigo": item['codigo'],
+				"nombre_empresa": item['nombreempresa'],
+				"cargo": item['cargo'],
+				"descripcion": item['descripcion']
+			}
+			target_cursor.execute(jobsQuery.get_query_code, [item['codigo']])
+			jobs = target_cursor.fetchone()
+			if jobs is None:
+				insert(target_cursor, table, item)
+				target_cnx.commit()
+			else: 
+				print("Ya existe {}".format(item['codigo']))
+				
+	elif table == "voluntariado":
+		items = content[ITEMS]
+		for item in items:
+			item = {
+				"codigo": item['codigo'],
+				"organizacion": item['organizacion'],
+				"descripcion": item['descripcion'],
+				"causa": item['causa']
+			}
+			target_cursor.execute(volunteeringQuery.get_query_code, [item['codigo']])
+			volunteerin = target_cursor.fetchone()
+			if volunteerin is None:
+				insert(target_cursor, table, item)
+				target_cnx.commit()
+			else: 
+				print("Ya existe {}".format(item['codigo']))
+
 
 	target_cursor.close()
 

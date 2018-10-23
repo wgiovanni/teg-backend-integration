@@ -443,7 +443,29 @@ update_estudiosUc = dedent("""\
 	SET titulo=%s, ano_grado=%s, url_certificacion=%s, codigo=%s
 	WHERE id=%s""")
 
+# consulta para certificacion
+get_certification_code = dedent("""\
+	SELECT id FROM dim_certificacion WHERE codigo = %s""")
 
+# consulta para cursos
+get_courses_code = dedent("""\
+	SELECT id FROM dim_cursos WHERE codigo = %s""")
+
+# consulta para educacion
+get_education_code = dedent("""\
+	SELECT id FROM dim_educacion WHERE codigo = %s""")
+
+# consulta para patentes
+get_patents_code = dedent("""\
+	SELECT id FROM dim_patentes WHERE codigo = %s""")
+
+# consulta para trabajos
+get_jobs_code = dedent("""\
+	SELECT id FROM dim_trabajos WHERE codigo = %s""")
+
+# consulta para voluntariado
+get_volunteering_code = dedent("""\
+	SELECT id FROM dim_voluntariado WHERE codigo = %s""")
 
 nationalityQuery = SqlTableStatic(get_nationality_code, insert_nationality, get_nationality_code_verify)
 sexQuery = SqlTableStatic(get_sex_code, insert_sex, get_sex_code_verify)
@@ -459,6 +481,13 @@ publicationQuery = SqlTableSameParse(get_publication_code)
 studentRelationship = SqlFactRelationship(get_relationship_student)
 teacherFacultyRelationship = SqlFactRelationship(get_relationship_docente_facultad)
 teacherPublicationRelationship = SqlFactRelationship(get_relationship_docente_publication)
+certificationQuery = SqlTableSameParse(get_certification_code)
+coursesQuery = SqlTableSameParse(get_courses_code)
+educationQuery = SqlTableSameParse(get_education_code)
+patentsQuery = SqlTableSameParse(get_patents_code)
+jobsQuery = SqlTableSameParse(get_jobs_code)
+volunteeringQuery = SqlTableSameParse(get_volunteering_code)
+
 
 
 

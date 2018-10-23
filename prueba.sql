@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.1
+-- version 4.8.2
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 21-10-2018 a las 11:22:29
--- Versión del servidor: 10.1.33-MariaDB
--- Versión de PHP: 7.2.6
+-- Tiempo de generación: 23-10-2018 a las 23:24:43
+-- Versión del servidor: 10.1.34-MariaDB
+-- Versión de PHP: 7.2.8
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -91,6 +91,57 @@ INSERT INTO `dim_carrera` (`id`, `nombre`, `tipo`, `created_date`, `updated_date
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `dim_certificacion`
+--
+
+CREATE TABLE `dim_certificacion` (
+  `id` int(11) NOT NULL,
+  `codigo` varchar(100) NOT NULL,
+  `nombre_certificacion` varchar(100) NOT NULL,
+  `descripcion` varchar(500) NOT NULL,
+  `url_certificacion` varchar(300) NOT NULL,
+  `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `dim_certificacion`
+--
+
+INSERT INTO `dim_certificacion` (`id`, `codigo`, `nombre_certificacion`, `descripcion`, `url_certificacion`, `fecha_creacion`, `fecha_actualizacion`) VALUES
+(22, '1', 'Certificacion1', 'descripcion', 'url xxx', '2018-10-23 13:39:10', '2018-10-23 13:39:10'),
+(23, '2', 'Certificacion2', 'descripcion', 'url xxx', '2018-10-23 13:39:10', '2018-10-23 13:39:10'),
+(24, '3', 'Certificacion3', 'descripcion', 'url certificacion', '2018-10-23 13:39:10', '2018-10-23 13:39:10');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `dim_cursos`
+--
+
+CREATE TABLE `dim_cursos` (
+  `id` int(11) NOT NULL,
+  `codigo` varchar(100) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `url` varchar(300) NOT NULL,
+  `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `dim_cursos`
+--
+
+INSERT INTO `dim_cursos` (`id`, `codigo`, `nombre`, `url`, `fecha_creacion`, `fecha_actualizacion`) VALUES
+(16, '1', 'Programación basica', 'http://platzi.com/programacionbasica', '2018-10-23 13:39:10', '2018-10-23 13:39:10'),
+(17, '2', 'Curso basico PHP', 'http://platzi.com/wgiovanni/phpbasico', '2018-10-23 13:39:11', '2018-10-23 13:39:11'),
+(18, '3', 'Curso Java', 'http://platzi.com/java', '2018-10-23 13:39:11', '2018-10-23 13:39:11'),
+(19, '4', 'Curso Angular', 'http://platzi.com/angular', '2018-10-23 13:39:11', '2018-10-23 13:39:11'),
+(20, '5', 'Curso basico PHP', 'http://platzi.com/lgomez/phpbasico', '2018-10-23 13:39:11', '2018-10-23 13:39:11');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `dim_docente`
 --
 
@@ -114,6 +165,32 @@ INSERT INTO `dim_docente` (`id`, `cedula`, `nombre`, `apellido`, `correo`, `area
 (43, '1515515', 'Dessiree', 'Delgado', 'investigacion', 'desidelgado@gmail.com', '2018-10-20 22:38:59', '2018-10-20 22:38:59'),
 (44, '11356034', 'Mirella', 'Herrera', 'investigacion', 'mirella.herrera@gmail.com', '2018-10-20 22:38:59', '2018-10-20 22:38:59'),
 (45, '1234567', 'prueba_docente', 'prueba_docente', 'prueba_docente@gmail.com', 'cualquier vaina', '2018-10-20 22:57:50', '2018-10-20 22:57:50');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `dim_educacion`
+--
+
+CREATE TABLE `dim_educacion` (
+  `id` int(11) NOT NULL,
+  `codigo` varchar(100) NOT NULL,
+  `instituto` varchar(100) NOT NULL,
+  `campo_estudio` varchar(100) NOT NULL,
+  `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `titulo_obtenido` varchar(100) NOT NULL,
+  `url_certificacion` varchar(300) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `dim_educacion`
+--
+
+INSERT INTO `dim_educacion` (`id`, `codigo`, `instituto`, `campo_estudio`, `fecha_creacion`, `fecha_actualizacion`, `titulo_obtenido`, `url_certificacion`) VALUES
+(1, '1', 'Instituto1', 'Campo de Estudio1', '2018-10-23 14:59:19', '2018-10-23 14:59:19', 'Titulo1', 'http://urlcertificacion.com'),
+(2, '2', 'Instituto2', 'Campo de Estudio2', '2018-10-23 14:59:19', '2018-10-23 14:59:19', 'Titulo2', 'http://urlcertificacion.com'),
+(3, '3', 'Instituto3', 'Campo de Estudio3', '2018-10-23 14:59:19', '2018-10-23 14:59:19', 'Titulo3', 'http://urlcertificacion.com');
 
 -- --------------------------------------------------------
 
@@ -142,9 +219,10 @@ CREATE TABLE `dim_egresado` (
 --
 
 INSERT INTO `dim_egresado` (`id`, `nombre_usuario`, `primer_nombre`, `segundo_nombre`, `primer_apellido`, `segundo_apellido`, `descripcion`, `intereses`, `correo`, `telefono`, `identificacion`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(14, 'gjimenez', 'Genessis', 'De Jesus', 'Jimenez', 'Zea', 'descripcion', 'futbol', 'gjimenez@gmail,com', '04127658802', '2464987', '2018-10-21 06:44:56', '2018-10-21 06:44:56'),
-(15, 'lgomez', 'Luis', 'Augusto', 'Gomez', 'No se', 'descripcion', 'metal', 'luisgomez@gmail,com', '04127658802', '756438457', '2018-10-21 06:44:56', '2018-10-21 06:44:56'),
-(16, 'wmorillo', 'Winder', 'Jose', 'Morillo', 'No se', 'descripcion', 'programar', 'wmorillo@gmail,com', '746574323', '146498766', '2018-10-21 06:44:56', '2018-10-21 06:44:56');
+(21, 'gjimenez', 'Genessis', 'De Jesus', 'Jimenez', 'Zea', 'descripcion', 'futbol', 'gjimenez@gmail,com', '04127658802', '2464987', '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
+(22, 'lgomez', 'Luis', 'Augusto', 'Gomez', 'No se', 'descripcion', 'metal', 'luisgomez@gmail,com', '04127658802', '756438457', '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
+(23, 'wmorillo', 'Winder', 'Jose', 'Morillo', 'No se', 'descripcion', 'programar', 'wmorillo@gmail,com', '746574323', '146498766', '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
+(24, 'wgiovanni', 'Wilkel', 'Alejandro', 'Giovanni', 'Perozo', 'descripcion', 'programar', 'wgiovanni@gmail,com', '746574323', '22422883', '2018-10-23 14:59:20', '2018-10-23 14:59:20');
 
 -- --------------------------------------------------------
 
@@ -220,10 +298,10 @@ CREATE TABLE `dim_estudiosuc` (
 --
 
 INSERT INTO `dim_estudiosuc` (`id`, `titulo`, `anho_grado`, `url_certificacion`, `codigo`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(1, 'Licenciado en Computación', '2018-07-24', 'url...', '1', '2018-10-21 06:44:56', '2018-10-21 06:44:56'),
-(2, 'Licenciado en Física', '2018-07-24', 'url...', '2', '2018-10-21 06:44:56', '2018-10-21 06:44:56'),
-(3, 'Licenciado en Computación', '2018-07-24', 'url...', '3', '2018-10-21 06:44:56', '2018-10-21 06:44:56'),
-(4, 'Licenciado en Química', '2010-07-24', 'url...', '4', '2018-10-21 06:44:56', '2018-10-21 06:44:56');
+(29, 'Licenciado en Computación', '2018-07-24', 'url...', '1', '2018-10-23 13:39:11', '2018-10-23 13:39:11'),
+(30, 'Licenciado en Física', '2018-07-24', 'url...', '2', '2018-10-23 13:39:11', '2018-10-23 13:39:11'),
+(31, 'Licenciado en Computación', '2018-07-24', 'url...', '3', '2018-10-23 13:39:11', '2018-10-23 13:39:11'),
+(32, 'Licenciado en Química', '2010-07-24', 'url...', '4', '2018-10-23 13:39:11', '2018-10-23 13:39:11');
 
 -- --------------------------------------------------------
 
@@ -292,6 +370,25 @@ CREATE TABLE `dim_nacionalidad` (
 INSERT INTO `dim_nacionalidad` (`id`, `codigo`) VALUES
 (13, 'Venezolano'),
 (14, 'Extranjero');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `dim_patentes`
+--
+
+CREATE TABLE `dim_patentes` (
+  `id` int(11) NOT NULL,
+  `codigo` varchar(100) NOT NULL,
+  `titulo` varchar(100) NOT NULL,
+  `descripcion` varchar(500) NOT NULL,
+  `numero` varchar(100) NOT NULL,
+  `inventores` varchar(150) NOT NULL,
+  `fecha` date NOT NULL,
+  `url` varchar(300) NOT NULL,
+  `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -378,6 +475,38 @@ CREATE TABLE `dim_titulo` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `dim_trabajos`
+--
+
+CREATE TABLE `dim_trabajos` (
+  `id` int(11) NOT NULL,
+  `codigo` varchar(100) NOT NULL,
+  `nombre_empresa` varchar(100) NOT NULL,
+  `cargo` varchar(100) NOT NULL,
+  `descripcion` varchar(500) NOT NULL,
+  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `dim_voluntariado`
+--
+
+CREATE TABLE `dim_voluntariado` (
+  `id` int(11) NOT NULL,
+  `codigo` varchar(100) NOT NULL,
+  `organizacion` varchar(100) NOT NULL,
+  `descripcion` varchar(500) NOT NULL,
+  `causa` varchar(300) NOT NULL,
+  `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `fact_asignatura_inscrita`
 --
 
@@ -415,9 +544,9 @@ CREATE TABLE `fact_docente_facultad` (
 --
 
 INSERT INTO `fact_docente_facultad` (`id`, `id_docente`, `id_sexo`, `id_grado`, `id_escalafon`, `id_facultad`, `id_nacionalidad`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(13, 42, 6, 2, 10, 58, 14, 1, '2018-10-20 22:38:59', '2018-10-20 22:39:00'),
-(14, 43, 7, 3, 10, 57, 13, 1, '2018-10-20 22:38:59', '2018-10-20 22:39:00'),
-(15, 44, 7, 3, 10, 57, 13, 1, '2018-10-20 22:38:59', '2018-10-20 22:39:00'),
+(13, 42, 6, 2, 10, 57, 14, 1, '2018-10-20 22:38:59', '2018-10-22 18:52:37'),
+(14, 43, 7, 3, 10, 64, 13, 1, '2018-10-20 22:38:59', '2018-10-22 18:52:37'),
+(15, 44, 7, 3, 10, 64, 13, 1, '2018-10-20 22:38:59', '2018-10-22 18:52:37'),
 (16, 45, 6, 1, 9, NULL, 13, 1, '2018-10-20 22:46:15', '2018-10-20 22:46:15');
 
 -- --------------------------------------------------------
@@ -442,10 +571,84 @@ CREATE TABLE `fact_docente_publicacion` (
 --
 
 INSERT INTO `fact_docente_publicacion` (`id`, `id_docente`, `id_publicacion`, `id_facultad`, `cantidad_citas`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(13, 44, 34, 57, 1, 1, '2018-10-20 22:39:00', '2018-10-20 22:39:00'),
-(14, 43, 35, 57, 2, 1, '2018-10-20 22:39:00', '2018-10-20 22:39:00'),
-(15, 44, 35, 57, 2, 1, '2018-10-20 22:39:01', '2018-10-20 22:39:01'),
-(16, 43, 36, 57, 1, 1, '2018-10-20 22:39:01', '2018-10-20 22:39:01');
+(13, 44, 34, 64, 2, 1, '2018-10-20 22:39:00', '2018-10-22 18:52:37'),
+(14, 43, 35, 64, 2, 1, '2018-10-20 22:39:00', '2018-10-22 18:52:37'),
+(15, 44, 35, 64, 2, 1, '2018-10-20 22:39:01', '2018-10-22 18:52:37'),
+(16, 43, 36, 64, 1, 1, '2018-10-20 22:39:01', '2018-10-22 18:52:37');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `fact_egresado_certificacion`
+--
+
+CREATE TABLE `fact_egresado_certificacion` (
+  `id` int(11) NOT NULL,
+  `id_egresado` int(11) NOT NULL,
+  `id_certificacion` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL DEFAULT '1',
+  `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `fact_egresado_certificacion`
+--
+
+INSERT INTO `fact_egresado_certificacion` (`id`, `id_egresado`, `id_certificacion`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
+(7, 23, 22, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
+(8, 24, 23, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
+(9, 24, 24, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `fact_egresado_cursos`
+--
+
+CREATE TABLE `fact_egresado_cursos` (
+  `id` int(11) NOT NULL,
+  `id_egresado` int(11) NOT NULL,
+  `id_cursos` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL DEFAULT '1',
+  `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `fact_egresado_cursos`
+--
+
+INSERT INTO `fact_egresado_cursos` (`id`, `id_egresado`, `id_cursos`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
+(6, 21, 19, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
+(7, 22, 20, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
+(8, 24, 16, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
+(9, 24, 17, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
+(10, 24, 18, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `fact_egresado_educacion`
+--
+
+CREATE TABLE `fact_egresado_educacion` (
+  `id` int(11) NOT NULL,
+  `id_egresado` int(11) NOT NULL,
+  `id_educacion` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL DEFAULT '1',
+  `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `fact_egresado_educacion`
+--
+
+INSERT INTO `fact_egresado_educacion` (`id`, `id_egresado`, `id_educacion`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
+(1, 22, 1, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
+(2, 22, 2, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
+(3, 23, 3, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20');
 
 -- --------------------------------------------------------
 
@@ -455,7 +658,7 @@ INSERT INTO `fact_docente_publicacion` (`id`, `id_docente`, `id_publicacion`, `i
 
 CREATE TABLE `fact_egresado_estudiosuc` (
   `id` int(11) NOT NULL,
-  `id_egresado` int(11) NOT NULL,
+  `id_egresado` int(11) DEFAULT NULL,
   `id_estudiosuc` int(11) NOT NULL,
   `id_facultad` int(11) NOT NULL,
   `id_carrera` int(11) NOT NULL,
@@ -463,6 +666,16 @@ CREATE TABLE `fact_egresado_estudiosuc` (
   `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `fact_egresado_estudiosuc`
+--
+
+INSERT INTO `fact_egresado_estudiosuc` (`id`, `id_egresado`, `id_estudiosuc`, `id_facultad`, `id_carrera`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
+(9, 21, 29, 64, 117, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
+(10, 22, 30, 64, 119, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
+(11, 23, 31, 64, 117, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
+(12, 23, 32, 64, 118, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20');
 
 -- --------------------------------------------------------
 
@@ -485,28 +698,9 @@ CREATE TABLE `fact_estudiante_facultad` (
 --
 
 INSERT INTO `fact_estudiante_facultad` (`id`, `id_estudiante`, `id_facultad`, `id_carrera`, `id_sexo`, `id_nacionalidad`, `cantidad`) VALUES
-(21, 167, 57, 118, 6, 13, 1),
-(22, 168, 57, 118, 6, 13, 1),
+(21, 167, 64, 119, 7, 13, 1),
+(22, 168, 64, 117, 6, 13, 1),
 (23, 169, 57, 120, 7, 13, 1);
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `last_update`
---
-
-CREATE TABLE `last_update` (
-  `id` int(11) NOT NULL,
-  `is_load_initial` tinyint(1) NOT NULL,
-  `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Volcado de datos para la tabla `last_update`
---
-
-INSERT INTO `last_update` (`id`, `is_load_initial`, `last_update`) VALUES
-(7, 0, '2018-10-18 20:25:38');
 
 -- --------------------------------------------------------
 
@@ -529,7 +723,7 @@ CREATE TABLE `parametro_sistema` (
 --
 
 INSERT INTO `parametro_sistema` (`id`, `codigo`, `nombre`, `descripcion`, `definicion`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(1, 'CARGA_INICIAL_ACTUALIZACION', 'CARGA_INICIAL_ACTUALIZACION', 'Parametro que toma valores boleanos para la carga inicial (1) y la actualizacion (0, toma la fecha de actualizacion)', '0', '2018-10-18 20:35:32', '2018-10-21 06:44:56'),
+(1, 'CARGA_INICIAL_ACTUALIZACION', 'CARGA_INICIAL_ACTUALIZACION', 'Parametro que toma valores boleanos para la carga inicial (1) y la actualizacion (0, toma la fecha de actualizacion)', '1', '2018-10-18 20:35:32', '2018-10-23 21:17:01'),
 (2, 'RUTA_CARGA_ESTUDIANTES', 'RUTA_CARGA_ESTUDIANTES', 'Endpoint o ruta para la carga inicial del modulo de estudiantes', 'http://127.0.0.1:8082/estudiantes', '2018-10-18 20:38:51', '2018-10-20 20:20:36'),
 (3, 'RUTA_CARGA_PROFESORES', 'RUTA_CARGA_PROFESORES', 'Endpoint o ruta para la carga inicial del modulo de profesores', 'http://127.0.0.1:8082/profesores', '2018-10-18 20:40:26', '2018-10-20 20:20:54'),
 (4, 'RUTA_CARGA_EGRESADOS', 'RUTA_CARGA_EGRESADOS', 'Endpoint o ruta para la carga inicial del modulo de egresados', 'http://127.0.0.1:8082/egresados', '2018-10-18 21:31:21', '2018-10-21 02:05:53');
@@ -626,11 +820,31 @@ ALTER TABLE `dim_carrera`
   ADD UNIQUE KEY `nombre` (`nombre`);
 
 --
+-- Indices de la tabla `dim_certificacion`
+--
+ALTER TABLE `dim_certificacion`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigo` (`codigo`);
+
+--
+-- Indices de la tabla `dim_cursos`
+--
+ALTER TABLE `dim_cursos`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigo` (`codigo`);
+
+--
 -- Indices de la tabla `dim_docente`
 --
 ALTER TABLE `dim_docente`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `cedula` (`cedula`);
+
+--
+-- Indices de la tabla `dim_educacion`
+--
+ALTER TABLE `dim_educacion`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `dim_egresado`
@@ -682,6 +896,13 @@ ALTER TABLE `dim_nacionalidad`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indices de la tabla `dim_patentes`
+--
+ALTER TABLE `dim_patentes`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigo` (`codigo`);
+
+--
 -- Indices de la tabla `dim_publicacion`
 --
 ALTER TABLE `dim_publicacion`
@@ -705,6 +926,18 @@ ALTER TABLE `dim_status`
 -- Indices de la tabla `dim_titulo`
 --
 ALTER TABLE `dim_titulo`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `dim_trabajos`
+--
+ALTER TABLE `dim_trabajos`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `dim_voluntariado`
+--
+ALTER TABLE `dim_voluntariado`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -740,6 +973,26 @@ ALTER TABLE `fact_docente_publicacion`
   ADD KEY `id_facultad` (`id_facultad`);
 
 --
+-- Indices de la tabla `fact_egresado_certificacion`
+--
+ALTER TABLE `fact_egresado_certificacion`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_egresado` (`id_egresado`),
+  ADD KEY `id_certificacion` (`id_certificacion`);
+
+--
+-- Indices de la tabla `fact_egresado_cursos`
+--
+ALTER TABLE `fact_egresado_cursos`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `fact_egresado_educacion`
+--
+ALTER TABLE `fact_egresado_educacion`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indices de la tabla `fact_egresado_estudiosuc`
 --
 ALTER TABLE `fact_egresado_estudiosuc`
@@ -759,12 +1012,6 @@ ALTER TABLE `fact_estudiante_facultad`
   ADD KEY `id_carrera` (`id_carrera`),
   ADD KEY `id_sexo` (`id_sexo`),
   ADD KEY `id_nacionalidad` (`id_nacionalidad`);
-
---
--- Indices de la tabla `last_update`
---
-ALTER TABLE `last_update`
-  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `parametro_sistema`
@@ -819,16 +1066,34 @@ ALTER TABLE `dim_carrera`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=122;
 
 --
+-- AUTO_INCREMENT de la tabla `dim_certificacion`
+--
+ALTER TABLE `dim_certificacion`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+
+--
+-- AUTO_INCREMENT de la tabla `dim_cursos`
+--
+ALTER TABLE `dim_cursos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
 -- AUTO_INCREMENT de la tabla `dim_docente`
 --
 ALTER TABLE `dim_docente`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
+-- AUTO_INCREMENT de la tabla `dim_educacion`
+--
+ALTER TABLE `dim_educacion`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT de la tabla `dim_egresado`
 --
 ALTER TABLE `dim_egresado`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_escalafon`
@@ -846,7 +1111,7 @@ ALTER TABLE `dim_estudiante`
 -- AUTO_INCREMENT de la tabla `dim_estudiosuc`
 --
 ALTER TABLE `dim_estudiosuc`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_facultad`
@@ -865,6 +1130,12 @@ ALTER TABLE `dim_grado`
 --
 ALTER TABLE `dim_nacionalidad`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT de la tabla `dim_patentes`
+--
+ALTER TABLE `dim_patentes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_publicacion`
@@ -891,6 +1162,18 @@ ALTER TABLE `dim_titulo`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `dim_trabajos`
+--
+ALTER TABLE `dim_trabajos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `dim_voluntariado`
+--
+ALTER TABLE `dim_voluntariado`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `fact_asignatura_inscrita`
 --
 ALTER TABLE `fact_asignatura_inscrita`
@@ -909,22 +1192,34 @@ ALTER TABLE `fact_docente_publicacion`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
+-- AUTO_INCREMENT de la tabla `fact_egresado_certificacion`
+--
+ALTER TABLE `fact_egresado_certificacion`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT de la tabla `fact_egresado_cursos`
+--
+ALTER TABLE `fact_egresado_cursos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT de la tabla `fact_egresado_educacion`
+--
+ALTER TABLE `fact_egresado_educacion`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT de la tabla `fact_egresado_estudiosuc`
 --
 ALTER TABLE `fact_egresado_estudiosuc`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_estudiante_facultad`
 --
 ALTER TABLE `fact_estudiante_facultad`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
-
---
--- AUTO_INCREMENT de la tabla `last_update`
---
-ALTER TABLE `last_update`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `parametro_sistema`

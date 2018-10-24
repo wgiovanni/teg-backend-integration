@@ -977,12 +977,12 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 			item = {
 				"nombre_usuario": item['nombreusuario'],  
 				"primer_nombre": item['primernombre'], 
-				"segundo nombre": item['segundonombre'], 
-				"primer apellido": item['primerapellido'],
-				"segundo apellido": item['segundoapellido'], 
+				"segundo_nombre": item['segundonombre'], 
+				"primer_apellido": item['primerapellido'],
+				"segundo_apellido": item['segundoapellido'], 
 				"descripcion": item['descripcion'],
 				"intereses": item['intereses'],
-				"email": item['email'],
+				"correo": item['email'],
 				"telefono": item['telefono'],
 				"identificacion": item['identificacion']
 			}
@@ -1371,7 +1371,7 @@ def insert(cursor, table: str, datos: dict=None, columns=None, values: list=None
 
 def update(cursor, table: str, datos: dict, where: dict):
 
-	sql = f"update {table} set "
+	sql = f"update dim_{table} set "
 	values = []
 	for col, val in datos.items():
 		if val is not None:
@@ -1385,4 +1385,5 @@ def update(cursor, table: str, datos: dict, where: dict):
 		values.append(val)
 
 	sql = sql.rstrip(' and ')
+	print(sql)
 	cursor.execute(sql, values)

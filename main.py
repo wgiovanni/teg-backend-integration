@@ -14,6 +14,7 @@ from resources.Student import Student, StudentMaleFaculty, StudentFemaleFaculty,
 from resources.InscribedCourse import InscribedCourseStudent, InscribedCourseStudentFaculty
 from resources.TeacherPublication import TeacherPublication, TeacherPublicationFaculty
 from resources.Teacher import TeacherWithDoctorateFaculty, TeacherGradeFaculty, TeacherWithDoctorate, TeacherInternacionals, TeacherNational
+from resources.GraduatePatents import GraduatePatents
 # metodos
 from etl import etl_process2
 
@@ -88,6 +89,12 @@ api.add_resource(TeacherWithDoctorate, '/profesor-doctorado-proporcion')
 api.add_resource(TeacherInternacionals, '/profesor-internacional')
 # cantidad de profesores nacionales 
 api.add_resource(TeacherNational, '/profesor-nacional')
+
+
+
+
+# egresados
+api.add_resource(GraduatePatents, '/egresado-patentes')
 
 if __name__ == "__main__":
 	#main()

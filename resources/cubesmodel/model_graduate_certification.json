@@ -1,0 +1,70 @@
+{
+    "dimensions": [
+        {
+            "name":"dim_egresado",
+            "levels": [
+                {
+                    "name":"egresado",
+                    "label":"Egresado",
+                    "attributes": ["id", "nombre_usuario", "primer_nombre", "segundo_nombre","primer_apellido", "segundo_apellido", "descripcion", "intereses","correo", "telefono", "identificacion"],
+                    "label_attribute": "nombre_usuario"
+                }
+            ]
+        },
+        {
+          "name":"dim_certificacion",
+          "levels": [
+            {
+              "name": "cursos",
+              "label":"Cursos",
+              "attributes": ["id", "codigo", "nombre_certificacion", "descripcion", "url_certificacion"],
+              "label_attribute": "codigo"
+            }
+          ]
+        }
+    ],
+    "cubes": [
+        {
+            "name": "fact_egresado_certificacion",
+            "dimensions": ["dim_egresado", "dim_certificacion"],
+            "measures": [
+                {"name": "cantidad", "label": "Cantidad"}
+            ],
+            "aggregates": [
+                {
+                    "name": "sumatoria",
+                    "function": "count",
+                    "measure": "cantidad"
+                }
+            ],
+            "joins": [
+                {
+                    "master": "fact_egresado_certificacion.id_egresado",
+                    "detail": "dim_egresado.id"
+                },
+                {
+                    "master": "fact_egresado_certificacion.id_patentes",
+                    "detail": "dim_certificacion.id"
+                }
+            ],
+            "mappings": {
+              "dim_egresado.id": "dim_egresado.id",
+              "dim_egresado.nombre_usuario": "dim_egresado.nombre_usuario",
+              "dim_egresado.primer_nombre": "dim_egresado.primer_nombre",
+              "dim_egresado.segundo_nombre": "dim_egresado.segundo_nombre",
+              "dim_egresado.primer_apellido": "dim_egresado.primer_apellido",
+              "dim_egresado.segundo_apellido": "dim_egresado.segundo_apellido",
+              "dim_egresado.descripcion": "dim_egresado.descripcion",
+              "dim_egresado.intereses": "dim_egresado.intereses",
+              "dim_egresado.correo": "dim_egresado.correo",
+              "dim_egresado.telefono": "dim_egresado.telefono",
+              "dim_egresado.identificacion": "dim_egresado.identificacion",
+              "dim_certificacion.id": "dim_certificacion.id",
+              "dim_certificacion.codigo": "dim_certificacion.codigo",
+              "dim_certificacion.nombre_certificacion": "dim_certificacion.nombre_certificacion",
+              "dim_certificacion.descripcion": "dim_certificacion.descripcion",
+              "dim_certificacion.url_certificacion": "dim_certificacion.url_certificacion"
+            }
+        }
+    ]
+}

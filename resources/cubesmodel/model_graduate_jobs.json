@@ -1,0 +1,73 @@
+{
+    "dimensions": [
+        {
+            "name":"dim_egresado",
+            "levels": [
+                {
+                    "name":"egresado",
+                    "label":"Egresado",
+                    "attributes": ["id", "nombre_usuario", "primer_nombre", "segundo_nombre","primer_apellido", "segundo_apellido", "descripcion", "intereses","correo", "telefono", "identificacion"],
+                    "label_attribute": "nombre_usuario"
+                }
+            ]
+        },
+        {
+          "name":"dim_trabajos",
+          "levels": [
+            {
+              "name": "trabajos",
+              "label":"Trabajos",
+              "attributes": ["id", "codigo", "nombre_empresa", "cargo", "descripcion"],
+              "label_attribute": "codigo"
+            }
+          ]
+        }
+    ],
+    "cubes": [
+        {
+            "name": "fact_egresado_trabajos",
+            "dimensions": ["dim_egresado", "dim_trabajos"],
+            "measures": [
+                {"name": "cantidad", "label": "Cantidad"}
+            ],
+            "aggregates": [
+                {
+                    "name": "sumatoria",
+                    "function": "count",
+                    "measure": "cantidad"
+                }
+            ],
+            "joins": [
+                {
+                    "master": "fact_egresado_trabajos.id_egresado",
+                    "detail": "dim_egresado.id"
+                },
+                {
+                    "master": "fact_egresado_trabajos.id_patentes",
+                    "detail": "dim_trabajos.id"
+                }
+            ],
+            "mappings": {
+              "dim_egresado.id": "dim_egresado.id",
+              "dim_egresado.nombre_usuario": "dim_egresado.nombre_usuario",
+              "dim_egresado.primer_nombre": "dim_egresado.primer_nombre",
+              "dim_egresado.segundo_nombre": "dim_egresado.segundo_nombre",
+              "dim_egresado.primer_apellido": "dim_egresado.primer_apellido",
+              "dim_egresado.segundo_apellido": "dim_egresado.segundo_apellido",
+              "dim_egresado.descripcion": "dim_egresado.descripcion",
+              "dim_egresado.intereses": "dim_egresado.intereses",
+              "dim_egresado.correo": "dim_egresado.correo",
+              "dim_egresado.telefono": "dim_egresado.telefono",
+              "dim_egresado.identificacion": "dim_egresado.identificacion",
+              "dim_trabajos.id": "dim_trabajos.id",
+              "dim_trabajos.codigo": "dim_trabajos.codigo",
+              "dim_trabajos.titulo": "dim_trabajos.titulo",
+              "dim_trabajos.descripcion": "dim_trabajos.descripcion",
+              "dim_trabajos.numero": "dim_trabajos.numero",
+              "dim_trabajos.inventores": "dim_trabajos.inventores",
+              "dim_trabajos.fecha": "dim_trabajos.fecha",
+              "dim_trabajos.url": "dim_trabajos.url"
+            }
+        }
+    ]
+}

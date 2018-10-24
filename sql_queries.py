@@ -133,28 +133,28 @@ get_relationship_graduate_patents = dedent("""\
 
 get_relationship_graduate_certification = dedent("""\
 	SELECT fact.id
-	FROM fact_egresado_patentes AS fact
+	FROM fact_egresado_certificacion AS fact
 	INNER JOIN dim_certificacion AS c
 	ON (fact.id_certificacion = c.id) 
 	WHERE c.codigo = %s""")
 
 get_relationship_graduate_courses = dedent("""\
 	SELECT fact.id
-	FROM fact_egresado_patentes AS fact
+	FROM fact_egresado_cursos AS fact
 	INNER JOIN dim_cursos AS c
 	ON (fact.id_cursos = c.id) 
 	WHERE c.codigo = %s""")
 
 get_relationship_graduate_education = dedent("""\
 	SELECT fact.id
-	FROM fact_egresado_patentes AS fact
+	FROM fact_egresado_educacion AS fact
 	INNER JOIN dim_educacion AS e
 	ON (fact.id_educacion = e.id) 
 	WHERE e.codigo = %s""")
 
 get_relationship_graduate_volunteering = dedent("""\
 	SELECT fact.id
-	FROM fact_egresado_patentes AS fact
+	FROM fact_egresado_voluntariado AS fact
 	INNER JOIN dim_voluntariado AS v
 	ON (fact.id_voluntariado = v.id) 
 	WHERE v.codigo = %s""")

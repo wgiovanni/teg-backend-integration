@@ -1,0 +1,73 @@
+{
+    "dimensions": [
+        {
+            "name":"dim_egresado",
+            "levels": [
+                {
+                    "name":"egresado",
+                    "label":"Egresado",
+                    "attributes": ["id", "nombre_usuario", "primer_nombre", "segundo_nombre","primer_apellido", "segundo_apellido", "descripcion", "intereses","correo", "telefono", "identificacion"],
+                    "label_attribute": "nombre_usuario"
+                }
+            ]
+        },
+        {
+          "name":"dim_patentes",
+          "levels": [
+            {
+              "name": "patentes",
+              "label":"Patentes",
+              "attributes": ["id", "codigo", "titulo", "descripcion", "numero", "inventores", "fecha", "url"],
+              "label_attribute": "codigo"
+            }
+          ]
+        }
+    ],
+    "cubes": [
+        {
+            "name": "fact_egresado_patentes",
+            "dimensions": ["dim_egresado", "dim_patentes"],
+            "measures": [
+                {"name": "cantidad", "label": "Cantidad"}
+            ],
+            "aggregates": [
+                {
+                    "name": "sumatoria",
+                    "function": "count",
+                    "measure": "cantidad"
+                }
+            ],
+            "joins": [
+                {
+                    "master": "fact_egresado_patentes.id_egresado",
+                    "detail": "dim_egresado.id"
+                },
+                {
+                    "master": "fact_egresado_patentes.id_patentes",
+                    "detail": "dim_patentes.id"
+                }
+            ],
+            "mappings": {
+              "dim_egresado.id": "dim_egresado.id",
+              "dim_egresado.nombre_usuario": "dim_egresado.nombre_usuario",
+              "dim_egresado.primer_nombre": "dim_egresado.primer_nombre",
+              "dim_egresado.segundo_nombre": "dim_egresado.segundo_nombre",
+              "dim_egresado.primer_apellido": "dim_egresado.primer_apellido",
+              "dim_egresado.segundo_apellido": "dim_egresado.segundo_apellido",
+              "dim_egresado.descripcion": "dim_egresado.descripcion",
+              "dim_egresado.intereses": "dim_egresado.intereses",
+              "dim_egresado.correo": "dim_egresado.correo",
+              "dim_egresado.telefono": "dim_egresado.telefono",
+              "dim_egresado.identificacion": "dim_egresado.identificacion",
+              "dim_patentes.id": "dim_patentes.id",
+              "dim_patentes.codigo": "dim_patentes.codigo",
+              "dim_patentes.titulo": "dim_patentes.titulo",
+              "dim_patentes.descripcion": "dim_patentes.descripcion",
+              "dim_patentes.numero": "dim_patentes.numero",
+              "dim_patentes.inventores": "dim_patentes.inventores",
+              "dim_patentes.fecha": "dim_patentes.fecha",
+              "dim_patentes.url": "dim_patentes.url"
+            }
+        }
+    ]
+}

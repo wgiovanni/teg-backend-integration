@@ -1,0 +1,69 @@
+{
+    "dimensions": [
+        {
+            "name":"dim_egresado",
+            "levels": [
+                {
+                    "name":"egresado",
+                    "label":"Egresado",
+                    "attributes": ["id", "nombre_usuario", "primer_nombre", "segundo_nombre","primer_apellido", "segundo_apellido", "descripcion", "intereses","correo", "telefono", "identificacion"],
+                    "label_attribute": "nombre_usuario"
+                }
+            ]
+        },
+        {
+          "name":"dim_cursos",
+          "levels": [
+            {
+              "name": "cursos",
+              "label":"Cursos",
+              "attributes": ["id", "codigo", "nombre", "url"],
+              "label_attribute": "codigo"
+            }
+          ]
+        }
+    ],
+    "cubes": [
+        {
+            "name": "fact_egresado_cursos",
+            "dimensions": ["dim_egresado", "dim_cursos"],
+            "measures": [
+                {"name": "cantidad", "label": "Cantidad"}
+            ],
+            "aggregates": [
+                {
+                    "name": "sumatoria",
+                    "function": "count",
+                    "measure": "cantidad"
+                }
+            ],
+            "joins": [
+                {
+                    "master": "fact_egresado_cursos.id_egresado",
+                    "detail": "dim_egresado.id"
+                },
+                {
+                    "master": "fact_egresado_cursos.id_patentes",
+                    "detail": "dim_cursos.id"
+                }
+            ],
+            "mappings": {
+              "dim_egresado.id": "dim_egresado.id",
+              "dim_egresado.nombre_usuario": "dim_egresado.nombre_usuario",
+              "dim_egresado.primer_nombre": "dim_egresado.primer_nombre",
+              "dim_egresado.segundo_nombre": "dim_egresado.segundo_nombre",
+              "dim_egresado.primer_apellido": "dim_egresado.primer_apellido",
+              "dim_egresado.segundo_apellido": "dim_egresado.segundo_apellido",
+              "dim_egresado.descripcion": "dim_egresado.descripcion",
+              "dim_egresado.intereses": "dim_egresado.intereses",
+              "dim_egresado.correo": "dim_egresado.correo",
+              "dim_egresado.telefono": "dim_egresado.telefono",
+              "dim_egresado.identificacion": "dim_egresado.identificacion",
+              "dim_cursos.id": "dim_cursos.id",
+              "dim_cursos.codigo": "dim_cursos.codigo",
+              "dim_cursos.nombre": "dim_cursos.nombre",
+              "dim_cursos.url": "dim_cursos.url"
+            }
+        }
+    ]
+}

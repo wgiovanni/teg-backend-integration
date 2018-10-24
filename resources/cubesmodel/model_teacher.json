@@ -84,27 +84,27 @@
             ],
             "joins": [
                 {
-                    "master": "fact_docente.id_docente",
+                    "master": "fact_docente_facultad.id_docente",
                     "detail": "dim_docente.id"
                 },
                 {
-                    "master": "fact_docente.id_facultad",
+                    "master": "fact_docente_facultad.id_facultad",
                     "detail": "dim_facultad.id"
                 },
                 {
-                    "master": "fact_docente.id_sexo",
+                    "master": "fact_docente_facultad.id_sexo",
                     "detail": "dim_sexo.id"
                 },
                 {
-                    "master": "fact_docente.id_grado",
+                    "master": "fact_docente_facultad.id_grado",
                     "detail": "dim_grado.id"
                 },
                 {
-                    "master": "fact_docente.id_nacionalidad",
+                    "master": "fact_docente_facultad.id_nacionalidad",
                     "detail": "dim_nacionalidad.id"
                 },
                 {
-                    "master": "fact_docente.id_escalafon",
+                    "master": "fact_docente_facultad.id_escalafon",
                     "detail": "dim_escalafon.id"
                 }
 

@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.1
+-- version 4.8.2
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 24-10-2018 a las 05:02:30
--- Versión del servidor: 10.1.33-MariaDB
--- Versión de PHP: 7.2.6
+-- Tiempo de generación: 24-10-2018 a las 23:02:48
+-- Versión del servidor: 10.1.34-MariaDB
+-- Versión de PHP: 7.2.8
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -528,7 +528,8 @@ CREATE TABLE `dim_voluntariado` (
 INSERT INTO `dim_voluntariado` (`id`, `codigo`, `organizacion`, `descripcion`, `causa`, `fecha_creacion`, `fecha_actualizacion`) VALUES
 (1, '1', 'Organizacion1', 'descripcion', 'una causa ahi', '2018-10-24 00:13:29', '2018-10-24 00:13:29'),
 (2, '2', 'Organizacion2', 'descripcion', 'una causa ahi2', '2018-10-24 00:13:29', '2018-10-24 00:13:29'),
-(3, '3', 'Organizacion3', 'descripcion', 'una causa ahi2', '2018-10-24 00:13:29', '2018-10-24 00:13:29');
+(3, '3', 'Organizacion3', 'descripcion', 'una causa ahi2', '2018-10-24 00:13:29', '2018-10-24 00:13:29'),
+(4, '4', 'Organizacion4', 'descripcion', 'una causa ahi4', '2018-10-24 13:06:30', '2018-10-24 13:06:30');
 
 -- --------------------------------------------------------
 
@@ -772,7 +773,8 @@ CREATE TABLE `fact_egresado_voluntariado` (
 INSERT INTO `fact_egresado_voluntariado` (`id`, `id_egresado`, `id_voluntariado`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
 (1, 25, 2, 0, '2018-10-24 00:42:40', '2018-10-24 00:42:40'),
 (2, 25, 3, 0, '2018-10-24 00:42:40', '2018-10-24 00:42:40'),
-(3, 27, 1, 0, '2018-10-24 00:42:40', '2018-10-24 00:42:40');
+(3, 27, 1, 0, '2018-10-24 00:42:40', '2018-10-24 00:42:40'),
+(4, 28, 4, 1, '2018-10-24 13:09:57', '2018-10-24 13:09:57');
 
 -- --------------------------------------------------------
 
@@ -820,7 +822,7 @@ CREATE TABLE `parametro_sistema` (
 --
 
 INSERT INTO `parametro_sistema` (`id`, `codigo`, `nombre`, `descripcion`, `definicion`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(1, 'CARGA_INICIAL_ACTUALIZACION', 'CARGA_INICIAL_ACTUALIZACION', 'Parametro que toma valores boleanos para la carga inicial (1) y la actualizacion (0, toma la fecha de actualizacion)', '0', '2018-10-18 20:35:32', '2018-10-24 00:42:40'),
+(1, 'CARGA_INICIAL_ACTUALIZACION', 'CARGA_INICIAL_ACTUALIZACION', 'Parametro que toma valores boleanos para la carga inicial (1) y la actualizacion (0, toma la fecha de actualizacion)', '0', '2018-10-18 20:35:32', '2018-10-24 13:09:57'),
 (2, 'RUTA_CARGA_ESTUDIANTES', 'RUTA_CARGA_ESTUDIANTES', 'Endpoint o ruta para la carga inicial del modulo de estudiantes', 'http://127.0.0.1:8082/estudiantes', '2018-10-18 20:38:51', '2018-10-20 20:20:36'),
 (3, 'RUTA_CARGA_PROFESORES', 'RUTA_CARGA_PROFESORES', 'Endpoint o ruta para la carga inicial del modulo de profesores', 'http://127.0.0.1:8082/profesores', '2018-10-18 20:40:26', '2018-10-20 20:20:54'),
 (4, 'RUTA_CARGA_EGRESADOS', 'RUTA_CARGA_EGRESADOS', 'Endpoint o ruta para la carga inicial del modulo de egresados', 'http://127.0.0.1:8082/egresados', '2018-10-18 21:31:21', '2018-10-21 02:05:53');
@@ -1300,7 +1302,7 @@ ALTER TABLE `dim_trabajos`
 -- AUTO_INCREMENT de la tabla `dim_voluntariado`
 --
 ALTER TABLE `dim_voluntariado`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_asignatura_inscrita`
@@ -1360,7 +1362,7 @@ ALTER TABLE `fact_egresado_trabajos`
 -- AUTO_INCREMENT de la tabla `fact_egresado_voluntariado`
 --
 ALTER TABLE `fact_egresado_voluntariado`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_estudiante_facultad`

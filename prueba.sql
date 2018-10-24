@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.2
+-- version 4.8.1
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 23-10-2018 a las 23:24:43
--- Versión del servidor: 10.1.34-MariaDB
--- Versión de PHP: 7.2.8
+-- Tiempo de generación: 24-10-2018 a las 05:02:30
+-- Versión del servidor: 10.1.33-MariaDB
+-- Versión de PHP: 7.2.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -109,9 +109,9 @@ CREATE TABLE `dim_certificacion` (
 --
 
 INSERT INTO `dim_certificacion` (`id`, `codigo`, `nombre_certificacion`, `descripcion`, `url_certificacion`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(22, '1', 'Certificacion1', 'descripcion', 'url xxx', '2018-10-23 13:39:10', '2018-10-23 13:39:10'),
-(23, '2', 'Certificacion2', 'descripcion', 'url xxx', '2018-10-23 13:39:10', '2018-10-23 13:39:10'),
-(24, '3', 'Certificacion3', 'descripcion', 'url certificacion', '2018-10-23 13:39:10', '2018-10-23 13:39:10');
+(28, '1', 'Certificacion1', 'descripcion', 'url xxx', '2018-10-24 00:34:10', '2018-10-24 00:34:10'),
+(29, '2', 'Certificacion2', 'descripcion', 'url xxx', '2018-10-24 00:34:10', '2018-10-24 00:34:10'),
+(30, '3', 'Certificacion3', 'descripcion', 'url certificacion', '2018-10-24 00:34:10', '2018-10-24 00:34:10');
 
 -- --------------------------------------------------------
 
@@ -133,11 +133,11 @@ CREATE TABLE `dim_cursos` (
 --
 
 INSERT INTO `dim_cursos` (`id`, `codigo`, `nombre`, `url`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(16, '1', 'Programación basica', 'http://platzi.com/programacionbasica', '2018-10-23 13:39:10', '2018-10-23 13:39:10'),
-(17, '2', 'Curso basico PHP', 'http://platzi.com/wgiovanni/phpbasico', '2018-10-23 13:39:11', '2018-10-23 13:39:11'),
-(18, '3', 'Curso Java', 'http://platzi.com/java', '2018-10-23 13:39:11', '2018-10-23 13:39:11'),
-(19, '4', 'Curso Angular', 'http://platzi.com/angular', '2018-10-23 13:39:11', '2018-10-23 13:39:11'),
-(20, '5', 'Curso basico PHP', 'http://platzi.com/lgomez/phpbasico', '2018-10-23 13:39:11', '2018-10-23 13:39:11');
+(21, '1', 'Programación basica', 'http://platzi.com/programacionbasica', '2018-10-24 00:26:28', '2018-10-24 00:26:28'),
+(22, '2', 'Curso basico PHP', 'http://platzi.com/wgiovanni/phpbasico', '2018-10-24 00:26:28', '2018-10-24 00:26:28'),
+(23, '3', 'Curso Java', 'http://platzi.com/java', '2018-10-24 00:26:28', '2018-10-24 00:26:28'),
+(24, '4', 'Curso Angular', 'http://platzi.com/angular', '2018-10-24 00:26:28', '2018-10-24 00:26:28'),
+(25, '5', 'Curso basico PHP', 'http://platzi.com/lgomez/phpbasico', '2018-10-24 00:26:28', '2018-10-24 00:26:28');
 
 -- --------------------------------------------------------
 
@@ -188,9 +188,9 @@ CREATE TABLE `dim_educacion` (
 --
 
 INSERT INTO `dim_educacion` (`id`, `codigo`, `instituto`, `campo_estudio`, `fecha_creacion`, `fecha_actualizacion`, `titulo_obtenido`, `url_certificacion`) VALUES
-(1, '1', 'Instituto1', 'Campo de Estudio1', '2018-10-23 14:59:19', '2018-10-23 14:59:19', 'Titulo1', 'http://urlcertificacion.com'),
-(2, '2', 'Instituto2', 'Campo de Estudio2', '2018-10-23 14:59:19', '2018-10-23 14:59:19', 'Titulo2', 'http://urlcertificacion.com'),
-(3, '3', 'Instituto3', 'Campo de Estudio3', '2018-10-23 14:59:19', '2018-10-23 14:59:19', 'Titulo3', 'http://urlcertificacion.com');
+(4, '1', 'Instituto1', 'Campo de Estudio1', '2018-10-24 00:26:28', '2018-10-24 00:26:28', 'Titulo1', 'http://urlcertificacion.com'),
+(5, '2', 'Instituto2', 'Campo de Estudio2', '2018-10-24 00:26:28', '2018-10-24 00:26:28', 'Titulo2', 'http://urlcertificacion.com'),
+(6, '3', 'Instituto3', 'Campo de Estudio3', '2018-10-24 00:26:28', '2018-10-24 00:26:28', 'Titulo3', 'http://urlcertificacion.com');
 
 -- --------------------------------------------------------
 
@@ -219,10 +219,10 @@ CREATE TABLE `dim_egresado` (
 --
 
 INSERT INTO `dim_egresado` (`id`, `nombre_usuario`, `primer_nombre`, `segundo_nombre`, `primer_apellido`, `segundo_apellido`, `descripcion`, `intereses`, `correo`, `telefono`, `identificacion`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(21, 'gjimenez', 'Genessis', 'De Jesus', 'Jimenez', 'Zea', 'descripcion', 'futbol', 'gjimenez@gmail,com', '04127658802', '2464987', '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
-(22, 'lgomez', 'Luis', 'Augusto', 'Gomez', 'No se', 'descripcion', 'metal', 'luisgomez@gmail,com', '04127658802', '756438457', '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
-(23, 'wmorillo', 'Winder', 'Jose', 'Morillo', 'No se', 'descripcion', 'programar', 'wmorillo@gmail,com', '746574323', '146498766', '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
-(24, 'wgiovanni', 'Wilkel', 'Alejandro', 'Giovanni', 'Perozo', 'descripcion', 'programar', 'wgiovanni@gmail,com', '746574323', '22422883', '2018-10-23 14:59:20', '2018-10-23 14:59:20');
+(25, 'gjimenez', 'Genessis', 'De Jesus', 'Jimenez', 'Zea', 'descripcion', 'futbol', 'gjimenez@gmail,com', '04127658802', '2464987', '2018-10-24 00:26:28', '2018-10-24 00:26:28'),
+(26, 'lgomez', 'Luis', 'Augusto', 'Gomez', 'No se', 'descripcion', 'metal', 'luisgomez@gmail,com', '04127658802', '756438457', '2018-10-24 00:26:28', '2018-10-24 00:26:28'),
+(27, 'wmorillo', 'Winder', 'Jose', 'Morillo', 'No se', 'descripcion', 'programar', 'wmorillo@gmail,com', '746574323', '146498766', '2018-10-24 00:26:29', '2018-10-24 00:26:29'),
+(28, 'wgiovanni', 'Wilkel', 'Alejandro', 'Giovanni', 'Perozo', 'descripcion', 'programar', 'wgiovanni@gmail,com', '746574323', '22422883', '2018-10-24 00:26:29', '2018-10-24 00:26:29');
 
 -- --------------------------------------------------------
 
@@ -298,10 +298,10 @@ CREATE TABLE `dim_estudiosuc` (
 --
 
 INSERT INTO `dim_estudiosuc` (`id`, `titulo`, `anho_grado`, `url_certificacion`, `codigo`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(29, 'Licenciado en Computación', '2018-07-24', 'url...', '1', '2018-10-23 13:39:11', '2018-10-23 13:39:11'),
-(30, 'Licenciado en Física', '2018-07-24', 'url...', '2', '2018-10-23 13:39:11', '2018-10-23 13:39:11'),
-(31, 'Licenciado en Computación', '2018-07-24', 'url...', '3', '2018-10-23 13:39:11', '2018-10-23 13:39:11'),
-(32, 'Licenciado en Química', '2010-07-24', 'url...', '4', '2018-10-23 13:39:11', '2018-10-23 13:39:11');
+(33, 'Licenciado en Computación', '2018-07-24', 'url...', '1', '2018-10-24 00:26:30', '2018-10-24 00:26:30'),
+(34, 'Licenciado en Física', '2018-07-24', 'url...', '2', '2018-10-24 00:26:30', '2018-10-24 00:26:30'),
+(35, 'Licenciado en Computación', '2018-07-24', 'url...', '3', '2018-10-24 00:26:30', '2018-10-24 00:26:30'),
+(36, 'Licenciado en Química', '2010-07-24', 'url...', '4', '2018-10-24 00:26:30', '2018-10-24 00:26:30');
 
 -- --------------------------------------------------------
 
@@ -389,6 +389,14 @@ CREATE TABLE `dim_patentes` (
   `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `dim_patentes`
+--
+
+INSERT INTO `dim_patentes` (`id`, `codigo`, `titulo`, `descripcion`, `numero`, `inventores`, `fecha`, `url`, `fecha_creacion`, `fecha_actualizacion`) VALUES
+(3, '1', 'Patente1', 'Descripcion Patente1', '5151', 'inventor1, inventor2, inventor3', '2018-07-10', 'url', '2018-10-24 00:26:30', '2018-10-24 00:26:30'),
+(4, '2', 'Patente2', 'Descripcion Patente1', '987874', 'inventor1, inventor2, inventor3', '2018-07-10', 'url', '2018-10-24 00:26:30', '2018-10-24 00:26:30');
 
 -- --------------------------------------------------------
 
@@ -488,6 +496,15 @@ CREATE TABLE `dim_trabajos` (
   `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Volcado de datos para la tabla `dim_trabajos`
+--
+
+INSERT INTO `dim_trabajos` (`id`, `codigo`, `nombre_empresa`, `cargo`, `descripcion`, `fecha_creacion`, `fecha_actualizacion`) VALUES
+(4, '1', 'Intelix', 'Programador web', 'descripcion', '2018-10-24 00:26:30', '2018-10-24 00:26:30'),
+(5, '2', 'Promotora Tantalo', 'Programador web', 'descripcion', '2018-10-24 00:26:30', '2018-10-24 00:26:30'),
+(6, '3', 'Sofos', 'Programador web', 'descripcion', '2018-10-24 00:26:30', '2018-10-24 00:26:30');
+
 -- --------------------------------------------------------
 
 --
@@ -503,6 +520,15 @@ CREATE TABLE `dim_voluntariado` (
   `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `dim_voluntariado`
+--
+
+INSERT INTO `dim_voluntariado` (`id`, `codigo`, `organizacion`, `descripcion`, `causa`, `fecha_creacion`, `fecha_actualizacion`) VALUES
+(1, '1', 'Organizacion1', 'descripcion', 'una causa ahi', '2018-10-24 00:13:29', '2018-10-24 00:13:29'),
+(2, '2', 'Organizacion2', 'descripcion', 'una causa ahi2', '2018-10-24 00:13:29', '2018-10-24 00:13:29'),
+(3, '3', 'Organizacion3', 'descripcion', 'una causa ahi2', '2018-10-24 00:13:29', '2018-10-24 00:13:29');
 
 -- --------------------------------------------------------
 
@@ -596,9 +622,9 @@ CREATE TABLE `fact_egresado_certificacion` (
 --
 
 INSERT INTO `fact_egresado_certificacion` (`id`, `id_egresado`, `id_certificacion`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(7, 23, 22, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
-(8, 24, 23, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
-(9, 24, 24, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20');
+(19, 27, 28, 1, '2018-10-24 00:42:36', '2018-10-24 00:42:36'),
+(20, 28, 29, 1, '2018-10-24 00:42:36', '2018-10-24 00:42:36'),
+(21, 28, 30, 1, '2018-10-24 00:42:37', '2018-10-24 00:42:37');
 
 -- --------------------------------------------------------
 
@@ -620,11 +646,11 @@ CREATE TABLE `fact_egresado_cursos` (
 --
 
 INSERT INTO `fact_egresado_cursos` (`id`, `id_egresado`, `id_cursos`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(6, 21, 19, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
-(7, 22, 20, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
-(8, 24, 16, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
-(9, 24, 17, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
-(10, 24, 18, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20');
+(26, 25, 24, 1, '2018-10-24 00:42:37', '2018-10-24 00:42:37'),
+(27, 26, 25, 1, '2018-10-24 00:42:37', '2018-10-24 00:42:37'),
+(28, 28, 21, 1, '2018-10-24 00:42:37', '2018-10-24 00:42:37'),
+(29, 28, 22, 1, '2018-10-24 00:42:37', '2018-10-24 00:42:37'),
+(30, 28, 23, 1, '2018-10-24 00:42:37', '2018-10-24 00:42:37');
 
 -- --------------------------------------------------------
 
@@ -646,9 +672,9 @@ CREATE TABLE `fact_egresado_educacion` (
 --
 
 INSERT INTO `fact_egresado_educacion` (`id`, `id_egresado`, `id_educacion`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(1, 22, 1, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
-(2, 22, 2, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
-(3, 23, 3, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20');
+(13, 26, 4, 1, '2018-10-24 00:42:37', '2018-10-24 00:42:37'),
+(14, 26, 5, 1, '2018-10-24 00:42:37', '2018-10-24 00:42:37'),
+(15, 27, 6, 1, '2018-10-24 00:42:37', '2018-10-24 00:42:37');
 
 -- --------------------------------------------------------
 
@@ -672,10 +698,81 @@ CREATE TABLE `fact_egresado_estudiosuc` (
 --
 
 INSERT INTO `fact_egresado_estudiosuc` (`id`, `id_egresado`, `id_estudiosuc`, `id_facultad`, `id_carrera`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(9, 21, 29, 64, 117, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
-(10, 22, 30, 64, 119, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
-(11, 23, 31, 64, 117, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20'),
-(12, 23, 32, 64, 118, 1, '2018-10-23 14:59:20', '2018-10-23 14:59:20');
+(25, 25, 33, 64, 117, 1, '2018-10-24 00:42:38', '2018-10-24 00:42:38'),
+(26, 26, 34, 64, 119, 1, '2018-10-24 00:42:38', '2018-10-24 00:42:38'),
+(27, 27, 35, 64, 117, 1, '2018-10-24 00:42:38', '2018-10-24 00:42:38'),
+(28, 27, 36, 64, 118, 1, '2018-10-24 00:42:38', '2018-10-24 00:42:38');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `fact_egresado_patentes`
+--
+
+CREATE TABLE `fact_egresado_patentes` (
+  `id` int(11) NOT NULL,
+  `id_egresado` int(11) NOT NULL,
+  `id_patentes` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL DEFAULT '1',
+  `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `fact_egresado_patentes`
+--
+
+INSERT INTO `fact_egresado_patentes` (`id`, `id_egresado`, `id_patentes`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
+(1, 25, 4, 1, '2018-10-24 00:42:39', '2018-10-24 00:42:39'),
+(2, 28, 3, 1, '2018-10-24 00:42:39', '2018-10-24 00:42:39');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `fact_egresado_trabajos`
+--
+
+CREATE TABLE `fact_egresado_trabajos` (
+  `id` int(11) NOT NULL,
+  `id_egresado` int(11) NOT NULL,
+  `id_trabajo` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL DEFAULT '1',
+  `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `fact_egresado_trabajos`
+--
+
+INSERT INTO `fact_egresado_trabajos` (`id`, `id_egresado`, `id_trabajo`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
+(1, 26, 6, 0, '2018-10-24 00:42:39', '2018-10-24 00:42:39'),
+(2, 28, 4, 0, '2018-10-24 00:42:40', '2018-10-24 00:42:40'),
+(3, 28, 5, 0, '2018-10-24 00:42:40', '2018-10-24 00:42:40');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `fact_egresado_voluntariado`
+--
+
+CREATE TABLE `fact_egresado_voluntariado` (
+  `id` int(11) NOT NULL,
+  `id_egresado` int(11) NOT NULL,
+  `id_voluntariado` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL DEFAULT '1',
+  `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `fact_egresado_voluntariado`
+--
+
+INSERT INTO `fact_egresado_voluntariado` (`id`, `id_egresado`, `id_voluntariado`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
+(1, 25, 2, 0, '2018-10-24 00:42:40', '2018-10-24 00:42:40'),
+(2, 25, 3, 0, '2018-10-24 00:42:40', '2018-10-24 00:42:40'),
+(3, 27, 1, 0, '2018-10-24 00:42:40', '2018-10-24 00:42:40');
 
 -- --------------------------------------------------------
 
@@ -723,7 +820,7 @@ CREATE TABLE `parametro_sistema` (
 --
 
 INSERT INTO `parametro_sistema` (`id`, `codigo`, `nombre`, `descripcion`, `definicion`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(1, 'CARGA_INICIAL_ACTUALIZACION', 'CARGA_INICIAL_ACTUALIZACION', 'Parametro que toma valores boleanos para la carga inicial (1) y la actualizacion (0, toma la fecha de actualizacion)', '1', '2018-10-18 20:35:32', '2018-10-23 21:17:01'),
+(1, 'CARGA_INICIAL_ACTUALIZACION', 'CARGA_INICIAL_ACTUALIZACION', 'Parametro que toma valores boleanos para la carga inicial (1) y la actualizacion (0, toma la fecha de actualizacion)', '0', '2018-10-18 20:35:32', '2018-10-24 00:42:40'),
 (2, 'RUTA_CARGA_ESTUDIANTES', 'RUTA_CARGA_ESTUDIANTES', 'Endpoint o ruta para la carga inicial del modulo de estudiantes', 'http://127.0.0.1:8082/estudiantes', '2018-10-18 20:38:51', '2018-10-20 20:20:36'),
 (3, 'RUTA_CARGA_PROFESORES', 'RUTA_CARGA_PROFESORES', 'Endpoint o ruta para la carga inicial del modulo de profesores', 'http://127.0.0.1:8082/profesores', '2018-10-18 20:40:26', '2018-10-20 20:20:54'),
 (4, 'RUTA_CARGA_EGRESADOS', 'RUTA_CARGA_EGRESADOS', 'Endpoint o ruta para la carga inicial del modulo de egresados', 'http://127.0.0.1:8082/egresados', '2018-10-18 21:31:21', '2018-10-21 02:05:53');
@@ -844,7 +941,9 @@ ALTER TABLE `dim_docente`
 -- Indices de la tabla `dim_educacion`
 --
 ALTER TABLE `dim_educacion`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigo` (`codigo`),
+  ADD UNIQUE KEY `codigo_2` (`codigo`);
 
 --
 -- Indices de la tabla `dim_egresado`
@@ -932,13 +1031,15 @@ ALTER TABLE `dim_titulo`
 -- Indices de la tabla `dim_trabajos`
 --
 ALTER TABLE `dim_trabajos`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigo` (`codigo`);
 
 --
 -- Indices de la tabla `dim_voluntariado`
 --
 ALTER TABLE `dim_voluntariado`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigo` (`codigo`);
 
 --
 -- Indices de la tabla `fact_asignatura_inscrita`
@@ -984,13 +1085,17 @@ ALTER TABLE `fact_egresado_certificacion`
 -- Indices de la tabla `fact_egresado_cursos`
 --
 ALTER TABLE `fact_egresado_cursos`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_egresado` (`id_egresado`),
+  ADD KEY `id_cursos` (`id_cursos`);
 
 --
 -- Indices de la tabla `fact_egresado_educacion`
 --
 ALTER TABLE `fact_egresado_educacion`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_egresado` (`id_egresado`),
+  ADD KEY `id_educacion` (`id_educacion`);
 
 --
 -- Indices de la tabla `fact_egresado_estudiosuc`
@@ -1001,6 +1106,30 @@ ALTER TABLE `fact_egresado_estudiosuc`
   ADD KEY `id_estudiosuc` (`id_estudiosuc`),
   ADD KEY `id_facultad` (`id_facultad`),
   ADD KEY `id_carrera` (`id_carrera`);
+
+--
+-- Indices de la tabla `fact_egresado_patentes`
+--
+ALTER TABLE `fact_egresado_patentes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_egresado` (`id_egresado`),
+  ADD KEY `id_patentes` (`id_patentes`);
+
+--
+-- Indices de la tabla `fact_egresado_trabajos`
+--
+ALTER TABLE `fact_egresado_trabajos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_egresado` (`id_egresado`),
+  ADD KEY `id_trabajo` (`id_trabajo`);
+
+--
+-- Indices de la tabla `fact_egresado_voluntariado`
+--
+ALTER TABLE `fact_egresado_voluntariado`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_egresado` (`id_egresado`),
+  ADD KEY `id_voluntariado` (`id_voluntariado`);
 
 --
 -- Indices de la tabla `fact_estudiante_facultad`
@@ -1069,13 +1198,13 @@ ALTER TABLE `dim_carrera`
 -- AUTO_INCREMENT de la tabla `dim_certificacion`
 --
 ALTER TABLE `dim_certificacion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_cursos`
 --
 ALTER TABLE `dim_cursos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_docente`
@@ -1087,13 +1216,13 @@ ALTER TABLE `dim_docente`
 -- AUTO_INCREMENT de la tabla `dim_educacion`
 --
 ALTER TABLE `dim_educacion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_egresado`
 --
 ALTER TABLE `dim_egresado`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_escalafon`
@@ -1111,7 +1240,7 @@ ALTER TABLE `dim_estudiante`
 -- AUTO_INCREMENT de la tabla `dim_estudiosuc`
 --
 ALTER TABLE `dim_estudiosuc`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_facultad`
@@ -1135,7 +1264,7 @@ ALTER TABLE `dim_nacionalidad`
 -- AUTO_INCREMENT de la tabla `dim_patentes`
 --
 ALTER TABLE `dim_patentes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_publicacion`
@@ -1165,13 +1294,13 @@ ALTER TABLE `dim_titulo`
 -- AUTO_INCREMENT de la tabla `dim_trabajos`
 --
 ALTER TABLE `dim_trabajos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_voluntariado`
 --
 ALTER TABLE `dim_voluntariado`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_asignatura_inscrita`
@@ -1195,25 +1324,43 @@ ALTER TABLE `fact_docente_publicacion`
 -- AUTO_INCREMENT de la tabla `fact_egresado_certificacion`
 --
 ALTER TABLE `fact_egresado_certificacion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_egresado_cursos`
 --
 ALTER TABLE `fact_egresado_cursos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_egresado_educacion`
 --
 ALTER TABLE `fact_egresado_educacion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_egresado_estudiosuc`
 --
 ALTER TABLE `fact_egresado_estudiosuc`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+
+--
+-- AUTO_INCREMENT de la tabla `fact_egresado_patentes`
+--
+ALTER TABLE `fact_egresado_patentes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de la tabla `fact_egresado_trabajos`
+--
+ALTER TABLE `fact_egresado_trabajos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de la tabla `fact_egresado_voluntariado`
+--
+ALTER TABLE `fact_egresado_voluntariado`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_estudiante_facultad`
@@ -1279,6 +1426,27 @@ ALTER TABLE `fact_docente_publicacion`
   ADD CONSTRAINT `fact_docente_publicacion_ibfk_3` FOREIGN KEY (`id_publicacion`) REFERENCES `dim_publicacion` (`id`);
 
 --
+-- Filtros para la tabla `fact_egresado_certificacion`
+--
+ALTER TABLE `fact_egresado_certificacion`
+  ADD CONSTRAINT `fact_egresado_certificacion_ibfk_1` FOREIGN KEY (`id_egresado`) REFERENCES `dim_egresado` (`id`),
+  ADD CONSTRAINT `fact_egresado_certificacion_ibfk_2` FOREIGN KEY (`id_certificacion`) REFERENCES `dim_certificacion` (`id`);
+
+--
+-- Filtros para la tabla `fact_egresado_cursos`
+--
+ALTER TABLE `fact_egresado_cursos`
+  ADD CONSTRAINT `fact_egresado_cursos_ibfk_1` FOREIGN KEY (`id_egresado`) REFERENCES `dim_egresado` (`id`),
+  ADD CONSTRAINT `fact_egresado_cursos_ibfk_2` FOREIGN KEY (`id_cursos`) REFERENCES `dim_cursos` (`id`);
+
+--
+-- Filtros para la tabla `fact_egresado_educacion`
+--
+ALTER TABLE `fact_egresado_educacion`
+  ADD CONSTRAINT `fact_egresado_educacion_ibfk_1` FOREIGN KEY (`id_egresado`) REFERENCES `dim_egresado` (`id`),
+  ADD CONSTRAINT `fact_egresado_educacion_ibfk_2` FOREIGN KEY (`id_educacion`) REFERENCES `dim_educacion` (`id`);
+
+--
 -- Filtros para la tabla `fact_egresado_estudiosuc`
 --
 ALTER TABLE `fact_egresado_estudiosuc`
@@ -1286,6 +1454,20 @@ ALTER TABLE `fact_egresado_estudiosuc`
   ADD CONSTRAINT `fact_egresado_estudiosuc_ibfk_2` FOREIGN KEY (`id_estudiosuc`) REFERENCES `dim_estudiosuc` (`id`),
   ADD CONSTRAINT `fact_egresado_estudiosuc_ibfk_3` FOREIGN KEY (`id_carrera`) REFERENCES `dim_carrera` (`id`),
   ADD CONSTRAINT `fact_egresado_estudiosuc_ibfk_4` FOREIGN KEY (`id_egresado`) REFERENCES `dim_egresado` (`id`);
+
+--
+-- Filtros para la tabla `fact_egresado_patentes`
+--
+ALTER TABLE `fact_egresado_patentes`
+  ADD CONSTRAINT `fact_egresado_patentes_ibfk_1` FOREIGN KEY (`id_patentes`) REFERENCES `dim_patentes` (`id`),
+  ADD CONSTRAINT `fact_egresado_patentes_ibfk_2` FOREIGN KEY (`id_egresado`) REFERENCES `dim_egresado` (`id`);
+
+--
+-- Filtros para la tabla `fact_egresado_voluntariado`
+--
+ALTER TABLE `fact_egresado_voluntariado`
+  ADD CONSTRAINT `fact_egresado_voluntariado_ibfk_1` FOREIGN KEY (`id_egresado`) REFERENCES `dim_egresado` (`id`),
+  ADD CONSTRAINT `fact_egresado_voluntariado_ibfk_2` FOREIGN KEY (`id_voluntariado`) REFERENCES `dim_voluntariado` (`id`);
 
 --
 -- Filtros para la tabla `fact_estudiante_facultad`

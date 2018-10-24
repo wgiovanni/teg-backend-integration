@@ -11,7 +11,8 @@ from db_credentials import datawarehouse_db_config
 from sql_queries import systemParameter, nationalityQuery, sexQuery, studentQuery, teacherQuery, professionQuery, facultyQuery 
 from sql_queries import publicationQuery, scaleQuery, studentRelationship, gradeQuery, teacherFacultyRelationship, teacherPublicationRelationship
 from sql_queries import graduateQuery, studiosUcQuery, certificationQuery, coursesQuery, educationQuery, educationQuery, patentsQuery
-from sql_queries import jobsQuery, volunteeringQuery
+from sql_queries import jobsQuery, volunteeringQuery, graduateJobsRelationship, graduatePatentsRelationship, graduateCertificationRelationship 
+from sql_queries import graduateCoursesRelationship, graduateEducationRelationship, graduateVolunteeringRelationship
 from constants import LOAD_INITIAL_UPDATE, ENDPOINT_LOAD_STUDENTS, ENDPOINT_LOAD_TEACHERS, ENDPOINT_LOAD_GRADUATES, CONTENT_TYPE
 from constants import DIMENSION, FACT, ITEMS
 from constants import STUDENT, PROFESSION, FACULTY, STUDENT_PROFESSION_FACULTY, TEACHER, SCALE, GRADE, PUBLICATION, TEACHER_PUBLICATION, TEACHER_FACULTY, GRADUATE, STUDIOS_UC
@@ -19,168 +20,6 @@ from constants import NACIONALITY_ATTRIBUTE, SEX_ATTRIBUTE, IDENTIFICATION_CARD,
 from constants import MALE, FEMALE, NATIONAL, INTERNACIONAL
 # variables
 from variables import datawarehouse_name
-
-def etl(query, source_cnx, target_cnx):
-	# extraer datos de la fuente db
-	source_cursor = source_cnx.cursor()
-	print("ETL \n")
-	#dateCurrent = [datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
-	# buscar ultima fecha de actualizacion
-	target_cursor = target_cnx.cursor()
-	target_cursor.execute("USE {}".format(datawarehouse_name))
-	target_cursor.execute()
-	row = target_cursor.fetchone(systemParameter.get_query)
-
-	if query.type_table == "DIM":
-
-		if row is not None:
-
-			if row[1] == False: 
-				# si es actualizacion
-				lastUpdate = [row[2]]
-				#print(lastUpdate)
-				source_cursor.execute(query.extract_update_query, lastUpdate)
-				data = source_cursor.fetchall()
-				print("Actualizacion")
-				#print(data)
-				source_cursor.close()
-
-				if data:
-					for d in data:
-						params = list(d)
-						if params[0] is not None:
-							# buscar registro
-							target_cursor.execute(query.get_query, [params[0]])
-							# se obtiene el registro
-							rowExists = target_cursor.fetchone()
-
-							if rowExists is not None:
-								params.append(rowExists[0])
-								target_cursor.execute(query.update_query, params)
-								print("Actualizo...")
-							else:
-								target_cursor.execute(query.load_query, params)
-								print("Inserto...")
-
-							target_cnx.commit()
-
-					print('Cargando datos al data warehouse')
-					#target_cursor.execute("UPDATE LAST_UPDATE SET is_load_initial=%s, last_update=NOW() WHERE id = %s", [False, row[0]])
-					#target_cnx.commit()
-					print("Actualizando fecha actualizacion")
-				else:
-					print('Los datos estan vacios')
-			else:
-				# modo carga inicial
-				source_cursor.execute(query.extract_initial_query)
-				data = source_cursor.fetchall()
-				print("Carga inicial")
-				#print(data)
-				if data:
-					target_cursor.executemany(query.load_query, data)
-					target_cnx.commit()
-					print('Carga Inicial Lista...')
-					#target_cursor.execute("UPDATE LAST_UPDATE SET is_load_initial=%s, last_update=NOW() WHERE id = %s", [False, row[0]])
-					#target_cnx.commit()
-					print("Actualizando fecha actualizacion")
-				else: 
-					print('Los datos estan vacios')
-		else:
-			print("Debe llenar un registro en la Tabla 'last_update'")		
-	else:
-		source_cursor.execute(query.extract_initial_query)
-		data = source_cursor.fetchall()
-		print("Tabla de hechos...")
-		#print(query.type_table)
-		#print(data)
-		if data:
-			for d in data:
-				if len(d) == len(query.tables):
-					print("Longitudes iguales")
-					#print(d)
-					ids = []
-					for i in range(len(d)):
-						#print(query.tables[i])
-						#print(d[i])
-						id = select_query(query.tables[i], d[i], target_cursor)
-						if id is not None:
-							ids.append(id[0])
-						else: 
-							ids.append(None)
-						#print(ids)
-					target_cursor.execute(query.verificate_query, ids)
-					foundRegister = target_cursor.fetchone()
-					#print(foundRegister)
-					if foundRegister is None:
-						target_cursor.execute(query.load_query, ids)
-						target_cnx.commit()
-						print("Llenando tablas de hechos...")
-					else:
-						print("Ya existen los registros") 	
-				else:	
-					print("Longitudes diferentes")
-	target_cursor.close()	
-
-
-def etl_process(queries, target_cnx, source_db_config, db_platform):
-	# establecer la conexion de fuentes de db
-	if db_platform == 'mysql':
-		source_cnx = mysql.connector.connect(**source_db_config)
-	elif db_platform == 'postgresql':
-		#print("Entro postgresql")
-		#print(source_db_config)
-		#print(source_db_config.user)
-		source_cnx = psycopg2.connect(**source_db_config)
-		#print("conecto")
-	else:
-		return 'Error! plataforma db no reconocida'
-
-	
-	# ciclo a traves de consultas sql
-	for query in queries:
-		#print(query)
-		etl(query, source_cnx, target_cnx)
-
-	target_cursor = target_cnx.cursor()
-	target_cursor.execute("USE {}".format(datawarehouse_name))
-	target_cursor.execute("SELECT * FROM LAST_UPDATE")
-	row = target_cursor.fetchone()
-	#print(row)
-	# Despues de del proceso ETL de cada tabla se actualiza la fecha de actualizacion
-	if row is not None:
-		#if row[1]:
-		target_cursor.execute("UPDATE LAST_UPDATE SET is_load_initial=%s, last_update=NOW() WHERE id = %s", [False, row[0]])
-		#else:
-		#	target_cursor.execute("UPDATE LAST_UPDATE SET is_load_initial=%s, last_update=NOW() WHERE id = %s", [False, row[0]])
-		target_cnx.commit()
-		print("Se actualizo la fecha")
-			
-	else:
-		print("Debe llenar un registro en la Tabla 'last_update'")
-
-	# cerra la conexion de fuente de db
-	target_cursor.close()
-	source_cnx.close()
-
-def select_query(table: str, param: str, target_cursor):
-	sql = dedent(f"""\
-	SELECT COLUMN_NAME 
-	FROM INFORMATION_SCHEMA.COLUMNS 
-	WHERE TABLE_SCHEMA = 'PRUEBA' AND TABLE_NAME = '{table}' AND COLUMN_KEY = 'UNI'""")
-	#print(sql)
-	target_cursor.execute(sql)
-	col = target_cursor.fetchone()
-	#print(col)
-
-	query = dedent(f"""\
-		SELECT id 
-		FROM {table} 
-		WHERE {col[0]}  = '{param}'""")
-	#print(query)
-	target_cursor.execute(query)
-	row = target_cursor.fetchone()
-	#print(row)
-	return row
 
 def etl_process2():
 	print("ETL \n")
@@ -769,13 +608,84 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 				"causa": item['causa']
 			}
 			target_cursor.execute(volunteeringQuery.get_query_code, [item['codigo']])
-			volunteerin = target_cursor.fetchone()
-			if volunteerin is None:
+			volunteering = target_cursor.fetchone()
+			if volunteering is None:
 				insert(target_cursor, table, item)
 				target_cnx.commit()
 			else: 
 				print("Ya existe {}".format(item['codigo']))
 
+	elif table == "egresado-voluntariado":
+		items = content[ITEMS]
+		for item in items:
+			print(item)
+			target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
+			idGraduate = target_cursor.fetchone()
+			volunteerinList = item["voluntariado"]
+
+			if volunteerinList is not None:
+				for i in volunteerinList:
+					volunteerinCode = i['codigo']
+
+					target_cursor.execute(volunteeringQuery.get_query_code, [volunteerinCode])
+					idVolunteering = target_cursor.fetchone()
+
+					if idVolunteering is not None and idGraduate is not None:
+						target_cursor.execute(dedent("""\
+						INSERT INTO FACT_EGRESADO_VOLUNTARIADO
+							(id_egresado, id_voluntariado)
+						VALUES (%s, %s)"""), [idGraduate[0], idVolunteering[0]])
+						target_cnx.commit()
+					else: 
+						print("Error")
+
+	elif table == "egresado-patentes":
+		items = content[ITEMS]
+		for item in items:
+			print(item)
+			target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
+			idGraduate = target_cursor.fetchone()
+			patentsList = item["patentes"]
+
+			if patentsList is not None:
+				for i in patentsList:
+					patentsCode = i['codigo']
+
+					target_cursor.execute(patentsQuery.get_query_code, [patentsCode])
+					idpatents = target_cursor.fetchone()
+
+					if idpatents is not None and idGraduate is not None:
+						target_cursor.execute(dedent("""\
+						INSERT INTO FACT_EGRESADO_PATENTES
+							(id_egresado, id_patentes)
+						VALUES (%s, %s)"""), [idGraduate[0], idpatents[0]])
+						target_cnx.commit()
+					else: 
+						print("Error")
+
+	elif table == "egresado-trabajos":
+		items = content[ITEMS]
+		for item in items:
+			print(item)
+			target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
+			idGraduate = target_cursor.fetchone()
+			jobsList = item["trabajos"]
+
+			if jobsList is not None:
+				for i in jobsList:
+					jobsCode = i['codigo']
+
+					target_cursor.execute(jobsQuery.get_query_code, [jobsCode])
+					idjobs = target_cursor.fetchone()
+
+					if idjobs is not None and idGraduate is not None:
+						target_cursor.execute(dedent("""\
+						INSERT INTO FACT_EGRESADO_TRABAJOS
+							(id_egresado, id_trabajo)
+						VALUES (%s, %s)"""), [idGraduate[0], idjobs[0]])
+						target_cnx.commit()
+					else: 
+						print("Error")
 
 	target_cursor.close()
 
@@ -1056,6 +966,355 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 			else:
 				print("Registro no existe")
 		print("Actualizacion finalizada")
+
+	elif table == GRADUATE:
+		items = content[ITEMS]
+		for item in items:
+			graduateCode = item['nombreusuario']
+			target_cursor.execute(graduateQuery.get_query_code, [graduateCode])
+			idGraduate = target_cursor.fetchone()
+
+			item = {
+				"nombre_usuario": item['nombreusuario'],  
+				"primer_nombre": item['primernombre'], 
+				"segundo nombre": item['segundonombre'], 
+				"primer apellido": item['primerapellido'],
+				"segundo apellido": item['segundoapellido'], 
+				"descripcion": item['descripcion'],
+				"intereses": item['intereses'],
+				"email": item['email'],
+				"telefono": item['telefono'],
+				"identificacion": item['identificacion']
+			}
+			if idGraduate is None:
+				insert(target_cursor, table, item)
+			else: 
+				update(target_cursor, table, item, {"id": idGraduate[0]})
+			target_cnx.commit()
+
+	elif table == STUDIOS_UC:
+		items = content[ITEMS]
+		for item in items:
+			print(item)
+
+			item = {
+				"titulo": item['titulo'],
+				"anho_grado": item['anhogrado'],
+				"url_certificacion": item['urlcertificacion'],
+				"codigo": item['codigo']
+			}
+			target_cursor.execute(studiosUcQuery.get_query_code, [item['codigo']])
+			studiosUc = target_cursor.fetchone()
+			if studiosUc is None:
+				insert(target_cursor, table, item)
+			else: 
+				update(target_cursor, table, item, {"id": studiosUc[0]})
+			target_cnx.commit()
+
+	elif table == "certificacion":
+		items = content[ITEMS]
+		for item in items:
+			item = {
+				"codigo": item['codigo'],
+				"nombre_certificacion": item['nombrecertificacion'],
+				"descripcion": item['descripcion'],
+				"url_certificacion": item['urlcertificacion']
+			}
+			target_cursor.execute(certificationQuery.get_query_code, [item['codigo']])
+			certification = target_cursor.fetchone()
+			if certification is None:
+				insert(target_cursor, table, item)
+			else: 
+				update(target_cursor, table, item, {"id": certification[0]})
+
+			target_cnx.commit()
+
+	elif table == "cursos":
+		items = content[ITEMS]
+		for item in items:
+			target_cursor.execute(coursesQuery.get_query_code, [item['codigo']])
+			courses = target_cursor.fetchone()
+			if courses is None:
+				insert(target_cursor, table, item)
+			else: 
+				update(target_cursor, table, item, {"id": courses[0]})
+
+			target_cnx.commit()
+
+	elif table == "educacion":
+		items = content[ITEMS]
+		for item in items:
+			item = {
+				"codigo": item['codigo'],
+				"instituto": item['instituto'],
+				"campo_estudio": item['campoestudio'],
+				"titulo_obtenido": item['tituloobtenido'],
+				"url_certificacion": item['urlcertificacion']
+			}
+			target_cursor.execute(educationQuery.get_query_code, [item['codigo']])
+			education = target_cursor.fetchone()
+			if education is None:
+				insert(target_cursor, table, item)
+			else: 
+				update(target_cursor, table, item, {"id": education[0]})
+			target_cnx.commit()
+
+	elif table == "patentes":
+		items = content[ITEMS]
+		for item in items:
+			item = {
+				"codigo": item['codigo'],
+				"titulo": item['titulo'],
+				"descripcion": item['descripcion'],
+				"numero": item['numero'],
+				"inventores": item['inventores'],
+				"fecha": item['fecha'],
+				"url": item['url']
+			}
+			target_cursor.execute(patentsQuery.get_query_code, [item['codigo']])
+			patents = target_cursor.fetchone()
+			if patents is None:
+				insert(target_cursor, table, item)
+			else: 
+				update(target_cursor, table, item, {"id": patents[0]})
+			target_cnx.commit()
+
+	elif table == "trabajos":
+		items = content[ITEMS]
+		for item in items:
+			item = {
+				"codigo": item['codigo'],
+				"nombre_empresa": item['nombreempresa'],
+				"cargo": item['cargo'],
+				"descripcion": item['descripcion']
+			}
+			target_cursor.execute(jobsQuery.get_query_code, [item['codigo']])
+			jobs = target_cursor.fetchone()
+			if jobs is None:
+				insert(target_cursor, table, item)
+			else: 
+				update(target_cursor, table, item, {"id": jobs[0]})
+			target_cnx.commit()
+				
+	elif table == "voluntariado":
+		items = content[ITEMS]
+		for item in items:
+			item = {
+				"codigo": item['codigo'],
+				"organizacion": item['organizacion'],
+				"descripcion": item['descripcion'],
+				"causa": item['causa']
+			}
+			target_cursor.execute(volunteeringQuery.get_query_code, [item['codigo']])
+			volunteering = target_cursor.fetchone()
+			if volunteering is None:
+				insert(target_cursor, table, item)
+			else: 
+				update(target_cursor, table, item, {"id": volunteering[0]})
+			target_cnx.commit()
+
+	elif table == "egresado-patentes":
+		items = content[ITEMS]
+		for item in items:
+			target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
+			idGraduate = target_cursor.fetchone()
+			patentsList = item["patentes"]
+			if patentsList is not None:
+				for i in patentsList:
+					patentsCode = i['codigo']
+
+					target_cursor.execute(patentsQuery.get_query_code, [patentsCode])
+					idPatents = target_cursor.fetchone()
+
+					target_cursor.execute(graduatePatentsRelationship.get_query_code, [patentsCode])
+					idFact = target_cursor.fetchone()
+
+					if idFact is not None:
+						target_cursor.execute(dedent("""\
+						UPDATE fact_egresado_patentes
+						SET id_egresado=%s, id_patentes=%s
+						WHERE id=%s;"""), [idGraduate[0], idPatents[0], idFact[0]])
+						print("Registro actualizado")
+					else:
+						target_cursor.execute(dedent("""\
+						INSERT INTO fact_egresado_patentes 
+							(id_egresado, id_patentes)
+						VALUES (%s, %s)"""), [idGraduate[0], idPatents[0]])
+						print("Registro insertado")
+
+					target_cnx.commit()
+		print("Actualizacion finalizada")
+
+	elif table == "egresado-trabajos":
+		items = content[ITEMS]
+		for item in items:
+			target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
+			idGraduate = target_cursor.fetchone()
+
+			jobsList = item["trabajos"]
+
+			if jobsList is not None:
+				for i in jobsList:
+					jobsCode = i['codigo']
+
+					target_cursor.execute(jobsQuery.get_query_code, [jobsCode])
+					idJobs = target_cursor.fetchone()
+
+					target_cursor.execute(graduateJobsRelationship.get_query_code, [jobsCode])
+					idFact = target_cursor.fetchone()
+
+					if idFact is not None:
+						target_cursor.execute(dedent("""\
+						UPDATE fact_egresado_trabajos
+						SET id_egresado=%s, id_trabajo=%s
+						WHERE id=%s;"""), [idGraduate[0], idJobs[0], idFact[0]])
+						print("Registro actualizado")
+					else:
+						target_cursor.execute(dedent("""\
+						INSERT INTO fact_egresado_trabajos 
+							(id_egresado, id_patentes)
+						VALUES (%s, %s)"""), [idGraduate[0], idJobs[0]])
+						print("Registro insertado")
+						
+					target_cnx.commit()
+		print("Actualizacion finalizada")
+
+	elif table == "egresado-certificacion":
+		items = content[ITEMS]
+		for item in items:
+			target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
+			idGraduate = target_cursor.fetchone()
+
+			certificationList = item["certificacion"]
+
+			if certificationList is not None:
+				for i in certificationList:
+					certificationCode = i['codigo']
+
+					target_cursor.execute(certificationQuery.get_query_code, [certificationCode])
+					idCertification = target_cursor.fetchone()
+
+					target_cursor.execute(graduateCertificationRelationship.get_query_code, [certificationCode])
+					idFact = target_cursor.fetchone()
+
+					if idFact is not None:
+						target_cursor.execute(dedent("""\
+						UPDATE fact_egresado_certificacion
+						SET id_egresado=%s, id_certificacion=%s
+						WHERE id=%s;"""), [idGraduate[0], idCertification[0], idFact[0]])
+						print("Registro actualizado")
+					else:
+						target_cursor.execute(dedent("""\
+						INSERT INTO fact_egresado_certificacion 
+							(id_egresado, id_certificacion)
+						VALUES (%s, %s)"""), [idGraduate[0], idCertification[0]])
+						print("Registro insertado")
+						
+					target_cnx.commit()
+		print("Actualizacion finalizada")
+
+	elif table == "egresado-cursos":
+		items = content[ITEMS]
+		for item in items:
+			target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
+			idGraduate = target_cursor.fetchone()
+
+			coursesList = item["cursos"]
+
+			if coursesList is not None:
+				for i in coursesList:
+					coursesCode = i['codigo']
+
+					target_cursor.execute(coursesQuery.get_query_code, [coursesCode])
+					idCourses = target_cursor.fetchone()
+
+					target_cursor.execute(graduateCoursesRelationship.get_query_code, [coursesCode])
+					idFact = target_cursor.fetchone()
+
+					if idFact is not None:
+						target_cursor.execute(dedent("""\
+						UPDATE fact_egresado_cursos
+						SET id_egresado=%s, id_cursos=%s
+						WHERE id=%s;"""), [idGraduate[0], idCourses[0], idFact[0]])
+						print("Registro actualizado")
+					else:
+						target_cursor.execute(dedent("""\
+						INSERT INTO fact_egresado_cursos 
+							(id_egresado, id_cursos)
+						VALUES (%s, %s)"""), [idGraduate[0], idCourses[0]])
+						print("Registro insertado")
+						
+					target_cnx.commit()
+		print("Actualizacion finalizada")
+
+	elif table == "egresado-educacion":
+		items = content[ITEMS]
+		for item in items:
+			target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
+			idGraduate = target_cursor.fetchone()
+
+			educationList = item["educacion"]
+
+			if educationList is not None:
+				for i in educationList:
+					educationCode = i['codigo']
+
+					target_cursor.execute(educationQuery.get_query_code, [educationCode])
+					idEducation = target_cursor.fetchone()
+
+					target_cursor.execute(graduateEducationRelationship.get_query_code, [educationCode])
+					idFact = target_cursor.fetchone()
+
+					if idFact is not None:
+						target_cursor.execute(dedent("""\
+						UPDATE fact_egresado_educacion
+						SET id_egresado=%s, id_educacion=%s
+						WHERE id=%s;"""), [idGraduate[0], idEducation[0], idFact[0]])
+						print("Registro actualizado")
+					else:
+						target_cursor.execute(dedent("""\
+						INSERT INTO fact_egresado_cursos 
+							(id_egresado, id_educacion)
+						VALUES (%s, %s)"""), [idGraduate[0], idEducation[0]])
+						print("Registro insertado")
+						
+					target_cnx.commit()
+		print("Actualizacion finalizada")
+
+	elif table == "egresado-voluntariado":
+		items = content[ITEMS]
+		for item in items:
+			target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
+			idGraduate = target_cursor.fetchone()
+
+			volunteeringList = item["voluntariado"]
+
+			if volunteeringList is not None:
+				for i in volunteeringList:
+					volunteeringCode = i['codigo']
+
+					target_cursor.execute(volunteeringQuery.get_query_code, [volunteeringCode])
+					idVolunteering = target_cursor.fetchone()
+
+					target_cursor.execute(graduateVolunteeringRelationship.get_query_code, [volunteeringCode])
+					idFact = target_cursor.fetchone()
+
+					if idFact is not None:
+						target_cursor.execute(dedent("""\
+						UPDATE fact_egresado_voluntariado
+						SET id_egresado=%s, id_voluntariado=%s
+						WHERE id=%s;"""), [idGraduate[0], idVolunteering[0], idFact[0]])
+						print("Registro actualizado")
+					else:
+						target_cursor.execute(dedent("""\
+						INSERT INTO fact_egresado_voluntariado 
+						(id_egresado, id_voluntariado)
+						VALUES (%s, %s)"""), [idGraduate[0], idVolunteering[0]])
+						print("Registro insertado")
+						
+					target_cnx.commit()
+		print("Actualizacion finalizada")
+
 
 	target_cursor.close()
 

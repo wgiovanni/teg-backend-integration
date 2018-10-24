@@ -1,218 +1,5 @@
 from textwrap import dedent
-#-------------------------------------------------------------
-#TABLA PRUEBA
-# extracción de los todos los registros Carga Inicial
-postgresql_extract_load_initial = dedent("""\
-	SELECT name, email
-	FROM PRUEBA
-	""")
 
-# extracción de los registros actualizados
-postgresql_extract_update = dedent("""\
-	SELECT name, email
-	FROM PRUEBA
-	WHERE updated_date > %s 
-	""")
-
-# insertar en el DW
-postgresql_insert = dedent("""\
-	INSERT INTO PRUEBA (name, email)
-	VALUES (%s, %s)
-	""")
-# actualizar en el DW
-postgresql_update = dedent("""\
-	UPDATE PRUEBA
-   	SET name=%s, email=%s
- 	WHERE id=%s;
-	""")
-
-# buscar en el DW
-# el primer parametro sera el campo unico
-postgresql_get = dedent("""\
-	SELECT id 
-	FROM PRUEBA 
-	WHERE name = %s
-	""")
-
-#tipo de tabla
-postgresql_type_table = "DIM"
-
-#------------------------------------------------------------------------------------------------------
-# TABLA FACULTAD: DIMENSION
-# extracción de los todos los registros Carga Inicial
-postgresql_extract_load_initial_facultad = dedent("""\
-	SELECT nombre
-	FROM FACULTAD
-	""")
-
-# extracción de los registros actualizados
-postgresql_extract_update_facultad = dedent("""\
-	SELECT nombre
-	FROM FACULTAD
-	WHERE updated_date > %s 
-	""")
-
-# insertar en el DW
-postgresql_insert_facultad = dedent("""\
-	INSERT INTO DIM_FACULTAD (nombre)
-	VALUES (%s)
-	""")
-
-# actualizar en el DW
-postgresql_update_facultad = dedent("""\
-	UPDATE DIM_FACULTAD
-   	SET nombre=%s
- 	WHERE id=%s;
-	""")
-
-# buscar en el DW
-# el primer parametro sera el campo unico
-postgresql_get_facultad = dedent("""\
-	SELECT id 
-	FROM DIM_FACULTAD 
-	WHERE nombre = %s
-	""")
-postgresql_type_table_facultad = "DIM"
-
-#------------------------------------------------------------------------------------------------------
-# TABLA CARRERA: DIMENSION
-# extracción de los todos los registros Carga Inicial
-postgresql_extract_load_initial_carrera = dedent("""\
-	SELECT nombre, tipo
-	FROM CARRERA
-	""")
-
-# extracción de los registros actualizados
-postgresql_extract_update_carrera = dedent("""\
-	SELECT nombre, tipo
-	FROM CARRERA
-	WHERE updated_date > %s 
-	""")
-
-# insertar en el DW
-postgresql_insert_carrera = dedent("""\
-	INSERT INTO DIM_CARRERA (nombre, tipo)
-	VALUES (%s, %s)
-	""")
-
-# actualizar en el DW
-postgresql_update_carrera = dedent("""\
-	UPDATE DIM_CARRERA
-   	SET nombre=%s, tipo=%s
- 	WHERE id=%s;
-	""")
-
-# buscar en el DW
-# el primer parametro sera el campo unico
-postgresql_get_carrera = dedent("""\
-	SELECT id 
-	FROM DIM_CARRERA 
-	WHERE nombre = %s
-	""")
-
-postgresql_type_table_carrera = "DIM"
-
-#------------------------------------------------------------------------------------------------------
-# TABLA ESTUDIANTE: DIMENSION
-# extracción de los todos los registros Carga Inicial
-postgresql_extract_load_initial_estudiante = dedent("""\
-	SELECT cedula, nacionalidad, nombre, 
-		apellido, sexo, fecha_nacimiento, 
-		telefono1, telefono2, email, edo_procedencia
-	FROM ESTUDIANTE
-	""")
-
-# extracción de los registros actualizados
-postgresql_extract_update_estudiante = dedent("""\
-	SELECT cedula, nacionalidad, nombre, 
-		apellido, sexo, fecha_nacimiento, 
-		telefono1, telefono2, email, edo_procedencia
-	FROM ESTUDIANTE
-	WHERE updated_date > %s 
-	""")
-
-# insertar en el DW
-postgresql_insert_estudiante = dedent("""\
-	INSERT INTO DIM_ESTUDIANTE (
-		cedula, nacionalidad, nombre, 
-		apellido, sexo, fecha_nacimiento, 
-		telefono1, telefono2, email, edo_procedencia)
-	VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-	""")
-
-# actualizar en el DW
-postgresql_update_estudiante = dedent("""\
-	UPDATE DIM_ESTUDIANTE
-   	SET cedula=%s, nacionalidad=%s, nombre=%s, 
-		apellido=%s, sexo=%s, fecha_nacimiento=%s, 
-		telefono1=%s, telefono2=%s, email=%s, edo_procedencia=%s
- 	WHERE id=%s;
-	""")
-
-# buscar en el DW
-# el primer parametro sera el campo unico
-postgresql_get_estudiante = dedent("""\
-	SELECT id 
-	FROM DIM_ESTUDIANTE
-	WHERE cedula = %s
-	""")
-
-postgresql_type_table_estudiante = "DIM"
-
-#------------------------------------------------------------------------------------------------------
-# RELACION ESTUDIANTE_FACULTAD: HECHOS
-# extracción de los todos los registros Carga Inicial
-postgresql_extract_load_initial_estudiante_facultad = dedent("""\
-	select e.cedula, f.nombre 
-	FROM estudiante as e 
-	INNER JOIN carrera as c ON (e.id_carrera = c.id)
-	INNER JOIN facultad as f ON (c.id_facultad = f.id)
-	""")
-
-# extracción de los registros actualizados
-#postgresql_extract_update_estudiante_facultad = ""
-#dedent("""\
-#	SELECT cedula, nacionalidad, nombre, 
-#		apellido, sexo, fecha_nacimiento, 
-#		telefono1, telefono2, email, edo_procedencia
-#	FROM ESTUDIANTE
-#	WHERE updated_date > %s 
-#	""")
-
-# insertar en el DW
-postgresql_insert_estudiante_facultad = dedent("""\
-	INSERT INTO FACT_ESTUDIANTE_FACULTAD (id_estudiante, id_facultad)
-	VALUES (%s, %s)
-	""")
-
-# actualizar en el DW
-#postgresql_update_estudiante = dedent("""\
-#	UPDATE DIM_ESTUDIANTE
-#   	SET cedula=%s, nacionalidad=%s, nombre=%s, 
-#		apellido=%s, sexo=%s, fecha_nacimiento=%s, 
-#		telefono1=%s, telefono2=%s, email=%s, edo_procedenciatipo=%s
-# 	WHERE id=%s;
-#	""")
-
-# buscar en el DW
-# el primer parametro sera el campo unico
-postgresql_get_estudiante_facultad = dedent("""\
-	SELECT id 
-	FROM %s
-	WHERE  id = %s
-	""")
-
-postgresql_verificate_estudiante_facultad = dedent("""\
-	SELECT * 
-	FROM FACT_ESTUDIANTE_FACULTAD
-	WHERE id_estudiante = %s AND id_facultad = %s
-	""")
-
-postgresql_type_table_estudiante_facultad = "FACT"
-
-postgresql_tables_estudiante_facultad = ["DIM_ESTUDIANTE", "DIM_FACULTAD"]
-
-# exportando consultas para las tablas de dimensiones
 class SqlQuery:
 	def __init__(self, extract_initial_query, extract_update_query, load_query, update_query, get_query, type_table):
 		self.extract_initial_query = extract_initial_query
@@ -257,61 +44,6 @@ class SqlFactRelationship:
 	def __init__(self, get_query_code):
 		self.get_query_code = get_query_code
 
-# creando instancias para la clase SqlQuery 
-postgresql_query = SqlQuery(
-	postgresql_extract_load_initial, 
-	postgresql_extract_update, 
-	postgresql_insert, 
-	postgresql_update, 
-	postgresql_get, 
-	postgresql_type_table)
-
-# FACULTAD
-postgresql_query_facultad = SqlQuery(
-	postgresql_extract_load_initial_facultad, 
-	postgresql_extract_update_facultad, 
-	postgresql_insert_facultad, 
-	postgresql_update_facultad,
-	postgresql_get_facultad,
-	postgresql_type_table_facultad)
-
-# CARRERA
-postgresql_query_carrera = SqlQuery(
-	postgresql_extract_load_initial_carrera, 
-	postgresql_extract_update_carrera, 
-	postgresql_insert_carrera, 
-	postgresql_update_carrera,
-	postgresql_get_carrera,
-	postgresql_type_table_carrera)
-
-# ESTUDIANTE
-postgresql_query_estudiante = SqlQuery(
-	postgresql_extract_load_initial_estudiante, 
-	postgresql_extract_update_estudiante, 
-	postgresql_insert_estudiante, 
-	postgresql_update_estudiante,
-	postgresql_get_estudiante,
-	postgresql_type_table_estudiante)
-
-# ESTUDIANTE_FACULTAD
-postgresql_query_estudiante_facultad = SqlQueryFact(
-	postgresql_extract_load_initial_estudiante_facultad, 
-	postgresql_insert_estudiante_facultad,
-	postgresql_get_estudiante_facultad,
-	postgresql_verificate_estudiante_facultad,
-	postgresql_type_table_estudiante_facultad,
-	postgresql_tables_estudiante_facultad)
-
-
-# almacenando como lista para iteraciones
-postgresql_queries = [
-	postgresql_query, 
-	postgresql_query_facultad, 
-	postgresql_query_carrera, 
-	postgresql_query_estudiante, 
-	postgresql_query_estudiante_facultad]
-
-
 
 # Querys para tablas donde se almacena la informacion de los estudiantes 
 # consultas para la actualizacion
@@ -321,10 +53,7 @@ get_system_parameter = dedent("""\
 update_system_parameter = dedent("""\
 	UPDATE parametro_sistema SET definicion=%s, fecha_actualizacion=NOW() WHERE id = %s""")
 
-systemParameter = SqlSystemParameter(get_system_parameter, update_system_parameter)
-
 # consultas para tablas estaticas
-
 get_nationality_code = dedent("""\
 	SELECT id FROM dim_nacionalidad WHERE codigo = %s""") 
 
@@ -387,6 +116,49 @@ get_relationship_docente_publication = dedent("""\
 	INNER JOIN dim_publicacion AS p
 	ON (fact.id_publicacion = p.id) 
 	WHERE d.cedula = %s AND p.codigo = %s""")
+
+get_relationship_graduate_jobs = dedent("""\
+	SELECT fact.id
+	FROM fact_egresado_trabajos AS fact
+	INNER JOIN dim_trabajos AS t
+	ON (fact.id_trabajo = t.id) 
+	WHERE t.codigo = %s""")
+
+get_relationship_graduate_patents = dedent("""\
+	SELECT fact.id
+	FROM fact_egresado_patentes AS fact
+	INNER JOIN dim_patentes AS p
+	ON (fact.id_patentes = p.id) 
+	WHERE p.codigo = %s""")
+
+get_relationship_graduate_certification = dedent("""\
+	SELECT fact.id
+	FROM fact_egresado_patentes AS fact
+	INNER JOIN dim_certificacion AS c
+	ON (fact.id_certificacion = c.id) 
+	WHERE c.codigo = %s""")
+
+get_relationship_graduate_courses = dedent("""\
+	SELECT fact.id
+	FROM fact_egresado_patentes AS fact
+	INNER JOIN dim_cursos AS c
+	ON (fact.id_cursos = c.id) 
+	WHERE c.codigo = %s""")
+
+get_relationship_graduate_education = dedent("""\
+	SELECT fact.id
+	FROM fact_egresado_patentes AS fact
+	INNER JOIN dim_educacion AS e
+	ON (fact.id_educacion = e.id) 
+	WHERE e.codigo = %s""")
+
+get_relationship_graduate_volunteering = dedent("""\
+	SELECT fact.id
+	FROM fact_egresado_patentes AS fact
+	INNER JOIN dim_voluntariado AS v
+	ON (fact.id_voluntariado = v.id) 
+	WHERE v.codigo = %s""")
+
 
 # consulta para escalafon
 get_scale_code = dedent("""\
@@ -467,6 +239,7 @@ get_jobs_code = dedent("""\
 get_volunteering_code = dedent("""\
 	SELECT id FROM dim_voluntariado WHERE codigo = %s""")
 
+systemParameter = SqlSystemParameter(get_system_parameter, update_system_parameter)
 nationalityQuery = SqlTableStatic(get_nationality_code, insert_nationality, get_nationality_code_verify)
 sexQuery = SqlTableStatic(get_sex_code, insert_sex, get_sex_code_verify)
 studentQuery = SqlFact(get_student_code, insert_student, update_student)
@@ -481,6 +254,12 @@ publicationQuery = SqlTableSameParse(get_publication_code)
 studentRelationship = SqlFactRelationship(get_relationship_student)
 teacherFacultyRelationship = SqlFactRelationship(get_relationship_docente_facultad)
 teacherPublicationRelationship = SqlFactRelationship(get_relationship_docente_publication)
+graduateJobsRelationship = SqlFactRelationship(get_relationship_graduate_jobs)
+graduatePatentsRelationship = SqlFactRelationship(get_relationship_graduate_patents)
+graduateCertificationRelationship = SqlFactRelationship(get_relationship_graduate_certification)
+graduateCoursesRelationship = SqlFactRelationship(get_relationship_graduate_courses)
+graduateEducationRelationship = SqlFactRelationship(get_relationship_graduate_education)
+graduateVolunteeringRelationship = SqlFactRelationship(get_relationship_graduate_volunteering)
 certificationQuery = SqlTableSameParse(get_certification_code)
 coursesQuery = SqlTableSameParse(get_courses_code)
 educationQuery = SqlTableSameParse(get_education_code)

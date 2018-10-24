@@ -1,6 +1,5 @@
 # variables
 from db_credentials import datawarehouse_db_config, postgresql_db_config
-from sql_queries import postgresql_queries
 from variables import *
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
@@ -16,28 +15,7 @@ from resources.InscribedCourse import InscribedCourseStudent, InscribedCourseStu
 from resources.TeacherPublication import TeacherPublication, TeacherPublicationFaculty
 from resources.Teacher import TeacherWithDoctorateFaculty, TeacherGradeFaculty, TeacherWithDoctorate, TeacherInternacionals, TeacherNational
 # metodos
-from etl import etl_process, etl_process2
-
-def main():
-	print('Empezando ETL')
-
-	# establecer la conexion para la base de datos de destino
-	target_cnx = mysql.connector.connect(**datawarehouse_db_config)
-
-	# ciclo para las credenciales
-
-	# postgresql
-	for config in postgresql_db_config:
-		try:
-			print("Cargando db: " + config['database'])
-			etl_process(postgresql_queries, target_cnx, config, 'postgresql')
-		except Exception as error:
-			print("etl para {} tiene error".format(config['database']))
-			print('mensaje de error: {}'.format(error))
-
-			continue
-
-	target_cnx.close()
+from etl import etl_process2
 
 def sensor():
 	#print(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) # Se obtiene local para la actualizacion de la data cuando se ejecute el job
@@ -64,13 +42,6 @@ CORS(app)
 def extraction():
 	#target_cnx = mysql.connector.connect(**datawarehouse_db_config)
 	etl_process2()
-	
-	return "Hola mundo"
-
-@app.route('/profesor')
-def extractionProfesor():
-	#target_cnx = mysql.connector.connect(**datawarehouse_db_config)
-	etl_process_teachers()
 	
 	return "Hola mundo"
 

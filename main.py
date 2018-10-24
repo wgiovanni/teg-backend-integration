@@ -1,5 +1,4 @@
 # variables
-from db_credentials import datawarehouse_db_config, postgresql_db_config
 from variables import *
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime

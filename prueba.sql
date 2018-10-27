@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 24-10-2018 a las 23:02:48
+-- Tiempo de generación: 27-10-2018 a las 21:47:37
 -- Versión del servidor: 10.1.34-MariaDB
 -- Versión de PHP: 7.2.8
 
@@ -853,6 +853,17 @@ INSERT INTO `prueba` (`id`, `name`, `email`, `created_date`, `updated_date`) VAL
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `revoked_token`
+--
+
+CREATE TABLE `revoked_token` (
+  `id` int(11) NOT NULL,
+  `jti` varchar(150) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `role`
 --
 
@@ -890,10 +901,9 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `first_name`, `last_name`, `username`, `email`, `password`, `id_role`) VALUES
-(19, 'Wilkel2', 'Giovanni', 'wgiovanni', 'wilkelgiovanni@gmail.com', '123456789', 1),
-(20, 'prueba', 'prueba', 'prueba', 'prueba@gmail.com', '123456', 1),
-(22, 'aja', 'aja', 'aja', 'aja@gmail.com', '123456', 2),
-(23, 'dfgdf', 'fdgdgd', 'ghcgh', 'aja2@gmail.com', '123456', 1);
+(24, 'prueba1', 'prueba2', 'prueba1', 'prueba1@gmail.com', '$pbkdf2-sha256$29000$vTdmDCGEUAqBUErJ2bvX2g$p7bIEjZu6MXK/xos0jqiRT2XgRPYZO47hoQKfmRdQ1o', 1),
+(25, 'prueba2', 'prueba2', 'prueba2', 'prueba2@gmail.com', '$pbkdf2-sha256$29000$wfh/T2nN2ZvT.p.TUiqF0A$ZRSM7IEU6fZP0TsQ.DX5pPCTwC60C7WZuiP9yKpAntY', 1),
+(26, 'Wilkel', 'Giovanni', 'wgiovanni', 'wilkelgiovanni@gmail.com', '$pbkdf2-sha256$29000$E.J8jzEmBGAs5VxLCeGc0w$Idx/SEUBCNC2vtTLfyceUMNKgJjhKr1Zmub4oQDPD4U', 1);
 
 --
 -- Índices para tablas volcadas
@@ -1159,6 +1169,13 @@ ALTER TABLE `prueba`
   ADD UNIQUE KEY `name` (`name`);
 
 --
+-- Indices de la tabla `revoked_token`
+--
+ALTER TABLE `revoked_token`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `jti` (`jti`);
+
+--
 -- Indices de la tabla `role`
 --
 ALTER TABLE `role`
@@ -1383,6 +1400,12 @@ ALTER TABLE `prueba`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=103;
 
 --
+-- AUTO_INCREMENT de la tabla `revoked_token`
+--
+ALTER TABLE `revoked_token`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `role`
 --
 ALTER TABLE `role`
@@ -1392,7 +1415,7 @@ ALTER TABLE `role`
 -- AUTO_INCREMENT de la tabla `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- Restricciones para tablas volcadas

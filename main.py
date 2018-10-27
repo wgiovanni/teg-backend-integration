@@ -34,7 +34,7 @@ def sensor1():
 #sched.start()
 
 app = Flask(__name__)
-api = Api(app)
+api = Api(app, prefix="/api/v1")
 # enable CORS
 CORS(app)
 

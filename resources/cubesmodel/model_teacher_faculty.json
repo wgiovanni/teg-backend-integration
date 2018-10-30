@@ -6,8 +6,8 @@
                 {
                     "name":"docente",
                     "label":"Docente",
-                    "attributes": ["id", "cedula", "nombre", "apellido", "correo", "area_trabajo"],
-                    "label_attribute": "nombre"
+                    "attributes": ["id", "cedula", "primer_nombre", "segundo_nombre", "primer_apellido", "segundo_apellido", "correo", "area_de_investigacion"],
+                    "label_attribute": "cedula"
                 }
             ]
         },
@@ -46,13 +46,13 @@
             ]
         },
         {
-            "name": "dim_grado",
+            "name": "dim_tipo_docente",
             "levels": [
               {
                 "name": "grado",
                 "label": "Grado",
-                "attributes": ["id", "nombre"],
-                "label_attribute": "nombre"
+                "attributes": ["id", "codigo"],
+                "label_attribute": "codigo"
               }
             ]
         },
@@ -71,7 +71,7 @@
     "cubes": [
         {
             "name": "fact_docente_facultad",
-            "dimensions": ["dim_docente", "dim_facultad", "dim_sexo", "dim_grado", "dim_escalafon", "dim_nacionalidad"],
+            "dimensions": ["dim_docente", "dim_facultad", "dim_sexo", "dim_tipo_docente", "dim_escalafon", "dim_nacionalidad"],
             "measures": [
                 {"name": "cantidad", "label": "Cantidad"}
             ],
@@ -96,8 +96,8 @@
                     "detail": "dim_sexo.id"
                 },
                 {
-                    "master": "fact_docente_facultad.id_grado",
-                    "detail": "dim_grado.id"
+                    "master": "fact_docente_facultad.id_tipo",
+                    "detail": "dim_tipo_docente.id"
                 },
                 {
                     "master": "fact_docente_facultad.id_nacionalidad",
@@ -110,22 +110,24 @@
 
             ],
             "mappings": {
-              "dim_docente.id": "dim_docente.id",
-              "dim_docente.cedula": "dim_docente.cedula",
-              "dim_docente.nombre": "dim_docente.nombre",
-              "dim_docente.apellido": "dim_docente.apellido",
-              "dim_docente.area_trabajo": "dim_docente.area_trabajo",
-              "dim_docente.correo": "dim_docente.correo",
-              "dim_facultad.id": "dim_facultad.id",
-              "dim_facultad.nombre": "dim_facultad.nombre",
-              "dim_sexo.id": "dim_sexo.id",
-              "dim_sexo.codigo": "dim_sexo.codigo",
-              "dim_nacionalidad.id": "dim_nacionalidad.id",
-              "dim_nacionalidad.codigo": "dim_nacionalidad.codigo",
-              "dim_grado.id": "dim_grado.id",
-              "dim_grado.nombre": "dim_grado.nombre",
-              "dim_escalafon.id": "dim_escalafon.id",
-              "dim_escalafon.nombre": "dim_escalafon.nombre"
+                "dim_docente.id": "dim_docente.id",
+                "dim_docente.cedula": "dim_docente.cedula",
+                "dim_docente.primer_nombre": "dim_docente.primer_nombre",
+                "dim_docente.segundo_nombre": "dim_docente.segundo_nombre",
+                "dim_docente.primer_apellido": "dim_docente.primer_apellido",
+                "dim_docente.segundo_apellido": "dim_docente.segundo_apellido",
+                "dim_docente.area_de_investigacion": "dim_docente.area_de_investigacion",
+                "dim_docente.correo": "dim_docente.correo",
+                "dim_facultad.id": "dim_facultad.id",
+                "dim_facultad.nombre": "dim_facultad.nombre",
+                "dim_sexo.id": "dim_sexo.id",
+                "dim_sexo.codigo": "dim_sexo.codigo",
+                "dim_nacionalidad.id": "dim_nacionalidad.id",
+                "dim_nacionalidad.codigo": "dim_nacionalidad.codigo",
+                "dim_tipo_docente.id": "dim_tipo_docente.id",
+                "dim_tipo_docente.codigo": "dim_tipo_docente.codigo",
+                "dim_escalafon.id": "dim_escalafon.id",
+                "dim_escalafon.nombre": "dim_escalafon.nombre"
             }
         }
     ]

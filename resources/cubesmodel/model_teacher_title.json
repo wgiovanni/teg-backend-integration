@@ -12,23 +12,23 @@
           ]
         },
         {
-          "name":"dim_facultad",
+          "name":"dim_titulo",
           "levels": [
             {
-              "name": "facultad",
-              "label":"Facultad",
-              "attributes": ["id", "nombre"],
+              "name": "titlo",
+              "label":"Titulo",
+              "attributes": ["id", "codigo", "nombre"],
               "label_attribute": "nombre"
             }
           ]
         },
         {
-            "name": "dim_publicacion",
+            "name": "dim_nivel",
             "levels": [
               {
-                "name": "publicacion",
-                "label": "Publicacion",
-                "attributes": ["id", "codigo", "titulo_publicacion", "url_citacion", "url_publicacion"],
+                "name": "nivel",
+                "label": "Nivel",
+                "attributes": ["id", "codigo"],
                 "label_attribute": "codigo"
               }
             ]
@@ -36,36 +36,30 @@
     ],
     "cubes": [
         {
-            "name": "fact_docente_publicacion",
-            "dimensions": ["dim_docente", "dim_facultad", "dim_publicacion"],
+            "name": "fact_docente_titulo",
+            "dimensions": ["dim_docente", "dim_titulo", "dim_nivel"],
             "measures": [
-              {"name": "cantidad", "label": "Cantidad"},
-              {"name": "cantidad_citas","label": "Citas"}
+              {"name": "cantidad", "label": "Cantidad"}
             ],
             "aggregates": [
               {
                 "name": "sumatoria",
                 "function": "count",
                 "measure": "cantidad"
-              },
-              {
-                "name": "sumatoria_citacion",
-                "function": "sum",
-                "measure": "cantidad_citas"
               }
             ],
             "joins": [
               {
-                "master": "fact_docente_publicacion.id_docente",
+                "master": "fact_docente_titulo.id_docente",
                 "detail": "dim_docente.id"
               },
               {
-                "master": "fact_docente_publicacion.id_facultad",
-                "detail": "dim_facultad.id"
+                "master": "fact_docente_titulo.id_titulo",
+                "detail": "dim_titulo.id"
               },
               {
-                "master": "fact_docente_publicacion.id_publicacion",
-                "detail": "dim_publicacion.id"
+                "master": "fact_docente_titulo.id_nivel",
+                "detail": "dim_nivel.id"
               }
             ],
             "mappings": {
@@ -77,13 +71,11 @@
               "dim_docente.segundo_apellido": "dim_docente.segundo_apellido",
               "dim_docente.area_de_investigacion": "dim_docente.area_de_investigacion",
               "dim_docente.correo": "dim_docente.correo",
-              "dim_facultad.id": "dim_facultad.id",
-              "dim_facultad.nombre": "dim_facultad.nombre",
-              "dim_publicacion.id": "dim_publicacion.id",
-              "dim_publicacion.codigo": "dim_publicacion.codigo",
-              "dim_publicacion.titulo_publicacion": "dim_publicacion.titulo_publicacion",
-              "dim_publicacion.url_citacion": "dim_publicacion.url_citacion",
-              "dim_publicacion.url_publicacion": "dim_publicacion.url_publicacion"
+              "dim_titulo.id": "dim_titulo.id",
+              "dim_titulo.nombre": "dim_titulo.nombre",
+              "dim_titulo.codigo": "dim_titulo.codigo",
+              "dim_nivel.id": "dim_nivel.id",
+              "dim_nivel.codigo": "dim_nivel.codigo"
             }
         }
     ]

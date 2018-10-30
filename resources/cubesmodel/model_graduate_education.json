@@ -12,12 +12,12 @@
             ]
         },
         {
-          "name":"dim_trabajos",
+          "name":"dim_educacion",
           "levels": [
             {
-              "name": "trabajos",
-              "label":"Trabajos",
-              "attributes": ["id", "codigo", "nombre_empresa", "cargo", "descripcion"],
+              "name": "cursos",
+              "label":"Cursos",
+              "attributes": ["id", "codigo", "instituto", "campo_estudio"],
               "label_attribute": "codigo"
             }
           ]
@@ -25,8 +25,8 @@
     ],
     "cubes": [
         {
-            "name": "fact_egresado_trabajos",
-            "dimensions": ["dim_egresado", "dim_trabajos"],
+            "name": "fact_egresado_educacion",
+            "dimensions": ["dim_egresado", "dim_educacion"],
             "measures": [
                 {"name": "cantidad", "label": "Cantidad"}
             ],
@@ -39,12 +39,12 @@
             ],
             "joins": [
                 {
-                    "master": "fact_egresado_trabajos.id_egresado",
+                    "master": "fact_egresado_educacion.id_egresado",
                     "detail": "dim_egresado.id"
                 },
                 {
-                    "master": "fact_egresado_trabajos.id_trabajo",
-                    "detail": "dim_trabajos.id"
+                    "master": "fact_egresado_educacion.id_educacion",
+                    "detail": "dim_educacion.id"
                 }
             ],
             "mappings": {
@@ -59,14 +59,10 @@
               "dim_egresado.correo": "dim_egresado.correo",
               "dim_egresado.telefono": "dim_egresado.telefono",
               "dim_egresado.identificacion": "dim_egresado.identificacion",
-              "dim_trabajos.id": "dim_trabajos.id",
-              "dim_trabajos.codigo": "dim_trabajos.codigo",
-              "dim_trabajos.titulo": "dim_trabajos.titulo",
-              "dim_trabajos.descripcion": "dim_trabajos.descripcion",
-              "dim_trabajos.numero": "dim_trabajos.numero",
-              "dim_trabajos.inventores": "dim_trabajos.inventores",
-              "dim_trabajos.fecha": "dim_trabajos.fecha",
-              "dim_trabajos.url": "dim_trabajos.url"
+              "dim_educacion.id": "dim_educacion.id",
+              "dim_educacion.codigo": "dim_educacion.codigo",
+              "dim_educacion.instituto": "dim_educacion.instituto",
+              "dim_educacion.campo_estudio": "dim_educacion.campo_estudio"
             }
         }
     ]

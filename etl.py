@@ -8,12 +8,12 @@ import simplejson as json
 import requests
 from common.BD import BD
 from db_credentials import datawarehouse_db_config
-from sql_queries import systemParameter, nationalityQuery, sexQuery, studentQuery, teacherQuery, professionQuery, facultyQuery 
+from sql_queries import systemParameter, nationalityQuery, sexQuery, statusQuery, disabilityQuery, ethnicGroupQuery, studentQuery, typeStudentQuery, teacherQuery, professionQuery, facultyQuery 
 from sql_queries import publicationQuery, scaleQuery, studentRelationship, gradeQuery, teacherFacultyRelationship, teacherPublicationRelationship
 from sql_queries import graduateQuery, studiosUcQuery, certificationQuery, coursesQuery, educationQuery, educationQuery, patentsQuery
 from sql_queries import jobsQuery, volunteeringQuery, graduateJobsRelationship, graduatePatentsRelationship, graduateCertificationRelationship 
-from sql_queries import graduateCoursesRelationship, graduateEducationRelationship, graduateVolunteeringRelationship
-from constants import LOAD_INITIAL_UPDATE, ENDPOINT_LOAD_STUDENTS, ENDPOINT_LOAD_TEACHERS, ENDPOINT_LOAD_GRADUATES, CONTENT_TYPE
+from sql_queries import graduateCoursesRelationship, graduateEducationRelationship, graduateVolunteeringRelationship, typeTeacherQuery
+from constants import LOAD_INITIAL_UPDATE, ENDPOINT_LOAD_STUDENTS, ENDPOINT_LOAD_TEACHERS, ENDPOINT_LOAD_GRADUATES, DATE_UPDATE, CONTENT_TYPE
 from constants import DIMENSION, FACT, ITEMS
 from constants import STUDENT, PROFESSION, FACULTY, STUDENT_PROFESSION_FACULTY, TEACHER, SCALE, GRADE, PUBLICATION, TEACHER_PUBLICATION, TEACHER_FACULTY, GRADUATE, STUDIOS_UC
 from constants import NACIONALITY_ATTRIBUTE, SEX_ATTRIBUTE, IDENTIFICATION_CARD, FIRST_NAME_ATRIBUTE, LAST_NAME_ATRIBUTE, BIRTH_DATE_ATTRIBUTE, PHONE_ONE_ATTRIBUTE, PHONE_TWO_ATTRIBUTE, EMAIL_ATTRIBUTE, STATE_PROVENANCE_ATTRIBUTE, WORK_AREA_ATTRIBUTE, CITE_ATTRIBUTE, USER_NAME_ATTRIBUTE
@@ -28,6 +28,9 @@ def etl_process2():
 	target_cursor.execute("USE {}".format(datawarehouse_name))
 	target_cursor.execute(systemParameter.get_query, [LOAD_INITIAL_UPDATE])
 	row = target_cursor.fetchone()
+	target_cursor.execute(systemParameter.get_query, [DATE_UPDATE])
+	systemParameterDate = target_cursor.fetchone()
+	dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 	print(row)
 	dimension = DIMENSION
 	hechos = FACT
@@ -36,7 +39,7 @@ def etl_process2():
 		if row[4] == "0":
 			#actualizacion
 			print("Actualizacion")
-			dataList = requestUpdate(target_cnx, row[6].strftime('%Y-%m-%d %H:%M:%S'))
+			dataList = requestUpdate(target_cnx, systemParameterDate[4])
 			
 			for data in dataList:
 				print(data)
@@ -87,7 +90,9 @@ def etl_process2():
 					print(content)
 					distributionCargaInitial(target_cnx, table, content)
 
-		target_cursor.execute(systemParameter.update_query, [False, row[0]])
+		
+		target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+		target_cursor.execute(systemParameter.update_query, ["0", row[0]])
 		target_cnx.commit()
 		print("Se actualizo la fecha")
 	else:
@@ -107,9 +112,9 @@ def requestCargaInitial(target_cnx):
 	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_GRADUATES])
 	endPointGraduated = target_cursor.fetchone()
 	#pathList.append(endPointStudent[4])
-	#pathList.append(endPointTeacher[4])
+	pathList.append(endPointTeacher[4])
 	#print(pathList)
-	pathList.append(endPointGraduated[4])
+	#pathList.append(endPointGraduated[4])
 	result = []
 	for path in pathList:
 		try:
@@ -117,9 +122,10 @@ def requestCargaInitial(target_cnx):
 			if r.status_code == requests.codes.ok:
 				result.append(json.loads(r.text))
 		except Exception as e:
-			abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))		
+			abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 		except r.raise_for_status() as e:
 			abort(404, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
+		continue		
 
 	return result
 	
@@ -148,6 +154,7 @@ def requestUpdate(target_cnx, lastUpdate):
 			abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))		
 		except r.raise_for_status() as e:
 			abort(404, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
+		continue
 
 	return result
 
@@ -180,6 +187,44 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 			target_cursor.execute(sexQuery.get_query_code, [sexCode])
 			idSex = target_cursor.fetchone()
 			print("sexo: {}".format(idSex))
+
+			statusCode = item['status']
+			if statusCode == 1:
+				statusCode = "Activo"
+			elif statusCode == 2:
+				statusCode = "Inactivo"
+			target_cursor.execute(statusQuery.get_query_code, [statusCode])
+			idStatus = target_cursor.fetchone()
+			print("status: {}".format(idStatus))
+
+			disabilityCode = item['discapacidad']
+			if disabilityCode != "NO POSEO NINGUNA DISCAPACIDAD":
+				disabilityCode = "SI POSEO DISCAPACIDAD"
+			target_cursor.execute(disabilityQuery.get_query_code, [disabilityCode])
+			idDisability = target_cursor.fetchone()
+			print("discapacidad: {}".format(idDisability))
+
+			ethnicGroupCode = item['etnia']
+			if ethnicGroupCode == "NO PERTENEZCO A UN PUEBLO INDÍGENA" or ethnicGroupCode == "NO PERTENEZCO A UN PUEBLO INDIGENA":
+				ethnicGroupCode = "NO PERTENEZCO A UN PUEBLO INDÍGENA"
+			elif ethnicGroupCode == "SI PERTENEZCO A UN PUEBLO INDÍGENA" or ethnicGroupCode == "NO PERTENEZCO A UN PUEBLO INDIGENA":
+				ethnicGroupCode = "SI PERTENEZCO A UN PUEBLO INDÍGENA"
+			else:
+				ethnicGroupCode = "SI PERTENEZCO A UN PUEBLO INDÍGENA"
+			target_cursor.execute(ethnicGroupQuery.get_query_code, [ethnicGroupCode])
+			idEthnicGroup = target_cursor.fetchone()
+			print("etnia: {}".format(idEthnicGroup))
+
+			typeStudentCode = item['tipo']
+			if typeStudentCode == "1":
+				typeStudentCode = "Pregrado"
+			elif typeStudentCode == "2":
+				typeStudentCode = "Postgrado"
+			target_cursor.execute(typeStudentQuery.get_query_code, [typeStudentCode])
+			idTypeStudent = target_cursor.fetchone()
+			print("etnia: {}".format(idTypeStudent))
+
+
 			# aqui iran todas las dimensiones que saldran de estudiantes
 			student = [
 				item[IDENTIFICATION_CARD],  
@@ -202,8 +247,8 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 
 			target_cursor.execute(dedent("""\
 			INSERT INTO FACT_ESTUDIANTE_FACULTAD 
-				(id_estudiante, id_sexo, id_nacionalidad)
-			VALUES (%s, %s, %s)"""), [idStudent[0], idSex[0], idNationality[0]])
+				(id_estudiante, id_sexo, id_nacionalidad, id_status, id_discapacidad, id_etnia, id_tipo)
+			VALUES (%s, %s, %s, %s, %s, %s, %s)"""), [idStudent[0], idSex[0], idNationality[0], idStatus[0], idDisability[0], idEthnicGroup[0], idTypeStudent[0]])
 			target_cnx.commit()
 	elif table == PROFESSION:
 		print("DEMAS TABLAS")
@@ -278,20 +323,32 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 			idSex = target_cursor.fetchone()
 			print("sexo: {}".format(idSex))
 
+			# facultad
+			facultyCode = item[FACULTY]
+			target_cursor.execute(facultyQuery.get_query_code, [facultyCode])
+			idFaculty = target_cursor.fetchone()
+
+			# escalafon
 			scaleCode = item[SCALE]
 			target_cursor.execute(scaleQuery.get_query_code, [scaleCode])
 			idScale = target_cursor.fetchone()
 			print("escalafon: {}".format(idScale))
 
-			gradeCode = item[GRADE]
-			target_cursor.execute(gradeQuery.get_query_code, [gradeCode])
-			idGrade = target_cursor.fetchone()
-			print("grado: {}".format(idGrade))
+			typeTeacherCode = item['tipo']
+			target_cursor.execute(typeTeacherQuery.get_query_code, [typeTeacherCode])
+			idTypeTeacher = target_cursor.fetchone()
+
+			#gradeCode = item[GRADE]
+			#target_cursor.execute(gradeQuery.get_query_code, [gradeCode])
+			#idGrade = target_cursor.fetchone()
+			#print("grado: {}".format(idGrade))
 
 			teacher = [
 				item[IDENTIFICATION_CARD],  
-				item[FIRST_NAME_ATRIBUTE], 
-				item[LAST_NAME_ATRIBUTE], 
+				item['primernombre'],
+				item['segundonombre'], 
+				item['primerapellido'],
+				item['segundoapellido'], 
 				item[EMAIL_ATTRIBUTE],
 				item[WORK_AREA_ATTRIBUTE]
 			]
@@ -306,8 +363,8 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 
 			target_cursor.execute(dedent("""\
 			INSERT INTO FACT_DOCENTE_FACULTAD 
-				(id_docente, id_sexo, id_nacionalidad, id_escalafon, id_grado)
-			VALUES (%s, %s, %s, %s, %s)"""), [idTeacher[0], idSex[0], idNationality[0], idScale[0], idGrade[0]])
+				(id_docente, id_sexo, id_nacionalidad, id_escalafon, id_tipo, id_facultad)
+			VALUES (%s, %s, %s, %s, %s, %s)"""), [idTeacher[0], idSex[0], idNationality[0], idScale[0], idTypeTeacher[0], idFaculty[0]])
 			target_cnx.commit()
 		print("INSERCION DOCENTE FINALIZADA")
 
@@ -323,47 +380,220 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 			else: 
 				print("Ya existe {}".format(item[FIRST_NAME_ATRIBUTE]))
 		print("Insercion finalizada")
-	elif table == PUBLICATION:
-		items = content[ITEMS]
-		for item in items:
-			insert(target_cursor, table, item)
-			target_cnx.commit()
-			print("Insercion finalizada")
 	elif table == TEACHER_PUBLICATION:
 		items = content[ITEMS]
 		for item in items:
-			target_cursor.execute(teacherQuery.get_query_code, [item[TEACHER]])
-			idTeacher = target_cursor.fetchone()
+			teacherCode = item['cedulaautor']
+			numberCites = item['numerocitaciones']
+			target_cursor.execute(dedent("""\
+			SELECT d.id as idTeacher, f.id as idFaculty 
+			FROM fact_docente_facultad AS fact 
+			INNER JOIN dim_docente AS d 
+			ON (fact.id_docente = d.id)
+			INNER JOIN dim_facultad AS f 
+			ON (fact.id_facultad = f.id) 
+			WHERE d.cedula = %s"""), [teacherCode])
+			ids = target_cursor.fetchone()
 
-			target_cursor.execute(facultyQuery.get_query_code, [item[FACULTY]])
-			idFaculty = target_cursor.fetchone()
+			item = {
+				"codigo": item['codigo'],
+				"titulo_publicacion": item['titulopublicacion'],
+				"url_citacion": item['urlcitacion'],
+				"url_publicacion": item['urlpublicacion'],
+			}
+			insert(target_cursor, "publicacion", item)
+			target_cnx.commit()
 
-			target_cursor.execute(publicationQuery.get_query_code, [item[PUBLICATION]])
+			target_cursor.execute(dedent("""\
+			SELECT id FROM dim_publicacion
+			WHERE codigo = %s"""), [item['codigo']])
 			idPublication = target_cursor.fetchone()
 
-			if idTeacher is not None and idFaculty is not None and idPublication is not None: 
-				target_cursor.execute(dedent("""\
-					INSERT INTO FACT_DOCENTE_PUBLICACION 
-						(id_docente, id_publicacion, id_facultad, cantidad_citas)
-					VALUES (%s, %s, %s, %s)"""), [idTeacher[0], idPublication[0], idFaculty[0], item[CITE_ATTRIBUTE]])
-				target_cnx.commit()
-				print("INSERTO DOCENTE, PUBLICACION Y FACULTAD")
-	elif table == TEACHER_FACULTY:
+			if len(ids) == 2:
+				if ids[0] is not None and ids[1] is not None or idPublication[0] is not None:
+					target_cursor.execute(dedent("""\
+					INSERT INTO fact_docente_publicacion 
+						(id_docente, id_facultad, id_publicacion, cantidad_citas)
+					VALUES (%s, %s, %s, %s)"""), [ids[0], ids[1], idPublication[0], numberCites])
+					target_cnx.commit()
+				else:
+					print("Error")
+			else: 
+				print("No encontrado")
+
+			print("Insercion finalizada")
+	#elif table == TEACHER_PUBLICATION:
+	#	items = content[ITEMS]
+	#	for item in items:
+	#		target_cursor.execute(teacherQuery.get_query_code, [item[TEACHER]])
+	#		idTeacher = target_cursor.fetchone()
+
+	#		target_cursor.execute(facultyQuery.get_query_code, [item[FACULTY]])
+	#		idFaculty = target_cursor.fetchone()
+
+	#		target_cursor.execute(publicationQuery.get_query_code, [item[PUBLICATION]])
+	#		idPublication = target_cursor.fetchone()
+
+	#		if idTeacher is not None and idFaculty is not None and idPublication is not None: 
+	#			target_cursor.execute(dedent("""\
+	#				INSERT INTO FACT_DOCENTE_PUBLICACION 
+	#					(id_docente, id_publicacion, id_facultad, cantidad_citas)
+	#				VALUES (%s, %s, %s, %s)"""), [idTeacher[0], idPublication[0], idFaculty[0], item[CITE_ATTRIBUTE]])
+	#			target_cnx.commit()
+	#			print("INSERTO DOCENTE, PUBLICACION Y FACULTAD")
+	#elif table == TEACHER_FACULTY:
+	#	items = content[ITEMS]
+	#	for item in items:
+	#		target_cursor.execute(teacherFacultyRelationship.get_query_code, [item[TEACHER]])
+	#		idFact = target_cursor.fetchone()
+
+	#		target_cursor.execute(facultyQuery.get_query_code, [item[FACULTY]])
+	#		idFaculty = target_cursor.fetchone()
+
+	#		if idFact is not None and idFaculty is not None: 
+	#			target_cursor.execute(dedent("""\
+	#				UPDATE fact_docente_facultad
+	#				SET id_facultad=%s
+	#				WHERE id=%s;"""), [idFaculty[0], idFact[0]])
+	#			target_cnx.commit()
+	#			print("INSERTO DOCENTE, PUBLICACION Y FACULTAD")
+	elif table == "docente-proyecto":
 		items = content[ITEMS]
 		for item in items:
-			target_cursor.execute(teacherFacultyRelationship.get_query_code, [item[TEACHER]])
-			idFact = target_cursor.fetchone()
+			teacherCode = item['cedulaautor']
+			target_cursor.execute(dedent("""\
+			SELECT id 
+			FROM dim_docente
+			WHERE cedula = %s"""), [teacherCode])
+			idTeacher = target_cursor.fetchone()
 
-			target_cursor.execute(facultyQuery.get_query_code, [item[FACULTY]])
-			idFaculty = target_cursor.fetchone()
+			item = {
+				"codigo": item['codigo'],
+				"titulo": item['titulo']
+			}
+			insert(target_cursor, "proyecto", item)
+			target_cnx.commit()
 
-			if idFact is not None and idFaculty is not None: 
+			target_cursor.execute(dedent("""\
+			SELECT id FROM dim_proyecto
+			WHERE codigo = %s"""), [item['codigo']])
+			idProyect = target_cursor.fetchone()
+
+			if idTeacher[0] is not None and idProyect[0] is not None:
 				target_cursor.execute(dedent("""\
-					UPDATE fact_docente_facultad
-					SET id_facultad=%s
-					WHERE id=%s;"""), [idFaculty[0], idFact[0]])
+				INSERT INTO fact_docente_proyecto 
+					(id_docente, id_proyecto)
+				VALUES (%s, %s)"""), [idTeacher[0], idProyect[0]])
 				target_cnx.commit()
-				print("INSERTO DOCENTE, PUBLICACION Y FACULTAD")
+			else:
+				print("Error")
+
+			print("Insercion finalizada")
+
+	elif table == "docente-otro-estudio":
+		items = content[ITEMS]
+		for item in items:
+			teacherCode = item['cedulaautor']
+			target_cursor.execute(dedent("""\
+			SELECT id 
+			FROM dim_docente
+			WHERE cedula = %s"""), [teacherCode])
+			idTeacher = target_cursor.fetchone()
+
+			item = {
+				"codigo": item['codigo'],
+				"nombre_titulo": item['nomtitulo']
+			}
+			insert(target_cursor, "otroestudio", item)
+			target_cnx.commit()
+
+			target_cursor.execute(dedent("""\
+			SELECT id FROM dim_otroestudio
+			WHERE codigo = %s"""), [item['codigo']])
+			idOtherStudio = target_cursor.fetchone()
+
+			if idTeacher[0] is not None and idOtherStudio[0] is not None:
+				target_cursor.execute(dedent("""\
+				INSERT INTO fact_docente_otroestudio 
+					(id_docente, id_otroestudio)
+				VALUES (%s, %s)"""), [idTeacher[0], idOtherStudio[0]])
+				target_cnx.commit()
+			else:
+				print("Error")
+			print("Insercion finalizada")
+
+	elif table == "docente-titulo":
+		items = content[ITEMS]
+		for item in items:
+			teacherCode = item['cedulaautor']
+			levelCode = item['nivel']
+			print("codigo nivel {}".format(levelCode))
+			target_cursor.execute(dedent("""\
+			SELECT id 
+			FROM dim_docente
+			WHERE cedula = %s"""), [teacherCode])
+			idTeacher = target_cursor.fetchone()
+
+			target_cursor.execute(dedent("""\
+			SELECT id 
+			FROM dim_nivel
+			WHERE codigo = %s"""), [levelCode])
+			idLevel = target_cursor.fetchone()
+
+			item = {
+				"codigo": item['codigo'],
+				"nombre": item['nomtitulo']
+			}
+			insert(target_cursor, "titulo", item)
+			target_cnx.commit()
+
+			target_cursor.execute(dedent("""\
+			SELECT id FROM dim_titulo
+			WHERE codigo = %s"""), [item['codigo']])
+			idTitle = target_cursor.fetchone()
+			print("LEVEL {}".format(idLevel[0]))
+			if idTeacher[0] is not None and idTitle[0] is not None and idLevel[0] is not None:
+				target_cursor.execute(dedent("""\
+				INSERT INTO fact_docente_titulo
+					(id_docente, id_titulo, id_nivel)
+				VALUES (%s, %s, %s)"""), [idTeacher[0], idTitle[0], idLevel[0]])
+				target_cnx.commit()
+			else:
+				print("Error")
+			print("Insercion finalizada")
+
+	elif table == "docente-premio":
+		items = content[ITEMS]
+		for item in items:
+			teacherCode = item['cedulaautor']
+			target_cursor.execute(dedent("""\
+			SELECT id 
+			FROM dim_docente
+			WHERE cedula = %s"""), [teacherCode])
+			idTeacher = target_cursor.fetchone()
+
+			item = {
+				"codigo": item['codigo'],
+				"nombre": item['nombre']
+			}
+			insert(target_cursor, "premio", item)
+			target_cnx.commit()
+
+			target_cursor.execute(dedent("""\
+			SELECT id FROM dim_premio
+			WHERE codigo = %s"""), [item['codigo']])
+			idPrize = target_cursor.fetchone()
+
+			if idTeacher[0] is not None and idPrize[0] is not None:
+				target_cursor.execute(dedent("""\
+				INSERT INTO fact_docente_premio 
+					(id_docente, id_premio)
+				VALUES (%s, %s)"""), [idTeacher[0], idPrize[0]])
+				target_cnx.commit()
+			else:
+				print("Error")
+			print("Insercion finalizada")
+
 	elif table == GRADUATE:
 		items = content[ITEMS]
 		for item in items:
@@ -716,6 +946,43 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 			idSex = target_cursor.fetchone()
 			print("sexo: {}".format(idSex))
 			# aqui iran todas las dimensiones que saldran de estudiantes
+
+			statusCode = item['status']
+			if statusCode == 1:
+				statusCode = "Activo"
+			elif statusCode == 2:
+				statusCode = "Inactivo"
+			target_cursor.execute(statusQuery.get_query_code, [statusCode])
+			idStatus = target_cursor.fetchone()
+			print("status: {}".format(idStatus))
+
+			disabilityCode = item['discapacidad']
+			if disabilityCode != "NO POSEO NINGUNA DISCAPACIDAD":
+				disabilityCode = "SI POSEO DISCAPACIDAD"
+			target_cursor.execute(disabilityQuery.get_query_code, [disabilityCode])
+			idDisability = target_cursor.fetchone()
+			print("discapacidad: {}".format(idDisability))
+
+			ethnicGroupCode = item['etnia']
+			if ethnicGroupCode == "NO PERTENEZCO A UN PUEBLO INDÍGENA" or ethnicGroupCode == "NO PERTENEZCO A UN PUEBLO INDIGENA":
+				ethnicGroupCode = "NO PERTENEZCO A UN PUEBLO INDÍGENA"
+			elif ethnicGroupCode == "SI PERTENEZCO A UN PUEBLO INDÍGENA" or ethnicGroupCode == "NO PERTENEZCO A UN PUEBLO INDIGENA":
+				ethnicGroupCode = "SI PERTENEZCO A UN PUEBLO INDÍGENA"
+			else:
+				ethnicGroupCode = "SI PERTENEZCO A UN PUEBLO INDÍGENA"
+			target_cursor.execute(ethnicGroupQuery.get_query_code, [ethnicGroupCode])
+			idEthnicGroup = target_cursor.fetchone()
+			print("etnia: {}".format(idEthnicGroup))
+
+			typeStudentCode = item['tipo']
+			if typeStudentCode == "1":
+				typeStudentCode = "Pregrado"
+			elif typeStudentCode == "2":
+				typeStudentCode = "Postgrado"
+			target_cursor.execute(typeStudentQuery.get_query_code, [typeStudentCode])
+			idTypeStudent = target_cursor.fetchone()
+			print("tipo: {}".format(idTypeStudent))
+
 			student = [
 				item[IDENTIFICATION_CARD],  
 				item[FIRST_NAME_ATRIBUTE], 
@@ -738,8 +1005,8 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 				if idFact is not None:
 					target_cursor.execute(dedent("""\
 					UPDATE fact_estudiante_facultad
-					SET id_estudiante=%s, id_sexo=%s, id_nacionalidad=%s
-					WHERE id = %s"""), [idStudentExist[0], idSex[0], idNationality[0], idFact[0]])
+					SET id_estudiante=%s, id_sexo=%s, id_nacionalidad=%s, id_status=%s, id_discapacidad=%s, id_etnia=%s, id_tipo=%s
+					WHERE id = %s"""), [idStudentExist[0], idSex[0], idNationality[0], idStatus[0], idDisability[0], idEthnicGroup[0], idTypeStudent[0], idFact[0]])
 					target_cnx.commit()
 				else: 
 					print("No existe el registro")
@@ -751,8 +1018,8 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 				idStudent = target_cursor.fetchone()
 				target_cursor.execute(dedent("""\
 				INSERT INTO FACT_ESTUDIANTE_FACULTAD 
-					(id_estudiante, id_sexo, id_nacionalidad)
-				VALUES (%s, %s, %s)"""), [idStudent[0], idSex[0], idNationality[0]])
+					(id_estudiante, id_sexo, id_nacionalidad, id_status, id_discapacidad, id_etnia, id_tipo)
+				VALUES (%s, %s, %s, %s, %s, %s, %s)"""), [idStudent[0], idSex[0], idNationality[0], idStatus[0], idDisability[0], idEthnicGroup[0], idTypeStudent[0]])
 			
 	elif table == FACULTY:
 		print("DEMAS TABLAS")
@@ -848,18 +1115,25 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 			idScale = target_cursor.fetchone()
 			print("escalafon: {}".format(idScale))
 
-			gradeCode = item[GRADE]
-			target_cursor.execute(gradeQuery.get_query_code, [gradeCode])
-			idGrade = target_cursor.fetchone()
-			print("grado: {}".format(idGrade))
+			typeTeacherCode = item['tipo']
+			target_cursor.execute(typeTeacherQuery.get_query_code, [typeTeacherCode])
+			idTypeTeacher = target_cursor.fetchone()
+
+			facultyCode = item[FACULTY]
+			target_cursor.execute(facultyQuery.get_query_code, [facultyCode])
+			idFaculty = target_cursor.fetchone()
+
 
 			teacher = [
 				item[IDENTIFICATION_CARD],  
-				item[FIRST_NAME_ATRIBUTE], 
-				item[LAST_NAME_ATRIBUTE], 
+				item['primernombre'],
+				item['segundonombre'], 
+				item['primerapellido'],
+				item['segundoapellido'], 
 				item[EMAIL_ATTRIBUTE],
 				item[WORK_AREA_ATTRIBUTE]
 			]
+
 			target_cursor.execute(teacherQuery.get_query_code, [item[IDENTIFICATION_CARD]])
 			idTeacherExits = target_cursor.fetchone()
 			if idTeacherExits is not None:
@@ -871,8 +1145,8 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 				if idFact is not None:
 					target_cursor.execute(dedent("""\
 						UPDATE fact_docente_facultad
-						SET id_docente=%s, id_sexo=%s, id_nacionalidad=%s, id_escalafon=%s, id_grado=%s
-						WHERE id=%s"""), [idTeacherExits[0], idSex[0], idNationality[0], idScale[0], idGrade[0], idFact[0]])
+						SET id_docente=%s, id_sexo=%s, id_nacionalidad=%s, id_escalafon=%s, id_tipo=%s, id_facultad=%s
+						WHERE id=%s"""), [idTeacherExits[0], idSex[0], idNationality[0], idScale[0], idTypeTeacher[0], idFaculty[0], idFact[0]])
 					target_cnx.commit()
 				else:
 					print("No existe el registro")
@@ -884,11 +1158,299 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 				idTeacher = target_cursor.fetchone()
 				target_cursor.execute(dedent("""\
 				INSERT INTO FACT_DOCENTE_FACULTAD 
-					(id_docente, id_sexo, id_nacionalidad, id_escalafon, id_grado)
-				VALUES (%s, %s, %s, %s, %s)"""), [idTeacher[0], idSex[0], idNationality[0], idScale[0], idGrade[0]])
+					(id_docente, id_sexo, id_nacionalidad, id_escalafon, id_tipo, id_facultad)
+				VALUES (%s, %s, %s, %s, %s, %s)"""), [idTeacher[0], idSex[0], idNationality[0], idScale[0], idTypeTeacher[0], idFaculty[0]])
 				target_cnx.commit()
 
 		print("ACTUALIZACION DOCENTE FINALIZADA")
+
+	elif table == TEACHER_PUBLICATION:
+		items = content[ITEMS]
+		for item in items:
+			teacherCode = item['cedulaautor']
+			numberCites = item['numerocitaciones']
+			target_cursor.execute(dedent("""\
+			SELECT d.id as idTeacher, f.id as idFaculty 
+			FROM fact_docente_facultad AS fact 
+			INNER JOIN dim_docente AS d 
+			ON (fact.id_docente = d.id)
+			INNER JOIN dim_facultad AS f 
+			ON (fact.id_facultad = f.id) 
+			WHERE d.cedula = %s"""), [teacherCode])
+			ids = target_cursor.fetchone()
+
+			item = {
+				"codigo": item['codigo'],
+				"titulo_publicacion": item['titulopublicacion'],
+				"url_citacion": item['urlcitacion'],
+				"url_publicacion": item['urlpublicacion'],
+			}
+
+			target_cursor.execute(dedent("""\
+			SELECT id FROM dim_publicacion
+			WHERE codigo = %s"""), [item['codigo']])
+			idPublication = target_cursor.fetchone()
+
+			if idPublication[0] is None:
+				insert(target_cursor, "publicacion", item)
+				target_cnx.commit()
+				target_cursor.execute(dedent("""\
+				SELECT id FROM dim_publicacion
+				WHERE codigo = %s"""), [item['codigo']])
+				idPublication = target_cursor.fetchone()
+
+			target_cursor.execute(dedent("""\
+			SELECT fact.id 
+			FROM fact_docente_publicacion AS fact
+			INNER JOIN dim_publicacion AS p
+			ON (fact.id_publicacion = p.id)
+			WHERE p.codigo = %s"""), [item['codigo']])
+			idFact = target_cursor.fetchone()
+
+			if ids[0] is not None and idPublication[0] is not None and ids[1] is not None:
+				if idFact[0] is not None:
+					target_cursor.execute(dedent("""\
+					UPDATE fact_docente_publicacion
+					SET id_docente=%s, id_publicacion=%s, id_facultad=%s, cantidad_citas=%s
+					WHERE id=%s"""), [ids[0], idPublication[0], ids[1], numberCites, idFact[0]])
+					target_cnx.commit()
+				else:
+					target_cursor.execute(dedent("""\
+					INSERT INTO fact_docente_publicacion
+					(id_docente, id_facultad, id_publicacion, cantidad_citas)
+					VALUES (%s, %s, %s, %s)"""), [ids[0], ids[1], idPublication[0], numberCites])
+			else: 
+				print("Error")
+			print("Insercion finalizada")
+
+	elif table == "docente-proyecto":
+		items = content[ITEMS]
+		for item in items:
+			teacherCode = item['cedulaautor']
+			target_cursor.execute(dedent("""\
+			SELECT id 
+			FROM dim_docente
+			WHERE cedula = %s"""), [teacherCode])
+			idTeacher = target_cursor.fetchone()
+
+			item = {
+				"codigo": item['codigo'],
+				"titulo": item['titulo']
+			}
+
+			target_cursor.execute(dedent("""\
+			SELECT id FROM dim_proyecto
+			WHERE codigo = %s"""), [item['codigo']])
+			idProyect = target_cursor.fetchone()
+
+			if idProyect[0] is None:
+				insert(target_cursor, "proyecto", item)
+				target_cnx.commit()
+				target_cursor.execute(dedent("""\
+				SELECT id FROM dim_proyecto
+				WHERE codigo = %s"""), [item['codigo']])
+				idProyect = target_cursor.fetchone()
+
+			target_cursor.execute(dedent("""\
+			SELECT fact.id 
+			FROM fact_docente_proyecto AS fact
+			INNER JOIN dim_proyecto AS p
+			ON (fact.id_proyecto = p.id)
+			WHERE p.codigo = %s"""), [item['codigo']])
+			idFact = target_cursor.fetchone()
+
+			if idTeacher[0] is not None and idProyect[0] is not None:
+				if idFact[0] is not None:
+					target_cursor.execute(dedent("""\
+					UPDATE fact_docente_proyecto
+					SET id_docente=%s, id_proyecto=%s
+					WHERE id=%s"""), [idTeacher[0], idProyect[0], idFact[0]])
+					target_cnx.commit()
+				else:
+					target_cursor.execute(dedent("""\
+					INSERT INTO fact_docente_proyecto
+					(id_docente, id_proyecto)
+					VALUES (%s, %s)"""), [idTeacher[0], idProyect[0]])
+			else: 
+				print("Error")
+			print("Insercion finalizada")
+
+	elif table == "docente-otro-estudio":
+		items = content[ITEMS]
+		for item in items:
+			teacherCode = item['cedulaautor']
+			target_cursor.execute(dedent("""\
+			SELECT id 
+			FROM dim_docente
+			WHERE cedula = %s"""), [teacherCode])
+			idTeacher = target_cursor.fetchone()
+
+			item = {
+				"codigo": item['codigo'],
+				"nombre_titulo": item['nomtitulo']
+			}
+			
+			target_cursor.execute(dedent("""\
+			SELECT id FROM dim_otroestudio
+			WHERE codigo = %s"""), [item['codigo']])
+			idOtherStudio = target_cursor.fetchone()
+
+			if idOtherStudio[0] is None:
+				insert(target_cursor, "otroestudio", item)
+				target_cnx.commit()
+				target_cursor.execute(dedent("""\
+				SELECT id FROM dim_otroestudio
+				WHERE codigo = %s"""), [item['codigo']])
+				idOtherStudio = target_cursor.fetchone()
+
+			target_cursor.execute(dedent("""\
+			SELECT fact.id 
+			FROM fact_docente_otroestudio AS fact
+			INNER JOIN dim_otroestudio AS o
+			ON (fact.id_otroestudio = o.id)
+			WHERE o.codigo = %s"""), [item['codigo']])
+			idFact = target_cursor.fetchone()
+
+			if idTeacher[0] is not None and idOtherStudio[0] is not None:
+				if idFact[0] is not None:
+					target_cursor.execute(dedent("""\
+					UPDATE fact_docente_otroestudio
+					SET id_docente=%s, id_otroestudio=%s
+					WHERE id=%s"""), [idTeacher[0], idOtherStudio[0], idFact[0]])
+					target_cnx.commit()
+				else:
+					target_cursor.execute(dedent("""\
+					INSERT INTO fact_docente_otroestudio
+					(id_docente, id_otroestudio)
+					VALUES (%s, %s)"""), [idTeacher[0], idOtherStudio[0]])
+			else:
+				print("Error")
+			print("Insercion finalizada")
+
+
+	elif table == "docente-titulo":
+		items = content[ITEMS]
+		for item in items:
+			teacherCode = item['cedulaautor']
+			levelCode = item['nivel']
+			print("codigo nivel {}".format(levelCode))
+			target_cursor.execute(dedent("""\
+			SELECT id 
+			FROM dim_docente
+			WHERE cedula = %s"""), [teacherCode])
+			idTeacher = target_cursor.fetchone()
+
+			target_cursor.execute(dedent("""\
+			SELECT id 
+			FROM dim_nivel
+			WHERE codigo = %s"""), [levelCode])
+			idLevel = target_cursor.fetchone()
+
+			item = {
+				"codigo": item['codigo'],
+				"nombre": item['nomtitulo']
+			}
+
+			target_cursor.execute(dedent("""\
+			SELECT id FROM dim_titulo
+			WHERE codigo = %s"""), [item['codigo']])
+			idTitle = target_cursor.fetchone()
+
+			if idTitle[0] is None:
+				insert(target_cursor, "titulo", item)
+				target_cnx.commit()
+				target_cursor.execute(dedent("""\
+				SELECT id FROM dim_titulo
+				WHERE codigo = %s"""), [item['codigo']])
+				idTitle = target_cursor.fetchone()
+
+			print("LEVEL {}".format(idLevel[0]))
+
+			target_cursor.execute(dedent("""\
+			SELECT fact.id 
+			FROM fact_docente_titulo AS fact
+			INNER JOIN dim_titulo AS t
+			ON (fact.id_titulo = t.id)
+			WHERE t.codigo = %s"""), [item['codigo']])
+			idFact = target_cursor.fetchone()
+
+			if idTeacher[0] is not None and idLevel[0] is not None and idTitle[0] is not None:
+				if idFact[0] is not None:
+					target_cursor.execute(dedent("""\
+					UPDATE fact_docente_titulo
+					SET id_docente=%s, id_titulo=%s, id_nivel=%s
+					WHERE id=%s"""), [idTeacher[0], idTitle[0], idLevel[0], idFact[0]])
+					target_cnx.commit()
+				else:
+					target_cursor.execute(dedent("""\
+					INSERT INTO fact_docente_titulo
+					(id_docente, id_titulo, id_nivel)
+					VALUES (%s, %s, %s)"""), [idTeacher[0], idTitle[0], idLevel[0]])
+			else:
+				print("Error")
+			print("Insercion finalizada")
+
+	elif table == "docente-premio":
+		items = content[ITEMS]
+		for item in items:
+			teacherCode = item['cedulaautor']
+			target_cursor.execute(dedent("""\
+			SELECT id 
+			FROM dim_docente
+			WHERE cedula = %s"""), [teacherCode])
+			idTeacher = target_cursor.fetchone()
+
+			item = {
+				"codigo": item['codigo'],
+				"nombre": item['nombre']
+			}
+
+			target_cursor.execute(dedent("""\
+			SELECT id FROM dim_premio
+			WHERE codigo = %s"""), [item['codigo']])
+			idPrize = target_cursor.fetchone()
+
+			if idPrize[0] is None:
+				insert(target_cursor, "premio", item)
+				target_cnx.commit()
+				target_cursor.execute(dedent("""\
+				SELECT id FROM dim_premio
+				WHERE codigo = %s"""), [item['codigo']])
+				idPrize = target_cursor.fetchone()
+
+			target_cursor.execute(dedent("""\
+			SELECT fact.id 
+			FROM fact_docente_premio AS fact
+			INNER JOIN dim_premio AS p
+			ON (fact.id_premio = p.id)
+			WHERE t.codigo = %s"""), [item['codigo']])
+			idFact = target_cursor.fetchone()
+
+			if idTeacher[0] is not None and idPrize[0] is not None:
+				target_cursor.execute(dedent("""\
+				INSERT INTO fact_docente_premio 
+					(id_docente, id_premio)
+				VALUES (%s, %s)"""), [idTeacher[0], idPrize[0]])
+				target_cnx.commit()
+			else:
+				print("Error")
+			print("Insercion finalizada")
+
+			if idTeacher[0] is not None and idPrize[0] is not None:
+				if idFact[0] is not None:
+					target_cursor.execute(dedent("""\
+					UPDATE fact_docente_premio
+					SET id_docente=%s, id_premio=%s
+					WHERE id=%s"""), [idTeacher[0], idPrize[0], idFact[0]])
+					target_cnx.commit()
+				else:
+					target_cursor.execute(dedent("""\
+					INSERT INTO fact_docente_premio
+					(id_docente, id_premio)
+					VALUES (%s, %s)"""), [idTeacher[0], idPrize[0]])
+			else:
+				print("Error")
+			print("Insercion finalizada")
 
 	elif table == SCALE:
 		print("{}".format(table))
@@ -1340,10 +1902,43 @@ def insertTableStatic(target_cnx):
 	if len(nationalityList) != 2:
 		target_cursor.executemany(nationalityQuery.load_query, nationalityParams)
 		target_cnx.commit()
-	#statusParams = [("Activo1",), ("Inactivo1",)]
-	#target_cursor.executemany("INSERT INTO DIM_STATUS (codigo) VALUES (%s)", statusParams)
-	#target_cnx.commit()
+
+	active = "Activo"
+	inactive = "Inactivo"
+	statusParams = [(active,), (inactive,)]
+	target_cursor.execute(statusQuery.get_verify, [active, inactive])
+	statusList = target_cursor.fetchall()
+	if len(statusList) != 2:
+		target_cursor.executemany(statusQuery.load_query, statusParams)
+		target_cnx.commit()
 	
+	etniaFalse = "NO PERTENEZCO A UN PUEBLO INDÍGENA"
+	etniaTrue = "SI PERTENEZCO A UN PUEBLO INDÍGENA"
+	etniaGroupParams = [(etniaTrue,), (etniaFalse,)]
+	target_cursor.execute(ethnicGroupQuery.get_verify, [etniaTrue, etniaFalse])
+	etniaGroupList = target_cursor.fetchall()
+	if len(etniaGroupList) != 2:
+		target_cursor.executemany(ethnicGroupQuery.load_query, etniaGroupParams)
+		target_cnx.commit()
+
+
+	disabilityFalse = "NO POSEO NINGUNA DISCAPACIDAD"
+	disabilityTrue = "SI POSEO DISCAPACIDAD"
+	disabilityParams = [(disabilityTrue,), (disabilityFalse,)]
+	target_cursor.execute(disabilityQuery.get_verify, [disabilityTrue, disabilityFalse])
+	disabilityList = target_cursor.fetchall()
+	if len(disabilityList) != 2:
+		target_cursor.executemany(disabilityQuery.load_query, disabilityParams)
+		target_cnx.commit()
+
+	undergraduate = "Pregrado"
+	postgraduate = "Postgrado"
+	typeStudentParams = [(undergraduate,), (postgraduate,)]
+	target_cursor.execute(typeStudentQuery.get_verify,[undergraduate, postgraduate])
+	typeList = target_cursor.fetchall()
+	if len(typeList) != 2:
+		target_cursor.execute(typeStudentQuery.load_query,typeStudentParams)
+		target_cnx.commit()
 
 
 def insert(cursor, table: str, datos: dict=None, columns=None, values: list=None):
@@ -1385,5 +1980,4 @@ def update(cursor, table: str, datos: dict, where: dict):
 		values.append(val)
 
 	sql = sql.rstrip(' and ')
-	print(sql)
 	cursor.execute(sql, values)

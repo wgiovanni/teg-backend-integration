@@ -1,0 +1,275 @@
+1.	Número de personal académico empleado en relación al número de alumnos matriculados.
+{
+    "total-estudiantes": 4555
+}
+NOOOO
+{
+    "total-empleados": 1100
+}
+LISTA
+
+2.	Proporción de estudiantes internacionales en relación con el total de estudiantes de la universidad.
+
+{
+    "estudiantes-internacionales": 154,
+    "total-estudiantes": 5555
+}
+LISTA
+
+api.add_resource(, '/estudiantes-internacionales-proporcion') 
+
+3.	Proporción de profesores internacionales en relación con el total 
+de PDI (tasa de productividad de las citas, personal docente e investigador) de la universidad. LISTO
+
+{
+    "profesores-doctorado": 1515,
+    "total-profesores": 15511 
+} 
+
+4.  International Faculty Ratio
+
+{
+    "profesores-internacionales": 154,
+    "total-profesores": 5555
+} LISTA
+
+5.  Faculty/Student Ratio : Estudiantes por facultad  LISTO
+
+{
+    "total-estudiantes":25488
+    "facultad": [
+        {
+            "nombre": "Ciencia y Tecnologia",
+            "total": 123
+        },
+        {
+            "nombre": "Ingenieria",
+            "total": 123
+        }
+    ]
+}
+
+6.	Citations per faculty : Citaciones por facultad LISTA
+api.add_resource(, '/citas-facultad')
+
+[
+    {
+        "facultad": "Ciencia y Tecnologia",
+        "citaciones": 151558
+    },
+    {
+        "facultad": "Ingenieria",
+        "citaciones": 151558
+    }
+]
+
+7. Citas por Publicación Científica  LISTA
+
+[
+    {
+        "autor": "Fulanito",
+        "titulo": "Titulo",
+        "citaciones": 458
+    },
+    {
+        "autor": "Mirella",
+        "titulo": "Titulo",
+        "citaciones": 788
+    }
+]
+
+8.
+# cantidad de estudiantes por sexo y por facultad
+api.add_resource(StudentSexFaculty, '/estudiantes-sexo-facultad')  LISTO
+Verificar que sea activos
+
+
+9.
+# cantidad de estudiantes por nacionalidad y por facultad
+api.add_resource(StudentNationalityFaculty, '/estudiantes-nacionalidad-facultad') LISTO
+Verificar que sea activos
+
+10.
+# cantidad de estudiantes por carrera, dada la facultad
+api.add_resource(StudentProfessionConstantsFaculty, '/estudiantes-carrera/<facultad_codigo>')
+
+{
+    "facultad": "Ingenieria",
+    "carrera": [
+        {
+            "nombre": "Civil", 
+            "total": 213
+        },
+        {
+            "nombre": "Quimica", 
+            "total": 883
+        }
+    ]
+}
+parametrizada
+
+11.
+api.add_resource(StudentProfessionFaculty, '/estudiantes-carrera-facultad')
+
+
+[
+    {
+        "facultad": "Ingenieria",
+        "carrera": [
+            {
+                "nombre": "Civil", 
+                "total": 213
+            },
+            {
+                "nombre": "Quimica", 
+                "total": 883
+            }
+        ]
+    }
+]
+
+12.
+# cantidad de estudiantes con discapacidad por facultad LISTO
+[
+    {
+        "facultad": "Ingenieria",
+        "total-estudiantes-discapacidad": 2548
+    },
+    {
+        "facultad": "Ciencia y Tecnologia",
+        "total-estudiantes-discapacidad": 12
+    }
+]
+
+13.
+# cantidad de estudiantes con etnia por facultad LISTO
+[
+    {
+        "facultad": "Ingenieria",
+        "total-estudiantes-etnia": 2548
+    },
+    {
+        "facultad": "Ciencia y Tecnologia",
+        "total-estudiantes-etnia": 12
+    }
+]
+
+14.
+Matricula de Estudiantes de Pregrado-sexo LISTO
+{
+    "total-estudiantes-pregrado"
+}
+/api/v1/estudiantes-pregrado-sexo
+
+{
+    "total-estudiantes-pregrado": 5454,
+    "estudiantes-masculino-pregrado": 12,
+    "estudiantes-femenino-pregrado": 256
+} 
+15.
+
+Matricula de Estudiantes de Pregrado-nacionalidad  LISTO
+/api/v1/estudiantes-pregrado-nacionalidad
+{
+    "total-estudiantes-pregrado": 5454,
+    "estudiantes-venezolanos-pregrado": 245,
+    "estudiantes-extranjeros-pregrado": 1548
+}
+
+Falta lo de postgrado
+
+
+Docentes
+1. Personal docente y de Investigación en la UC
+{
+    "total-profesores": 100
+}
+
+/api/v1/profesores
+LISTO
+2.
+# cantidad de publicaciones por facultad
+api.add_resource(TeacherPublicationFaculty, '/profesor-publicacion-facultad') LISTA
+
+[
+    {
+        "facultad": "Ingenieria",
+        "cantidad-publicaciones": 1235
+    },
+    {
+        "facultad": "Ciencia y Tecnologia",
+        "cantidad-publicaciones": 1235
+    }
+]
+
+3.
+# cantidad de profesores con doctorado o phd por facultad
+api.add_resource(TeacherWithDoctorateFaculty, '/profesor-doctorado-facultad') NOO
+
+[
+    {
+        "facultad": "Ingenieria",
+        "cantidad-doctorado": 456
+    },
+    {
+        "facultad": "Ciencia y Tecnologia",
+        "cantidad-doctorado": 123
+    }
+]
+
+4. cantidad de profesores por sexo por facultad LISTO
+/api/v1/profesores-sexo-facultad
+
+5. cantidad de profesores por nacionalidad por facultad LISTA
+/api/v1/profesores-nacionalidad-facultad
+
+
+
+6.
+Proporción de profesor con escalafon/ total de profesores LISTO
+/api/v1/profesores-escalafon-proporcion
+{
+    "total-profesores":522,
+    "escalafon": [
+        {
+            "nombre": "Titular",
+            "total": 100
+        },
+        {
+            "nombre": "Asociado",
+            "total": 522
+        }
+    ]
+}
+
+Egresados
+1. Egresados por año
+/api/v1/egresados-anho
+[
+    {
+        "año": "2016",
+        "total": 2000
+    },
+    {
+        "año": "2017",
+        "total": 1500
+    },
+    {
+        "año": "2018",
+        "total": 100
+    }
+]
+
+2. Cantidad de egresados con patentes
+/api/v1/egresados-patentes
+
+{
+    "total-egresados-patentes": 1000
+}
+
+3. Cantidad de egresados con certificaciones
+/api/v1/egresados-certificaciones
+
+{
+    "total-egresados-certificaciones": 1000
+}

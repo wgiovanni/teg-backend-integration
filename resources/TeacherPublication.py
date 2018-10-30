@@ -26,7 +26,7 @@ class TeacherPublication(BD, Resource):
             result = []
             for ids in listIds:
                 #print(ids)
-                teacher = self.queryOne("SELECT cedula, nombre, apellido FROM DIM_DOCENTE WHERE ID = %s", [ids])
+                teacher = self.queryOne("SELECT cedula, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, correo, area_de_investigacion FROM DIM_DOCENTE WHERE ID = %s", [ids])
                 #print(teacher)
                 cut = PointCut("dim_docente", [ids])
                 cell = Cell(browser.cube, cuts = [cut])
@@ -34,10 +34,9 @@ class TeacherPublication(BD, Resource):
                 publications = []
                 for row in r:
                     print(row)
-                    item = {"autor": row["dim_publicacion.autor"], 
-                        "titulo": row["dim_publicacion.titulo"], 
-                        "revista": row["dim_publicacion.revista"], 
-                        "fecha_publicacion": row["dim_publicacion.fecha"].strftime('%Y-%m-%d'),
+                    item = {"titulo_publicacion": row["dim_publicacion.titulo_publicacion"], 
+                        "url_citacion": row["dim_publicacion.url_citacion"], 
+                        "url_publicacion": row["dim_publicacion.url_publicacion"],
                         "citas": row["sumatoria_citacion"]}
                     publications.append(item)
                 
@@ -67,6 +66,26 @@ class TeacherPublicationFaculty(BD, Resource):
                 cell = Cell(browser.cube, cuts = [cut])
                 r = browser.aggregate(cell, drilldown=["dim_publicacion", "dim_facultad"])
                 item = {"facultad": faculty['nombre'], "cantidad_publicaciones": r.summary['sumatoria']}
+                result.append(item)
+                
+        except Exception as e:
+            abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
+
+        return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }
+
+class TeacherCiteFaculty(BD, Resource):
+    representations = {'application/json': make_response}
+    parser = reqparse.RequestParser()
+    def get(self):
+        try:
+            facultyList = self.queryAll("SELECT * FROM dim_facultad")
+            result = []
+            for faculty in facultyList:
+                print(faculty)
+                cut = PointCut("dim_facultad", [faculty['id']])
+                cell = Cell(browser.cube, cuts = [cut])
+                r = browser.aggregate(cell, drilldown=["dim_publicacion", "dim_facultad"])
+                item = {"facultad": faculty['nombre'], "citaciones": r.summary['sumatoria_citacion']}
                 result.append(item)
                 
         except Exception as e:

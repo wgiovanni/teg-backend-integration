@@ -1,0 +1,65 @@
+{
+    "dimensions": [
+        {
+         "name":"dim_docente",
+         "levels": [
+                {
+                    "name":"docente",
+                    "label":"Docente",
+                    "attributes": ["id", "cedula", "primer_nombre", "segundo_nombre", "primer_apellido", "segundo_apellido", "correo", "area_de_investigacion"],
+                    "label_attribute": "cedula"
+                }
+          ]
+        },
+        {
+          "name":"dim_otroestudio",
+          "levels": [
+            {
+              "name": "estudios",
+              "label":"Estudios",
+              "attributes": ["id", "codigo", "nombre_titulo"],
+              "label_attribute": "nombre_titulo"
+            }
+          ]
+        }
+    ],
+    "cubes": [
+        {
+            "name": "fact_docente_otroestudio",
+            "dimensions": ["dim_docente", "dim_otroestudio"],
+            "measures": [
+              {"name": "cantidad", "label": "Cantidad"}
+            ],
+            "aggregates": [
+              {
+                "name": "sumatoria",
+                "function": "count",
+                "measure": "cantidad"
+              }
+            ],
+            "joins": [
+              {
+                "master": "fact_docente_otroestudio.id_docente",
+                "detail": "dim_docente.id"
+              },
+              {
+                "master": "fact_docente_otroestudio.id_otroestudio",
+                "detail": "dim_otroestudio.id"
+              }
+            ],
+            "mappings": {
+              "dim_docente.id": "dim_docente.id",
+              "dim_docente.cedula": "dim_docente.cedula",
+              "dim_docente.primer_nombre": "dim_docente.primer_nombre",
+              "dim_docente.segundo_nombre": "dim_docente.segundo_nombre",
+              "dim_docente.primer_apellido": "dim_docente.primer_apellido",
+              "dim_docente.segundo_apellido": "dim_docente.segundo_apellido",
+              "dim_docente.area_de_investigacion": "dim_docente.area_de_investigacion",
+              "dim_docente.correo": "dim_docente.correo",
+              "dim_otroestudio.id": "dim_otroestudio.id",
+              "dim_otroestudio.nombre_titulo": "dim_otroestudio.nombre_titulo",
+              "dim_otroestudio.codigo": "dim_otroestudio.codigo"
+            }
+        }
+    ]
+}

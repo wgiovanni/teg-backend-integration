@@ -51,6 +51,55 @@
             {
               "name": "nacionalidad",
               "label": "Nacionalidad",
+              "key": "id",
+              "attributes": ["id", "codigo"],
+              "label_attribute": "codigo"
+            }
+          ]
+        },
+        {
+          "name":"dim_status",
+          "levels": [
+            {
+              "name": "status",
+              "label":"Status",
+              "key":"id",
+              "attributes": ["id", "codigo"],
+              "label_attribute": "codigo"
+            }
+          ]
+        },
+        {
+          "name":"dim_discapacidad",
+          "levels": [
+            {
+              "name": "discapacidad",
+              "label":"Discapacidad",
+              "key":"id",
+              "attributes": ["id", "codigo"],
+              "label_attribute": "codigo"
+            }
+          ]
+        },
+        {
+          "name":"dim_etnia",
+          "levels": [
+            {
+              "name": "etnia",
+              "label":"Etnia",
+              "key":"id",
+              "attributes": ["id", "codigo"],
+              "label_attribute": "codigo"
+            }
+          ]
+        },
+        {
+          "name":"dim_tipo_estudiante",
+          "levels": [
+            {
+              "name": "tipo",
+              "label":"Tipo",
+              "key":"id",
               "attributes": ["id", "codigo"],
               "label_attribute": "codigo"
             }
@@ -60,7 +109,7 @@
     "cubes": [
         {
             "name": "fact_estudiante_facultad",
-            "dimensions": ["dim_estudiante", "dim_facultad", "dim_carrera", "dim_sexo", "dim_nacionalidad"],
+            "dimensions": ["dim_estudiante", "dim_facultad", "dim_carrera", "dim_sexo", "dim_nacionalidad", "dim_status", "dim_discapacidad", "dim_etnia", "dim_tipo_estudiante"],
             "measures": [
               {"name": "cantidad", "label": "Cantidad"}
             ],
@@ -91,6 +140,22 @@
               {
                 "master": "fact_estudiante_facultad.id_nacionalidad",
                 "detail": "dim_nacionalidad.id"
+              },
+              {
+                "master": "fact_estudiante_facultad.id_status",
+                "detail": "dim_status.id"
+              },
+              {
+                "master": "fact_estudiante_facultad.id_discapacidad",
+                "detail": "dim_discapacidad.id"
+              },
+              {
+                "master": "fact_estudiante_facultad.id_etnia",
+                "detail": "dim_etnia.id"
+              },
+              {
+                "master": "fact_estudiante_facultad.id_tipo",
+                "detail": "dim_tipo_estudiante.id"
               }
             ],
             "mappings": {
@@ -110,7 +175,15 @@
               "dim_sexo.id": "dim_sexo.id",
               "dim_sexo.codigo": "dim_sexo.codigo",
               "dim_nacionalidad.id": "dim_nacionalidad.id",
-              "dim_nacionalidad.codigo": "dim_nacionalidad.codigo"
+              "dim_nacionalidad.codigo": "dim_nacionalidad.codigo",
+              "dim_status.id": "dim_status.id",
+              "dim_status.codigo": "dim_status.codigo",
+              "dim_discapacidad.id": "dim_discapacidad.id",
+              "dim_discapacidad.codigo": "dim_discapacidad.codigo",
+              "dim_etnia.id": "dim_etnia.id",
+              "dim_etnia.codigo": "dim_etnia.codigo",
+              "dim_tipo_estudiante.id": "dim_tipo_estudiante.id",
+              "dim_tipo_estudiante.codigo": "dim_tipo_estudiante.codigo"
             }
         }
     ]

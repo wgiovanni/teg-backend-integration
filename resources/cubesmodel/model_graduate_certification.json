@@ -43,7 +43,7 @@
                     "detail": "dim_egresado.id"
                 },
                 {
-                    "master": "fact_egresado_certificacion.id_patentes",
+                    "master": "fact_egresado_certificacion.id_certificacion",
                     "detail": "dim_certificacion.id"
                 }
             ],

@@ -72,6 +72,46 @@ insert_sex = dedent("""\
 get_sex_code_verify = dedent("""\
 	SELECT id FROM dim_sexo WHERE codigo = %s OR codigo = %s""")
 
+# status
+get_status_code = dedent("""\
+	SELECT id FROM dim_status WHERE codigo = %s""") 
+
+insert_status = dedent("""\
+	INSERT INTO dim_status (codigo) VALUES (%s)""")
+
+get_status_code_verify = dedent("""\
+	SELECT id FROM dim_status WHERE codigo = %s OR codigo = %s""")
+
+# DISCAPACIDAD
+get_disability_code = dedent("""\
+	SELECT id FROM dim_discapacidad WHERE codigo = %s""") 
+
+insert_disability = dedent("""\
+	INSERT INTO dim_discapacidad (codigo) VALUES (%s)""")
+
+get_disability_code_verify = dedent("""\
+	SELECT id FROM dim_discapacidad WHERE codigo = %s OR codigo = %s""")
+
+# ETNIA
+get_ethnic_group_code = dedent("""\
+	SELECT id FROM dim_etnia WHERE codigo = %s""") 
+
+insert_ethnic_group = dedent("""\
+	INSERT INTO dim_etnia (codigo) VALUES (%s)""")
+
+get_ethnic_group_code_verify = dedent("""\
+	SELECT id FROM dim_etnia WHERE codigo = %s OR codigo = %s""")
+
+# ETNIA
+get_type_student_code = dedent("""\
+	SELECT id FROM dim_tipo_estudiante WHERE codigo = %s""") 
+
+insert_type_student = dedent("""\
+	INSERT INTO dim_tipo_estudiante (codigo) VALUES (%s)""")
+
+get_type_student_code_verify = dedent("""\
+	SELECT id FROM dim_tipo_estudiante WHERE codigo = %s OR codigo = %s""")
+
 # consultas para estudiante
 get_student_code = dedent("""\
 	SELECT id FROM dim_estudiante WHERE cedula = %s""")
@@ -174,12 +214,12 @@ get_teacher_code = dedent("""\
 
 insert_teacher = dedent("""\
 	INSERT INTO dim_docente
-		(cedula, nombre, apellido, correo, area_trabajo)
-	VALUES (%s, %s, %s, %s, %s)""")
+		(cedula, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, correo, area_de_investigacion)
+	VALUES (%s, %s, %s, %s, %s, %s, %s)""")
 
 update_teacher = dedent("""\
 	UPDATE dim_docente
-	SET cedula = %s, nombre=%s, apellido=%s,  correo=%s, area_trabajo=%s
+	SET cedula = %s, primer_nombre=%s, segundo_nombre=%s, primera_pellido=%s,segundo_apellido=%s, correo=%s, area_de_investigacion=%s
 	WHERE id=%s""")
 
 # consulta para publicacion
@@ -239,9 +279,24 @@ get_jobs_code = dedent("""\
 get_volunteering_code = dedent("""\
 	SELECT id FROM dim_voluntariado WHERE codigo = %s""")
 
+
+get_type_teacher_code = dedent("""\
+	SELECT id FROM dim_tipo_docente WHERE codigo = %s""")
+
+insert_type_teacher = dedent("""\
+	INSERT INTO dim_tipo_docente (codigo) VALUES (%s)""")
+
+get_type_teacher_code_verify = dedent("""\
+	SELECT id FROM dim_tipo_docente WHERE codigo = %s OR codigo = %s""")
+
 systemParameter = SqlSystemParameter(get_system_parameter, update_system_parameter)
 nationalityQuery = SqlTableStatic(get_nationality_code, insert_nationality, get_nationality_code_verify)
 sexQuery = SqlTableStatic(get_sex_code, insert_sex, get_sex_code_verify)
+statusQuery = SqlTableStatic(get_status_code, insert_status, get_status_code_verify)
+typeTeacherQuery = SqlTableStatic(get_type_teacher_code, insert_type_teacher, get_type_teacher_code_verify)
+disabilityQuery = SqlTableStatic(get_disability_code, insert_disability, get_disability_code_verify)
+ethnicGroupQuery = SqlTableStatic(get_ethnic_group_code, insert_ethnic_group, get_ethnic_group_code_verify)
+typeStudentQuery = SqlTableStatic(get_type_student_code, insert_type_student, get_type_student_code_verify)
 studentQuery = SqlFact(get_student_code, insert_student, update_student)
 teacherQuery = SqlFact(get_teacher_code, insert_teacher, update_teacher)
 graduateQuery = SqlFact(get_graduate_code, insert_graduate, update_graduate)

@@ -1,0 +1,65 @@
+{
+    "dimensions": [
+        {
+         "name":"dim_docente",
+         "levels": [
+                {
+                    "name":"docente",
+                    "label":"Docente",
+                    "attributes": ["id", "cedula", "primer_nombre", "segundo_nombre", "primer_apellido", "segundo_apellido", "correo", "area_de_investigacion"],
+                    "label_attribute": "cedula"
+                }
+          ]
+        },
+        {
+          "name":"dim_proyecto",
+          "levels": [
+            {
+              "name": "titlo",
+              "label":"Titulo",
+              "attributes": ["id", "codigo", "titulo"],
+              "label_attribute": "titulo"
+            }
+          ]
+        }
+    ],
+    "cubes": [
+        {
+            "name": "fact_docente_proyecto",
+            "dimensions": ["dim_docente", "dim_proyecto"],
+            "measures": [
+              {"name": "cantidad", "label": "Cantidad"}
+            ],
+            "aggregates": [
+              {
+                "name": "sumatoria",
+                "function": "count",
+                "measure": "cantidad"
+              }
+            ],
+            "joins": [
+              {
+                "master": "fact_docente_proyecto.id_docente",
+                "detail": "dim_docente.id"
+              },
+              {
+                "master": "fact_docente_proyecto.id_proyecto",
+                "detail": "dim_proyecto.id"
+              }
+            ],
+            "mappings": {
+              "dim_docente.id": "dim_docente.id",
+              "dim_docente.cedula": "dim_docente.cedula",
+              "dim_docente.primer_nombre": "dim_docente.primer_nombre",
+              "dim_docente.segundo_nombre": "dim_docente.segundo_nombre",
+              "dim_docente.primer_apellido": "dim_docente.primer_apellido",
+              "dim_docente.segundo_apellido": "dim_docente.segundo_apellido",
+              "dim_docente.area_de_investigacion": "dim_docente.area_de_investigacion",
+              "dim_docente.correo": "dim_docente.correo",
+              "dim_proyecto.id": "dim_proyecto.id",
+              "dim_proyecto.titulo": "dim_proyecto.titulo",
+              "dim_proyecto.codigo": "dim_proyecto.codigo"
+            }
+        }
+    ]
+}

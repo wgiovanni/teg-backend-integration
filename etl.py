@@ -39,12 +39,13 @@ def etl_process2():
 		if row[4] == "0":
 			#actualizacion
 			print("Actualizacion")
+			print(systemParameterDate[4])
 			dataList = requestUpdate(target_cnx, systemParameterDate[4])
 			
 			for data in dataList:
 				print(data)
 				keyList= data.keys()
-				keyList = sorted(keyList)
+				#keyList = sorted(keyList)
 				for key in keyList:
 					print("KEY:{}".format(key))
 					if dimension in key:
@@ -140,9 +141,9 @@ def requestUpdate(target_cnx, lastUpdate):
 	endPointTeacher = target_cursor.fetchone()
 	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_GRADUATES])
 	endPointGraduated = target_cursor.fetchone()
-	pathList.append(endPointStudent[4]+"/{}".format(lastUpdate))
+	#pathList.append(endPointStudent[4]+"/{}".format(lastUpdate))
 	pathList.append(endPointTeacher[4]+"/{}".format(lastUpdate))
-	pathList.append(endPointGraduated[4]) 
+	#pathList.append(endPointGraduated[4]) 
 	#print(pathList)
 	result = []
 	for path in pathList:
@@ -1191,7 +1192,7 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 			WHERE codigo = %s"""), [item['codigo']])
 			idPublication = target_cursor.fetchone()
 
-			if idPublication[0] is None:
+			if idPublication is None:
 				insert(target_cursor, "publicacion", item)
 				target_cnx.commit()
 				target_cursor.execute(dedent("""\
@@ -1208,7 +1209,7 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 			idFact = target_cursor.fetchone()
 
 			if ids[0] is not None and idPublication[0] is not None and ids[1] is not None:
-				if idFact[0] is not None:
+				if idFact is not None:
 					target_cursor.execute(dedent("""\
 					UPDATE fact_docente_publicacion
 					SET id_docente=%s, id_publicacion=%s, id_facultad=%s, cantidad_citas=%s
@@ -1243,7 +1244,7 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 			WHERE codigo = %s"""), [item['codigo']])
 			idProyect = target_cursor.fetchone()
 
-			if idProyect[0] is None:
+			if idProyect is None:
 				insert(target_cursor, "proyecto", item)
 				target_cnx.commit()
 				target_cursor.execute(dedent("""\
@@ -1260,7 +1261,7 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 			idFact = target_cursor.fetchone()
 
 			if idTeacher[0] is not None and idProyect[0] is not None:
-				if idFact[0] is not None:
+				if idFact is not None:
 					target_cursor.execute(dedent("""\
 					UPDATE fact_docente_proyecto
 					SET id_docente=%s, id_proyecto=%s
@@ -1295,7 +1296,7 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 			WHERE codigo = %s"""), [item['codigo']])
 			idOtherStudio = target_cursor.fetchone()
 
-			if idOtherStudio[0] is None:
+			if idOtherStudio is None:
 				insert(target_cursor, "otroestudio", item)
 				target_cnx.commit()
 				target_cursor.execute(dedent("""\
@@ -1312,7 +1313,7 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 			idFact = target_cursor.fetchone()
 
 			if idTeacher[0] is not None and idOtherStudio[0] is not None:
-				if idFact[0] is not None:
+				if idFact is not None:
 					target_cursor.execute(dedent("""\
 					UPDATE fact_docente_otroestudio
 					SET id_docente=%s, id_otroestudio=%s
@@ -1356,7 +1357,7 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 			WHERE codigo = %s"""), [item['codigo']])
 			idTitle = target_cursor.fetchone()
 
-			if idTitle[0] is None:
+			if idTitle is None:
 				insert(target_cursor, "titulo", item)
 				target_cnx.commit()
 				target_cursor.execute(dedent("""\
@@ -1375,7 +1376,7 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 			idFact = target_cursor.fetchone()
 
 			if idTeacher[0] is not None and idLevel[0] is not None and idTitle[0] is not None:
-				if idFact[0] is not None:
+				if idFact is not None:
 					target_cursor.execute(dedent("""\
 					UPDATE fact_docente_titulo
 					SET id_docente=%s, id_titulo=%s, id_nivel=%s
@@ -1410,7 +1411,7 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 			WHERE codigo = %s"""), [item['codigo']])
 			idPrize = target_cursor.fetchone()
 
-			if idPrize[0] is None:
+			if idPrize is None:
 				insert(target_cursor, "premio", item)
 				target_cnx.commit()
 				target_cursor.execute(dedent("""\
@@ -1423,21 +1424,11 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 			FROM fact_docente_premio AS fact
 			INNER JOIN dim_premio AS p
 			ON (fact.id_premio = p.id)
-			WHERE t.codigo = %s"""), [item['codigo']])
+			WHERE p.codigo = %s"""), [item['codigo']])
 			idFact = target_cursor.fetchone()
 
 			if idTeacher[0] is not None and idPrize[0] is not None:
-				target_cursor.execute(dedent("""\
-				INSERT INTO fact_docente_premio 
-					(id_docente, id_premio)
-				VALUES (%s, %s)"""), [idTeacher[0], idPrize[0]])
-				target_cnx.commit()
-			else:
-				print("Error")
-			print("Insercion finalizada")
-
-			if idTeacher[0] is not None and idPrize[0] is not None:
-				if idFact[0] is not None:
+				if idFact is not None:
 					target_cursor.execute(dedent("""\
 					UPDATE fact_docente_premio
 					SET id_docente=%s, id_premio=%s
@@ -1465,69 +1456,69 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 			target_cnx.commit()	
 		print("Insercion finalizada")
 
-	elif table == PUBLICATION:
-		print("{}".format(table))
-		items = content[ITEMS]
-		for item in items:
-			target_cursor.execute(publicationQuery.get_query_code, [item[FIRST_NAME_ATRIBUTE]])
-			publicacion = target_cursor.fetchone()
-			if publication is not None:
-				update(target_cursor, table, item, {"id": publication[0]})
-			else: 
-				insert(target_cursor, table, item)
-			target_cnx.commit()
-		print("Insercion finalizada")
-	elif table == TEACHER_PUBLICATION:
-		print("{}".format(table))
-		items = content[ITEMS]
-		for item in items:
-			publicationCode = item[PUBLICATION]
-			target_cursor.execute(publicationQuery.get_query_code, [publicationCode])
-			idPublication = target_cursor.fetchone()
+	#elif table == PUBLICATION:
+	#	print("{}".format(table))
+	#	items = content[ITEMS]
+	#	for item in items:
+	#		target_cursor.execute(publicationQuery.get_query_code, [item[FIRST_NAME_ATRIBUTE]])
+	#		publicacion = target_cursor.fetchone()
+	#		if publication is not None:
+	#			update(target_cursor, table, item, {"id": publication[0]})
+	#		else: 
+	#			insert(target_cursor, table, item)
+	#		target_cnx.commit()
+	#	print("Insercion finalizada")
+	#elif table == TEACHER_PUBLICATION:
+	#	print("{}".format(table))
+	#	items = content[ITEMS]
+	#	for item in items:
+	#		publicationCode = item[PUBLICATION]
+	#		target_cursor.execute(publicationQuery.get_query_code, [publicationCode])
+	#		idPublication = target_cursor.fetchone()
 
-			facultyCode = item[FACULTY]
-			target_cursor.execute(facultyQuery.get_query_code, [facultyCode])
-			idFaculty = target_cursor.fetchone()
+	#		facultyCode = item[FACULTY]
+	#		target_cursor.execute(facultyQuery.get_query_code, [facultyCode])
+	#		idFaculty = target_cursor.fetchone()
 			
-			teacherCode = item[TEACHER]
-			target_cursor.execute(teacherQuery.get_query_code, [teacherCode])
-			idTeacher = target_cursor.fetchone()
+	#		teacherCode = item[TEACHER]
+	#		target_cursor.execute(teacherQuery.get_query_code, [teacherCode])
+	#		idTeacher = target_cursor.fetchone()
 
 			# pasar dos parametros
-			target_cursor.execute(teacherPublicationRelationship.get_query_code, [teacherCode, publicationCode])
-			idFact = target_cursor.fetchone()
+	#		target_cursor.execute(teacherPublicationRelationship.get_query_code, [teacherCode, publicationCode])
+	#		idFact = target_cursor.fetchone()
 
-			if idFact is not None:
-				target_cursor.execute(dedent("""\
-				UPDATE fact_docente_publicacion
-				SET id_docente=%s, id_facultad=%s, id_publicacion=%s, cantidad_citas=%s
-				WHERE id=%s;"""), [idTeacher[0], idFaculty[0], idPublication[0], item[CITE_ATTRIBUTE], idFact[0]])
-				target_cnx.commit()
-				print("Registro actualizado")
-			else:
-				print("Registro no existe")
-		print("ACTUALIZACION finalizada")
-	elif table == TEACHER_FACULTY:
-		items = content[ITEMS]
-		for item in items:
-			facultyCode = item[FACULTY]
-			target_cursor.execute(facultyQuery.get_query_code, [facultyCode])
-			idFaculty = target_cursor.fetchone()
+	#		if idFact is not None:
+	#			target_cursor.execute(dedent("""\
+	#			UPDATE fact_docente_publicacion
+	#			SET id_docente=%s, id_facultad=%s, id_publicacion=%s, cantidad_citas=%s
+	#			WHERE id=%s;"""), [idTeacher[0], idFaculty[0], idPublication[0], item[CITE_ATTRIBUTE], idFact[0]])
+	#			target_cnx.commit()
+	#			print("Registro actualizado")
+	#		else:
+	#			print("Registro no existe")
+	#	print("ACTUALIZACION finalizada")
+	#elif table == TEACHER_FACULTY:
+	#	items = content[ITEMS]
+	#	for item in items:
+	#		facultyCode = item[FACULTY]
+	#		target_cursor.execute(facultyQuery.get_query_code, [facultyCode])
+	#		idFaculty = target_cursor.fetchone()
 			
-			teacherCode = item[TEACHER]
-			target_cursor.execute(teacherFacultyRelationship.get_query_code, [teacherCode])
-			idFact = target_cursor.fetchone()
+	#		teacherCode = item[TEACHER]
+	#		target_cursor.execute(teacherFacultyRelationship.get_query_code, [teacherCode])
+	#		idFact = target_cursor.fetchone()
 
-			if idFact is not None:
-				target_cursor.execute(dedent("""\
-				UPDATE fact_docente_facultad
-				SET id_facultad=%s
-				WHERE id=%s;"""), [idFaculty[0], idFact[0]])
-				target_cnx.commit()
-				print("Registro actualizado")
-			else:
-				print("Registro no existe")
-		print("Actualizacion finalizada")
+	#		if idFact is not None:
+	#			target_cursor.execute(dedent("""\
+	#			UPDATE fact_docente_facultad
+	#			SET id_facultad=%s
+	#			WHERE id=%s;"""), [idFaculty[0], idFact[0]])
+	#			target_cnx.commit()
+	#			print("Registro actualizado")
+	#		else:
+	#			print("Registro no existe")
+	#	print("Actualizacion finalizada")
 
 	elif table == GRADUATE:
 		items = content[ITEMS]

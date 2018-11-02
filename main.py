@@ -17,6 +17,7 @@ from resources.InscribedCourse import InscribedCourseStudent, InscribedCourseStu
 from resources.TeacherPublication import TeacherPublication, TeacherPublicationFaculty, TeacherCiteFaculty
 from resources.Teacher import Teacher, TeacherSexFaculty, TeacherScale, TeacherNacionalityFaculty, TeacherWithDoctorateFaculty, TeacherGradeFaculty, TeacherWithDoctorate, TeacherInternacionals, TeacherNational
 from resources.TeacherTitle import TeacherTitle
+from resources.TeacherStudent import TeacherStudent
 from resources.TeacherPrize import TeacherPrize
 from resources.TeacherProject import TeacherProject
 from resources.TeacherOtherStudios import TeacherOtherStudios
@@ -99,7 +100,8 @@ api.add_resource(InscribedCourseStudentFaculty, '/asignatura-inscrita-estudiante
 
 
 # docentes
-
+# Número de personal académico empleado en relación al número de alumnos matriculados.
+api.add_resource(TeacherStudent, '/profesor-estudiante-proporcion')
 # total de docentes empleado
 api.add_resource(Teacher,'/profesor-total')
 # pulicaciones por docente

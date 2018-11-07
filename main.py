@@ -111,7 +111,7 @@ api.add_resource(TeacherPublicationFaculty, '/profesor-publicacion-facultad')
 # cantidad de citas por facultad
 api.add_resource(TeacherCiteFaculty, '/citas-facultad')
 # cantidad de profesores con doctorado o phd por facultad
-api.add_resource(TeacherWithDoctorateFaculty, '/profesor-doctorado-facultad')
+#api.add_resource(TeacherWithDoctorateFaculty, '/profesor-doctorado-facultad')
 # cantidad de profesores por facultad, dado un grado
 api.add_resource(TeacherGradeFaculty, '/profesor-grado-facultad/<grado_codigo>')
 # proporcion docentes internacioles / total de docentes

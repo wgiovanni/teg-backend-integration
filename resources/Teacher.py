@@ -32,12 +32,12 @@ class TeacherWithDoctorateFaculty(BD, Resource):
     def get(self):
         try:
             params = "Doctorado"
-            result = self.queryOne("SELECT * FROM dim_grado WHERE nombre = %s", [params])
+            result = self.queryOne("SELECT * FROM dim_nivel WHERE codigo = %s", [params])
             if result is None:
                 abort(404, message="Resource {} doesn't exists".format(params))
-            cut = PointCut("dim_grado", [result['id']])
+            cut = PointCut("dim_nivel", [result['id']])
             cell = Cell(browser.cube, cuts = [cut])
-            r = browser.aggregate(cell, drilldown=["dim_facultad", "dim_grado"])
+            r = browser.aggregate(cell, drilldown=["dim_facultad", "dim_nivel"])
 
             facultades = self.queryAll("SELECT nombre FROM DIM_FACULTAD")
 
@@ -55,6 +55,7 @@ class TeacherWithDoctorateFaculty(BD, Resource):
                     item = {"facultad": f['nombre'], "cantidad": 0}
                     result.append(item)
                 flag = False
+            result = sorted(result, key=lambda k: k['facultad']) 
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -188,6 +189,7 @@ class TeacherSexFaculty(BD, Resource):
                         item = {"facultad": f['nombre'], "masculino": 0, "femenino": 0}
                         result.append(item)
                     flag = False
+                result = sorted(result, key=lambda k: k['facultad']) 
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 

@@ -1,12 +1,13 @@
-from flask_restful import abort
+from flask_restful import abort, Resource
 import simplejson as json
 from textwrap import dedent
-from resources.BaseRes import BaseRes
+from flask import make_response
 from pymysql import DatabaseError
+from common.BD import BD
+from flask import request
 
-class SystemParameterList(BaseRes):
-	database = "PRUEBA"
-	table = "PARAMETRO_SISTEMA"
+class SystemParameterList(BD, Resource):
+	representations = {'application/json': make_response}
 
 	def get(self):
 		try:
@@ -24,7 +25,7 @@ class SystemParameterList(BaseRes):
 
 	def post(self):
 		try:
-			systemParameter = self.parser.parse_args()
+			systemParameter = request.get_json(force=True)
 			print(systemParameter)
 			self.insert('PARAMETRO_SISTEMA', systemParameter)
 			self.commit()
@@ -37,9 +38,8 @@ class SystemParameterList(BaseRes):
 
 		return json.dumps(result), 201, { 'Access-Control-Allow-Origin': '*' }
 
-class SystemParameter(BaseRes):
-	database = "PRUEBA"
-	table = "PARAMETRO_SISTEMA"
+class SystemParameter(BD, Resource):
+	representations = {'application/json': make_response}
 
 	def get(self, systemParameter_id):
 		try:
@@ -55,13 +55,27 @@ class SystemParameter(BaseRes):
 
 	def put(self, systemParameter_id):
 		try:
-			systemParameter = self.parser.parse_args()
-			del systemParameter['id']
+			jsonData = request.get_json(force=True)
+			systemParameter = {
+				"codigo": jsonData['codigo'],
+				"nombre": jsonData['nombre'],
+				"descripcion": jsonData['descripcion'],
+				"definicion": jsonData['definicion']
+			}
+			username = jsonData['user']
 			self.update('PARAMETRO_SISTEMA', systemParameter, {'ID': systemParameter_id})
 			self.commit()
 			result = self.queryOne("SELECT id, codigo, nombre, descripcion, definicion FROM PARAMETRO_SISTEMA WHERE ID = %s", [systemParameter_id])
 			if result is None:
 				abort(404, message="Resource {} doesn't exist".format(systemParameter_id))
+			# datos de auditoria
+			audit = {
+				"username": username,
+				"action": 'Modificó un parámetro del sistema',
+				"module": 'Integración'
+			}
+			self.insert('HISTORY_ACTION', audit)
+			self.commit()
 		except DatabaseError as e:
 			self.rollback()
 			abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))

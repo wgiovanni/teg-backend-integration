@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 01-11-2018 a las 20:44:26
+-- Tiempo de generación: 08-11-2018 a las 00:03:17
 -- Versión del servidor: 10.1.34-MariaDB
 -- Versión de PHP: 7.2.8
 
@@ -1088,7 +1088,38 @@ INSERT INTO `fact_estudiante_facultad` (`id`, `id_estudiante`, `id_facultad`, `i
 (9, 9, 64, 117, 7, 13, 1, 2, 2, 1, 1),
 (10, 10, 64, 119, 7, 13, 2, 1, 1, 2, 1),
 (11, 11, 64, 120, 6, 13, 1, 1, 2, 2, 1),
-(12, 12, 64, 120, 6, 13, 2, 2, 1, 1, 1);
+(12, 12, 64, 120, 6, 14, 2, 2, 1, 1, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `history_action`
+--
+
+CREATE TABLE `history_action` (
+  `id` int(11) NOT NULL,
+  `username` varchar(100) NOT NULL,
+  `action` varchar(100) NOT NULL,
+  `module` varchar(100) NOT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `history_action`
+--
+
+INSERT INTO `history_action` (`id`, `username`, `action`, `module`, `date`) VALUES
+(20, 'wgiovanni', 'Ingreso al sistema', 'Usuarios', '2018-11-07 19:40:40'),
+(21, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-07 20:09:19'),
+(22, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-07 20:13:22'),
+(23, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-07 20:21:55'),
+(24, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-07 20:26:32'),
+(25, 'wgiovanni', 'Eliminó un usuario', 'Usuarios', '2018-11-07 20:26:46'),
+(26, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-07 20:27:50'),
+(27, 'wgiovanni', 'Eliminó un usuario', 'Usuarios', '2018-11-07 20:32:21'),
+(28, 'wgiovanni', 'Modificó un parámetro del sistema', 'Integración', '2018-11-07 20:56:42'),
+(29, 'wgiovanni', 'Modificó un parámetro del sistema', 'Integración', '2018-11-07 20:56:59'),
+(30, 'wgiovanni', 'Ingreso al sistema', 'Usuarios', '2018-11-07 21:12:38');
 
 -- --------------------------------------------------------
 
@@ -1111,7 +1142,7 @@ CREATE TABLE `parametro_sistema` (
 --
 
 INSERT INTO `parametro_sistema` (`id`, `codigo`, `nombre`, `descripcion`, `definicion`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(1, 'CARGA_INICIAL_ACTUALIZACION', 'CARGA_INICIAL_ACTUALIZACION', 'Parametro que toma valores boleanos para la carga inicial (1) y la actualizacion (0)', '0', '2018-10-18 20:35:32', '2018-10-31 17:19:38'),
+(1, 'CARGA_INICIAL_ACTUALIZACION', 'CARGA_INICIAL_ACTUALIZACION', 'Parametro que toma valores boleanos para la carga inicial (1) y la actualizacion (0)', '0', '2018-10-18 20:35:32', '2018-11-07 20:56:58'),
 (2, 'RUTA_CARGA_ESTUDIANTES', 'RUTA_CARGA_ESTUDIANTES', 'Endpoint o ruta para la carga inicial del modulo de estudiantes', 'http://127.0.0.1:8082/api/v1/estudiantes', '2018-10-18 20:38:51', '2018-10-29 19:06:57'),
 (3, 'RUTA_CARGA_PROFESORES', 'RUTA_CARGA_PROFESORES', 'Endpoint o ruta para la carga inicial del modulo de profesores', 'http://127.0.0.1:8082/api/v1/profesores', '2018-10-18 20:40:26', '2018-10-29 00:04:01'),
 (4, 'RUTA_CARGA_EGRESADOS', 'RUTA_CARGA_EGRESADOS', 'Endpoint o ruta para la carga inicial del modulo de egresados', 'http://127.0.0.1:8082/api/v1/egresados', '2018-10-18 21:31:21', '2018-10-29 00:04:17'),
@@ -1156,9 +1187,10 @@ CREATE TABLE `role` (
 --
 
 INSERT INTO `role` (`id`, `name`) VALUES
-(1, 'administrador'),
-(3, 'facultad'),
-(2, 'vicerrector');
+(5, 'administrador'),
+(7, 'facultad'),
+(8, 'verificador'),
+(6, 'vicerrector');
 
 -- --------------------------------------------------------
 
@@ -1172,20 +1204,37 @@ CREATE TABLE `user` (
   `last_name` varchar(50) NOT NULL,
   `username` varchar(50) NOT NULL,
   `email` varchar(100) NOT NULL,
-  `password` varchar(100) NOT NULL,
-  `id_role` int(11) NOT NULL
+  `password` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Volcado de datos para la tabla `user`
 --
 
-INSERT INTO `user` (`id`, `first_name`, `last_name`, `username`, `email`, `password`, `id_role`) VALUES
-(25, 'prueba', 'prueba', 'prueba', 'prueba@gmail.com', '123456', 1),
-(26, 'Wilkel', 'Giovanni', 'wgiovanni', 'wilkelgiovanni@gmail.com', '123456', 2),
-(27, 'prueba2', 'prueba2', 'prueba2', 'prueba2@gmail.com', '123456', 1),
-(28, 'facyt', 'facyt', 'facyt', 'facyt@gmail.com', '123456', 3),
-(29, 'ingenieria', 'ingenieria', 'ingenieria', 'ingenieria@gmail.com', '123456', 3);
+INSERT INTO `user` (`id`, `first_name`, `last_name`, `username`, `email`, `password`) VALUES
+(42, 'Wilkel', 'Giovanni', 'wgiovanni', 'wilkelgiovanni@gmail.com', '123456'),
+(44, 'prueba', 'prueba', 'prueba', 'prueba@gmail.com', '123456');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `user_role`
+--
+
+CREATE TABLE `user_role` (
+  `id` int(11) NOT NULL,
+  `id_user` int(11) NOT NULL,
+  `id_role` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `user_role`
+--
+
+INSERT INTO `user_role` (`id`, `id_user`, `id_role`) VALUES
+(13, 42, 5),
+(14, 44, 6),
+(15, 44, 8);
 
 --
 -- Índices para tablas volcadas
@@ -1524,6 +1573,12 @@ ALTER TABLE `fact_estudiante_facultad`
   ADD KEY `id_tipo` (`id_tipo`);
 
 --
+-- Indices de la tabla `history_action`
+--
+ALTER TABLE `history_action`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indices de la tabla `parametro_sistema`
 --
 ALTER TABLE `parametro_sistema`
@@ -1550,7 +1605,14 @@ ALTER TABLE `role`
 ALTER TABLE `user`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`),
-  ADD UNIQUE KEY `username` (`username`),
+  ADD UNIQUE KEY `username` (`username`);
+
+--
+-- Indices de la tabla `user_role`
+--
+ALTER TABLE `user_role`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_user` (`id_user`),
   ADD KEY `id_role` (`id_role`);
 
 --
@@ -1816,6 +1878,12 @@ ALTER TABLE `fact_estudiante_facultad`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
+-- AUTO_INCREMENT de la tabla `history_action`
+--
+ALTER TABLE `history_action`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+
+--
 -- AUTO_INCREMENT de la tabla `parametro_sistema`
 --
 ALTER TABLE `parametro_sistema`
@@ -1831,12 +1899,18 @@ ALTER TABLE `prueba`
 -- AUTO_INCREMENT de la tabla `role`
 --
 ALTER TABLE `role`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `user`
 --
 ALTER TABLE `user`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+
+--
+-- AUTO_INCREMENT de la tabla `user_role`
+--
+ALTER TABLE `user_role`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
@@ -1960,10 +2034,11 @@ ALTER TABLE `fact_estudiante_facultad`
   ADD CONSTRAINT `fact_estudiante_facultad_ibfk_9` FOREIGN KEY (`id_tipo`) REFERENCES `dim_tipo_estudiante` (`id`);
 
 --
--- Filtros para la tabla `user`
+-- Filtros para la tabla `user_role`
 --
-ALTER TABLE `user`
-  ADD CONSTRAINT `user_ibfk_1` FOREIGN KEY (`id_role`) REFERENCES `role` (`id`);
+ALTER TABLE `user_role`
+  ADD CONSTRAINT `user_role_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `user` (`id`),
+  ADD CONSTRAINT `user_role_ibfk_2` FOREIGN KEY (`id_role`) REFERENCES `role` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -69,7 +69,7 @@ class StudentFaculty(BD, Resource):
                     item = {"nombre": f['nombre'], "total": 0}
                     items.append(item)
                 flag = False
-
+            items = sorted(items, key=lambda k: k['nombre']) 
             result['facultad'] = items
 
 
@@ -168,7 +168,7 @@ class StudentSexFaculty(BD, Resource):
                         item = {"facultad": f['nombre'], "masculino": 0, "femenino": 0}
                         result.append(item)
                     flag = False
-                #print(result) 
+                result = sorted(result, key=lambda k: k['facultad']) 
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -265,6 +265,7 @@ class StudentNationalityFaculty(BD, Resource):
                         item = {"facultad": f['nombre'], "venezolano": 0, "extranjero": 0}
                         result.append(item)
                     flag = False
+                result = sorted(result, key=lambda k: k['facultad']) 
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -301,6 +302,7 @@ class StudentDisabilityFaculty(BD, Resource):
                         item = {"facultad": f['nombre'], "total-estudiantes-discapacidad": 0}
                         result.append(item)
                     flag = False
+                result = sorted(result, key=lambda k: k['facultad']) 
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -337,6 +339,7 @@ class StudentEthnicGroupFaculty(BD, Resource):
                         item = {"facultad": f['nombre'], "total-estudiantes-etnia": 0}
                         result.append(item)
                     flag = False
+                result = sorted(result, key=lambda k: k['facultad']) 
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -397,6 +400,8 @@ class StudentUndergraduateNacionality(BD, Resource):
         return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }
 
 class StudentProfessionFaculty(BD, Resource):
+    representations = {'application/json': make_response}
+    parser = reqparse.RequestParser()
     def get(self):
         try:
             r = browser.aggregate(drilldown=["dim_carrera", "dim_facultad"])

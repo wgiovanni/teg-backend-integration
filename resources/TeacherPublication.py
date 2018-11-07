@@ -67,6 +67,7 @@ class TeacherPublicationFaculty(BD, Resource):
                 r = browser.aggregate(cell, drilldown=["dim_publicacion", "dim_facultad"])
                 item = {"facultad": faculty['nombre'], "cantidad_publicaciones": r.summary['sumatoria']}
                 result.append(item)
+            result = sorted(result, key=lambda k: k['facultad']) 
                 
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
@@ -87,6 +88,7 @@ class TeacherCiteFaculty(BD, Resource):
                 r = browser.aggregate(cell, drilldown=["dim_publicacion", "dim_facultad"])
                 item = {"facultad": faculty['nombre'], "citaciones": r.summary['sumatoria_citacion']}
                 result.append(item)
+            result = sorted(result, key=lambda k: k['facultad']) 
                 
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))

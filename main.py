@@ -14,9 +14,9 @@ from resources.Student import StudentEthnicGroupFaculty, StudentDisabilityFacult
 from resources.Student import StudentNationalityFaculty, StudentProfessionFaculty, StudentProfessionConstantsFaculty, StudentInternacional 
 from resources.Student import StudentFaculty, StudentUndergraduateNacionality
 from resources.InscribedCourse import InscribedCourseStudent, InscribedCourseStudentFaculty
-from resources.TeacherPublication import TeacherPublication, TeacherPublicationFaculty, TeacherCiteFaculty
+from resources.TeacherPublication import TeacherPublication, TeacherPublicationFaculty, TeacherCiteFaculty, TeacherCitePublication
 from resources.Teacher import Teacher, TeacherSexFaculty, TeacherScale, TeacherNacionalityFaculty, TeacherWithDoctorateFaculty, TeacherGradeFaculty, TeacherWithDoctorate, TeacherInternacionals, TeacherNational
-from resources.TeacherTitle import TeacherTitle
+from resources.TeacherTitle import TeacherTitle, TeacherTitleFaculty
 from resources.TeacherStudent import TeacherStudent
 from resources.TeacherPrize import TeacherPrize
 from resources.TeacherProject import TeacherProject
@@ -110,8 +110,10 @@ api.add_resource(TeacherPublication, '/profesor-publicacion')
 api.add_resource(TeacherPublicationFaculty, '/profesor-publicacion-facultad')
 # cantidad de citas por facultad
 api.add_resource(TeacherCiteFaculty, '/citas-facultad')
+# cantidad de citas por publicación
+api.add_resource(TeacherCitePublication, '/citas-publicacion')
 # cantidad de profesores con doctorado o phd por facultad
-#api.add_resource(TeacherWithDoctorateFaculty, '/profesor-doctorado-facultad')
+api.add_resource(TeacherTitleFaculty, '/profesor-doctorado-facultad')
 # cantidad de profesores por facultad, dado un grado
 api.add_resource(TeacherGradeFaculty, '/profesor-grado-facultad/<grado_codigo>')
 # proporcion docentes internacioles / total de docentes

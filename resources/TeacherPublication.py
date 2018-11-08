@@ -94,3 +94,27 @@ class TeacherCiteFaculty(BD, Resource):
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
         return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }
+
+class TeacherCitePublication(BD, Resource):
+    representations = {'application/json': make_response}
+    parser = reqparse.RequestParser()
+    def get(self):
+        try:
+            r = browser.aggregate(drilldown=["dim_publicacion", "dim_docente"])
+            result = []
+            for row in r:
+                item = {
+                    'titulo_publicacion': row['dim_publicacion.titulo_publicacion'],
+                    'url_citacion': row['dim_publicacion.url_citacion'],
+                    'url_publicacion': row['dim_publicacion.url_publicacion'],
+                    'cedula_docente': row['dim_docente.cedula'],
+                    'nombre': row['dim_docente.primer_nombre'],
+                    'apellido': row['dim_docente.primer_apellido'],
+                    'citas': row['sumatoria_citacion']
+                }
+                result.append(item)
+            
+        except Exception as e:
+            abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
+
+        return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }

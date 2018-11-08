@@ -416,9 +416,10 @@ class StudentProfessionFaculty(BD, Resource):
 
 
 class StudentProfessionConstantsFaculty(BD, Resource):
-    def get(self, faculty_code):
+    representations = {'application/json': make_response}
+    def get(self, facultad_codigo):
         try:
-            params = faculty_code
+            params = facultad_codigo
             result = self.queryOne("SELECT * FROM DIM_FACULTAD WHERE NOMBRE = %s", [params])
             if result is None:
                 abort(404, message="Resource {} doesn't exists".format(params))
@@ -427,13 +428,17 @@ class StudentProfessionConstantsFaculty(BD, Resource):
             r = browser.aggregate(cell, drilldown=["dim_facultad", "dim_carrera"])
             result = []
             for row in r:
-                item = {"carrera": row['dim_carrera.nombre'], "facultad": row['dim_facultad.nombre'], "total": row['sumatoria']}
+                item = {"carrera": row['dim_carrera.nombre'], "total": row['sumatoria']}
                 result.append(item)
+            response = {
+                "facultad": facultad_codigo,
+                "carrera": result
+            }
         except DatabaseError as e:
             self.rollback()
             abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
-        return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }
+        return json.dumps(response), 200, { 'Access-Control-Allow-Origin': '*' }
         

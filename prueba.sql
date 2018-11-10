@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 08-11-2018 a las 00:03:17
+-- Tiempo de generación: 10-11-2018 a las 16:15:22
 -- Versión del servidor: 10.1.34-MariaDB
 -- Versión de PHP: 7.2.8
 
@@ -72,7 +72,6 @@ INSERT INTO `dim_asigtura_aprobada` (`id`, `codigo`, `nombre`) VALUES
 CREATE TABLE `dim_carrera` (
   `id` int(11) NOT NULL,
   `nombre` varchar(100) NOT NULL,
-  `tipo` varchar(50) NOT NULL,
   `created_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -81,12 +80,12 @@ CREATE TABLE `dim_carrera` (
 -- Volcado de datos para la tabla `dim_carrera`
 --
 
-INSERT INTO `dim_carrera` (`id`, `nombre`, `tipo`, `created_date`, `updated_date`) VALUES
-(117, 'Computación', 'Semestre', '2018-10-18 21:28:47', '2018-10-18 21:28:47'),
-(118, 'Química', 'Semestre', '2018-10-18 21:28:47', '2018-10-18 21:28:47'),
-(119, 'Física', 'Semestre', '2018-10-18 21:28:47', '2018-10-18 21:28:47'),
-(120, 'Matemática', 'Semestre', '2018-10-18 21:28:47', '2018-10-18 21:28:47'),
-(121, 'Biología', 'Semestre', '2018-10-18 21:28:47', '2018-10-18 21:28:47');
+INSERT INTO `dim_carrera` (`id`, `nombre`, `created_date`, `updated_date`) VALUES
+(117, 'Computación', '2018-10-18 21:28:47', '2018-10-18 21:28:47'),
+(118, 'Química', '2018-10-18 21:28:47', '2018-10-18 21:28:47'),
+(119, 'Física', '2018-10-18 21:28:47', '2018-10-18 21:28:47'),
+(120, 'Matemática', '2018-10-18 21:28:47', '2018-10-18 21:28:47'),
+(121, 'Biología', '2018-10-18 21:28:47', '2018-10-18 21:28:47');
 
 -- --------------------------------------------------------
 
@@ -184,11 +183,14 @@ CREATE TABLE `dim_docente` (
 --
 
 INSERT INTO `dim_docente` (`id`, `cedula`, `primer_nombre`, `segundo_nombre`, `primer_apellido`, `segundo_apellido`, `correo`, `area_de_investigacion`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(156, '11356034', 'Mirella', 'SegundoNombre', 'Herrera', 'Segundoapellido', 'mirella.herrera@gmail.com', 'investigacion', '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(157, '1515515', 'Dessiree', 'SegundoNombre', 'Delgado', 'Segundoapellido', 'desidelgado@gmail.com', 'investigacion', '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(158, '545511', 'Marilyn', 'SegundoNombre', 'Guigni', 'Segundoapellido', 'marilyngiugni@gmail.com', 'investigacion', '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(159, '226555', 'Pero', 'SegundoNombre', 'Linares', 'Segundoapellido', 'pedro@gmail.com', 'investigacion', '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(160, '123456788', 'Alguien ahi', 'SegundoNombre', 'Alguien ahi', 'Segundoapellido', 'alguienahi@gmail.com', 'investigacion', '2018-10-30 19:02:08', '2018-10-30 19:02:08');
+(223, '121212', 'Daniel', '', 'Rosquete', '', 'dhrosquete@uc.edu.ve', 'grafica', '2018-11-10 02:50:00', '2018-11-10 02:50:00'),
+(224, '1888', 'Kiara', '', 'Ottogalli', '', 'kottogal@uc.edu.ve', 'grafica', '2018-11-10 02:50:00', '2018-11-10 02:50:00'),
+(225, '888', 'Dinarle', '', 'Ortega', '', ' dortega@uc.edu.ve', 'grafica', '2018-11-10 02:50:00', '2018-11-10 02:50:00'),
+(226, '1221212', 'Marylin', '', 'Giugni', '', 'mgiugni@uc.edu.ve', 'grafica', '2018-11-10 02:50:00', '2018-11-10 02:50:00'),
+(227, '122', 'Amadis', '', 'Martinez', '', 'aamartin@uc.edu.ve', 'grafica', '2018-11-10 02:50:00', '2018-11-10 02:50:00'),
+(228, '1122', 'Mirella', '', 'Herrera', '', 'mherrera@uc.edu.ve', 'grafica', '2018-11-10 02:50:00', '2018-11-10 02:50:00'),
+(229, '1568', 'Ana', '', 'Aguilera', '', 'aaguilef@uc.edu.ve', 'grafica', '2018-11-10 02:50:00', '2018-11-10 02:50:00'),
+(230, '1231313', 'Francisca', '', 'Grimon', '', 'fgrimon@uc.edu.ve', 'grafica', '2018-11-10 02:50:00', '2018-11-10 02:50:00');
 
 -- --------------------------------------------------------
 
@@ -359,6 +361,7 @@ INSERT INTO `dim_etnia` (`id`, `codigo`, `fecha_creacion`, `fecha_actualizacion`
 
 CREATE TABLE `dim_facultad` (
   `id` int(11) NOT NULL,
+  `codigo` varchar(100) NOT NULL,
   `nombre` varchar(100) NOT NULL,
   `created_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -368,15 +371,14 @@ CREATE TABLE `dim_facultad` (
 -- Volcado de datos para la tabla `dim_facultad`
 --
 
-INSERT INTO `dim_facultad` (`id`, `nombre`, `created_date`, `updated_date`) VALUES
-(57, 'Ingeniería', '2018-10-18 19:46:57', '2018-10-18 19:46:57'),
-(58, 'Ciencias Jurídicas y Políticas', '2018-10-18 19:46:57', '2018-10-18 19:46:57'),
-(59, 'Ciencias de la Salud', '2018-10-18 19:46:57', '2018-10-18 19:46:57'),
-(60, 'Ciencias Económicas y Sociales', '2018-10-18 19:46:57', '2018-10-18 19:46:57'),
-(61, 'Ciencias de la Educación', '2018-10-18 19:46:57', '2018-10-18 19:46:57'),
-(62, 'Odontología', '2018-10-18 19:46:57', '2018-10-18 19:46:57'),
-(63, 'Dirección General de Postgrado', '2018-10-18 19:46:57', '2018-10-18 19:46:57'),
-(64, 'Ciencias y Tecnología', '2018-10-18 19:46:57', '2018-10-18 19:46:57');
+INSERT INTO `dim_facultad` (`id`, `codigo`, `nombre`, `created_date`, `updated_date`) VALUES
+(57, 'INGENIERIA', 'Ingeniería', '2018-10-18 19:46:57', '2018-11-10 01:44:39'),
+(58, 'FCJP', 'Ciencias Jurídicas y Políticas', '2018-10-18 19:46:57', '2018-11-10 01:44:30'),
+(59, 'FCS', 'Ciencias de la Salud', '2018-10-18 19:46:57', '2018-11-10 01:44:50'),
+(60, 'FACES', 'Ciencias Económicas y Sociales', '2018-10-18 19:46:57', '2018-11-10 01:45:11'),
+(61, 'FACE', 'Ciencias de la Educación', '2018-10-18 19:46:57', '2018-11-10 01:45:03'),
+(62, 'ODONTOLOGIA', 'Odontología', '2018-10-18 19:46:57', '2018-11-10 01:44:17'),
+(64, 'FACYT', 'Ciencias y Tecnología', '2018-10-18 19:46:57', '2018-11-10 01:43:57');
 
 -- --------------------------------------------------------
 
@@ -440,12 +442,8 @@ CREATE TABLE `dim_otroestudio` (
 --
 
 INSERT INTO `dim_otroestudio` (`id`, `codigo`, `nombre_titulo`, `fecha_creacion`, `fec`) VALUES
-(36, '5', 'Estudio1', '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(37, '6', 'Estudio2', '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(38, '7', 'Estudio3', '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(39, '8', 'Estudio4', '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(40, '9', 'Estudio5', '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(41, '10', 'Estudio6', '2018-10-31 03:24:46', '2018-10-31 03:24:46');
+(42, '30', 'Chef', '2018-11-10 02:41:02', '2018-11-10 02:41:02'),
+(43, '31', 'Cocina', '2018-11-10 02:41:02', '2018-11-10 02:41:02');
 
 -- --------------------------------------------------------
 
@@ -493,11 +491,9 @@ CREATE TABLE `dim_premio` (
 --
 
 INSERT INTO `dim_premio` (`id`, `codigo`, `nombre`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(26, '7', 'Mejor profesor', '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(27, '8', 'Mejor Investigador 2016', '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(28, '9', 'Mejor publicacion 2018', '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(29, '10', 'Mejor publicacion 2019', '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(30, '11', 'Premio', '2018-10-31 03:27:44', '2018-10-31 03:27:44');
+(34, '10', 'Mejor programador 2018', '2018-11-10 02:24:20', '2018-11-10 02:24:20'),
+(35, '11', 'Mejor programador 2017', '2018-11-10 02:24:20', '2018-11-10 02:24:20'),
+(36, '12', 'Mejor docente 2018', '2018-11-10 02:24:20', '2018-11-10 02:24:20');
 
 -- --------------------------------------------------------
 
@@ -518,11 +514,8 @@ CREATE TABLE `dim_proyecto` (
 --
 
 INSERT INTO `dim_proyecto` (`id`, `codigo`, `titulo`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(21, '5', 'Proyecto1', '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(22, '6', 'Proyecto2', '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(23, '7', 'Proyecto3', '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(24, '8', 'Proyecto4', '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(25, '9', 'Proyecto5', '2018-10-31 03:28:38', '2018-10-31 03:28:38');
+(28, '22', 'Desarrollo de aplicaciones', '2018-11-10 02:24:20', '2018-11-10 02:24:20'),
+(29, '23', 'modificacion de sw del ps4', '2018-11-10 02:24:20', '2018-11-10 02:24:20');
 
 -- --------------------------------------------------------
 
@@ -545,11 +538,10 @@ CREATE TABLE `dim_publicacion` (
 --
 
 INSERT INTO `dim_publicacion` (`id`, `codigo`, `titulo_publicacion`, `url_citacion`, `url_publicacion`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(17, '4', 'Titulo de la publicacion2', 'http://dhcvhzvgvgvgvz.com', 'http://aquiseencuentra.com', '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(18, '5', 'Titulo de la publicacion1', 'http://dhcvhzvgvgvgvz.com', 'http://aquiseencuentra.com', '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(19, '6', 'Titulo de la publicacion2', 'http://dhcvhzvgvgvgvz.com', 'http://aquiseencuentra.com', '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(20, '7', 'Titulo de la publicacion3', 'http://dhcvhzvgvgvgvz.com', 'http://aquiseencuentra.com', '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(21, '8', 'Titulo de la publicacion4', 'http://dhcvhzvgvgvgvz.com', 'http://aquiseencuentra.com', '2018-10-31 03:28:38', '2018-10-31 03:28:38');
+(22, '7', 'NASPI: Una notación algorítmica estándar para programación imperativa', 'ghbn', 'bcgbn', '2018-11-10 02:24:20', '2018-11-10 02:24:20'),
+(23, '9', 'NASPI: Una notación algorítmica estándar para programación imperativa', 'fbcvnc', 'cvbcvb', '2018-11-10 02:24:20', '2018-11-10 02:24:20'),
+(24, '8', 'Informe de Pasantías', 'bcb', 'bcvbcv', '2018-11-10 02:24:20', '2018-11-10 02:24:20'),
+(25, '10', 'Informe de Pasantías', 'bcvb', 'bcvbcvb', '2018-11-10 02:24:20', '2018-11-10 02:24:20');
 
 -- --------------------------------------------------------
 
@@ -607,8 +599,9 @@ CREATE TABLE `dim_tipo_docente` (
 --
 
 INSERT INTO `dim_tipo_docente` (`id`, `codigo`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(4, 'Investigacion', '2018-10-30 02:29:16', '2018-10-30 02:29:16'),
-(5, 'Docente', '2018-10-30 02:29:16', '2018-10-30 02:29:16');
+(4, 'Investigador', '2018-10-30 02:29:16', '2018-11-10 02:21:41'),
+(5, 'Contratado', '2018-10-30 02:29:16', '2018-11-10 02:21:50'),
+(6, 'Normal', '2018-11-09 19:02:43', '2018-11-09 19:02:43');
 
 -- --------------------------------------------------------
 
@@ -648,11 +641,8 @@ CREATE TABLE `dim_titulo` (
 --
 
 INSERT INTO `dim_titulo` (`id`, `codigo`, `nombre`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(13, '3', 'Licenciado en Computacion', '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(14, '4', 'Ingeniera', '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(15, '5', 'Licenciado en Computacion', '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(16, '6', 'Ingeniera', '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(17, '7', 'Administracion', '2018-10-31 03:28:38', '2018-10-31 03:28:38');
+(18, '37', 'ingeniero', '2018-11-10 02:24:20', '2018-11-10 02:24:20'),
+(19, '38', 'lincenciado', '2018-11-10 02:24:20', '2018-11-10 02:24:20');
 
 -- --------------------------------------------------------
 
@@ -745,11 +735,14 @@ CREATE TABLE `fact_docente_facultad` (
 --
 
 INSERT INTO `fact_docente_facultad` (`id`, `id_docente`, `id_sexo`, `id_tipo`, `id_escalafon`, `id_facultad`, `id_nacionalidad`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(106, 156, 7, 4, 10, 64, 13, 1, '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(107, 157, 7, 4, 10, 64, 13, 1, '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(108, 158, 7, 4, 9, 64, 13, 1, '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(109, 159, 6, 4, 9, 57, 14, 1, '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(110, 160, 7, 4, 7, 62, 14, 1, '2018-10-30 19:02:08', '2018-10-30 19:02:08');
+(167, 223, 6, 4, 6, 64, 13, 1, '2018-11-10 02:50:00', '2018-11-10 02:50:00'),
+(168, 224, 7, 5, 6, 64, 13, 1, '2018-11-10 02:50:00', '2018-11-10 02:50:00'),
+(169, 225, 7, 4, 8, 64, 13, 1, '2018-11-10 02:50:00', '2018-11-10 02:50:00'),
+(170, 226, 7, 6, 8, 64, 14, 1, '2018-11-10 02:50:00', '2018-11-10 02:50:00'),
+(171, 227, 6, 6, 6, 64, 13, 1, '2018-11-10 02:50:00', '2018-11-10 02:50:00'),
+(172, 228, 7, 4, 6, 64, 13, 1, '2018-11-10 02:50:00', '2018-11-10 02:50:00'),
+(173, 229, 7, 4, 6, 64, 13, 1, '2018-11-10 02:50:00', '2018-11-10 02:50:00'),
+(174, 230, 7, 4, 6, 64, 13, 1, '2018-11-10 02:50:00', '2018-11-10 02:50:00');
 
 -- --------------------------------------------------------
 
@@ -771,12 +764,8 @@ CREATE TABLE `fact_docente_otroestudio` (
 --
 
 INSERT INTO `fact_docente_otroestudio` (`id`, `id_docente`, `id_otroestudio`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(36, 156, 36, 1, '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(37, 156, 37, 1, '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(38, 156, 38, 1, '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(39, 157, 39, 1, '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(40, 157, 40, 1, '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(42, 157, 41, 1, '2018-10-31 03:27:44', '2018-10-31 03:27:44');
+(47, 225, 43, 1, '2018-11-10 02:50:01', '2018-11-10 02:50:01'),
+(48, 223, 42, 1, '2018-11-10 02:50:01', '2018-11-10 02:50:01');
 
 -- --------------------------------------------------------
 
@@ -798,11 +787,9 @@ CREATE TABLE `fact_docente_premio` (
 --
 
 INSERT INTO `fact_docente_premio` (`id`, `id_docente`, `id_premio`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(26, 159, 26, 1, '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(27, 156, 27, 1, '2018-10-30 19:02:08', '2018-10-30 19:02:08'),
-(28, 156, 28, 1, '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(29, 157, 29, 1, '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(30, 157, 30, 1, '2018-10-31 03:28:38', '2018-10-31 03:28:38');
+(40, 224, 35, 1, '2018-11-10 02:50:01', '2018-11-10 02:50:01'),
+(41, 228, 36, 1, '2018-11-10 02:50:01', '2018-11-10 02:50:01'),
+(42, 223, 34, 1, '2018-11-10 02:50:01', '2018-11-10 02:50:01');
 
 -- --------------------------------------------------------
 
@@ -824,11 +811,10 @@ CREATE TABLE `fact_docente_proyecto` (
 --
 
 INSERT INTO `fact_docente_proyecto` (`id`, `id_docente`, `id_proyecto`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(21, 158, 21, 1, '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(22, 158, 22, 1, '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(23, 156, 23, 1, '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(24, 159, 24, 1, '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(25, 159, 25, 1, '2018-10-31 03:28:38', '2018-10-31 03:28:38');
+(38, 227, 28, 1, '2018-11-10 02:50:01', '2018-11-10 02:50:01'),
+(39, 225, 29, 1, '2018-11-10 02:50:01', '2018-11-10 02:50:01'),
+(40, 224, 28, 1, '2018-11-10 02:50:01', '2018-11-10 02:50:01'),
+(41, 223, 29, 1, '2018-11-10 02:50:01', '2018-11-10 02:50:01');
 
 -- --------------------------------------------------------
 
@@ -852,11 +838,10 @@ CREATE TABLE `fact_docente_publicacion` (
 --
 
 INSERT INTO `fact_docente_publicacion` (`id`, `id_docente`, `id_publicacion`, `id_facultad`, `cantidad_citas`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(9, 156, 17, 64, 50, 1, '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(10, 156, 18, 64, 100, 1, '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(11, 157, 19, 64, 75, 1, '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(12, 157, 20, 64, 500, 1, '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(13, 157, 21, 64, 56, 1, '2018-10-31 03:28:38', '2018-10-31 03:28:38');
+(26, 223, 23, 64, 789, 1, '2018-11-10 02:50:01', '2018-11-10 02:50:01'),
+(27, 223, 25, 64, 652, 1, '2018-11-10 02:50:01', '2018-11-10 02:50:01'),
+(28, 223, 22, 64, 20, 1, '2018-11-10 02:50:01', '2018-11-10 02:50:01'),
+(29, 223, 24, 64, 15, 1, '2018-11-10 02:50:01', '2018-11-10 02:50:01');
 
 -- --------------------------------------------------------
 
@@ -879,11 +864,9 @@ CREATE TABLE `fact_docente_titulo` (
 --
 
 INSERT INTO `fact_docente_titulo` (`id`, `id_docente`, `id_titulo`, `id_nivel`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(11, 156, 13, 3, 1, '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(12, 156, 14, 4, 1, '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(13, 157, 15, 4, 1, '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(14, 159, 16, 1, 1, '2018-10-30 19:02:09', '2018-10-30 19:02:09'),
-(15, 159, 17, 5, 1, '2018-10-31 03:28:38', '2018-10-31 03:28:38');
+(16, 227, 19, 4, 1, '2018-11-10 02:50:01', '2018-11-10 02:50:01'),
+(17, 228, 19, 4, 1, '2018-11-10 02:50:01', '2018-11-10 02:50:01'),
+(18, 229, 18, 1, 1, '2018-11-10 02:50:01', '2018-11-10 02:50:01');
 
 -- --------------------------------------------------------
 
@@ -1119,7 +1102,15 @@ INSERT INTO `history_action` (`id`, `username`, `action`, `module`, `date`) VALU
 (27, 'wgiovanni', 'Eliminó un usuario', 'Usuarios', '2018-11-07 20:32:21'),
 (28, 'wgiovanni', 'Modificó un parámetro del sistema', 'Integración', '2018-11-07 20:56:42'),
 (29, 'wgiovanni', 'Modificó un parámetro del sistema', 'Integración', '2018-11-07 20:56:59'),
-(30, 'wgiovanni', 'Ingreso al sistema', 'Usuarios', '2018-11-07 21:12:38');
+(30, 'wgiovanni', 'Ingreso al sistema', 'Usuarios', '2018-11-07 21:12:38'),
+(31, 'prueba', 'Ingreso al sistema', 'Usuarios', '2018-11-08 13:12:03'),
+(32, 'wgiovanni', 'Ingreso al sistema', 'Usuarios', '2018-11-08 13:13:02'),
+(33, 'wgiovanni', 'Ingreso al sistema', 'Usuarios', '2018-11-08 13:15:40'),
+(34, 'prueba', 'Ingreso al sistema', 'Usuarios', '2018-11-08 14:27:02'),
+(35, 'wgiovanni', 'Ingreso al sistema', 'Usuarios', '2018-11-08 14:27:13'),
+(36, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-08 14:27:30'),
+(37, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-08 14:43:25'),
+(38, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-08 14:44:15');
 
 -- --------------------------------------------------------
 
@@ -1142,11 +1133,11 @@ CREATE TABLE `parametro_sistema` (
 --
 
 INSERT INTO `parametro_sistema` (`id`, `codigo`, `nombre`, `descripcion`, `definicion`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(1, 'CARGA_INICIAL_ACTUALIZACION', 'CARGA_INICIAL_ACTUALIZACION', 'Parametro que toma valores boleanos para la carga inicial (1) y la actualizacion (0)', '0', '2018-10-18 20:35:32', '2018-11-07 20:56:58'),
+(1, 'CARGA_INICIAL_ACTUALIZACION', 'CARGA_INICIAL_ACTUALIZACION', 'Parametro que toma valores boleanos para la carga inicial (1) y la actualizacion (0)', '0', '2018-10-18 20:35:32', '2018-11-10 02:50:01'),
 (2, 'RUTA_CARGA_ESTUDIANTES', 'RUTA_CARGA_ESTUDIANTES', 'Endpoint o ruta para la carga inicial del modulo de estudiantes', 'http://127.0.0.1:8082/api/v1/estudiantes', '2018-10-18 20:38:51', '2018-10-29 19:06:57'),
-(3, 'RUTA_CARGA_PROFESORES', 'RUTA_CARGA_PROFESORES', 'Endpoint o ruta para la carga inicial del modulo de profesores', 'http://127.0.0.1:8082/api/v1/profesores', '2018-10-18 20:40:26', '2018-10-29 00:04:01'),
+(3, 'RUTA_CARGA_PROFESORES', 'RUTA_CARGA_PROFESORES', 'Endpoint o ruta para la carga inicial del modulo de profesores', 'http://127.0.0.1:8083/api/v1/docentes', '2018-10-18 20:40:26', '2018-11-10 01:55:55'),
 (4, 'RUTA_CARGA_EGRESADOS', 'RUTA_CARGA_EGRESADOS', 'Endpoint o ruta para la carga inicial del modulo de egresados', 'http://127.0.0.1:8082/api/v1/egresados', '2018-10-18 21:31:21', '2018-10-29 00:04:17'),
-(5, 'FECHA_ACTUALIZACION', 'FECHA_ACTUALIZACION', 'Parámetro de fecha que se utilizara para poder llevar el control de la fecha de actualización en cada ejecución del proceso ETL  ', '2018-10-30 23:28:38', '2018-10-28 17:44:52', '2018-10-31 03:28:38');
+(5, 'FECHA_ACTUALIZACION', 'FECHA_ACTUALIZACION', 'Parámetro de fecha que se utilizara para poder llevar el control de la fecha de actualización en cada ejecución del proceso ETL  ', '2018-11-09 22:49:58', '2018-10-28 17:44:52', '2018-11-10 02:50:01');
 
 -- --------------------------------------------------------
 
@@ -1213,7 +1204,10 @@ CREATE TABLE `user` (
 
 INSERT INTO `user` (`id`, `first_name`, `last_name`, `username`, `email`, `password`) VALUES
 (42, 'Wilkel', 'Giovanni', 'wgiovanni', 'wilkelgiovanni@gmail.com', '123456'),
-(44, 'prueba', 'prueba', 'prueba', 'prueba@gmail.com', '123456');
+(44, 'prueba', 'prueba', 'prueba', 'prueba@gmail.com', '123456'),
+(54, 'prueba2', 'prueba2', 'prueba2', 'prueba2@gmail.com', '123456'),
+(55, 'aja', 'aja', 'aja', 'aja@gmail.com', '123456'),
+(56, 'dcsdcsd', 'sdccsd', 'csdcsdc', 'sdcsdc@gmail.com', '123456');
 
 -- --------------------------------------------------------
 
@@ -1234,7 +1228,10 @@ CREATE TABLE `user_role` (
 INSERT INTO `user_role` (`id`, `id_user`, `id_role`) VALUES
 (13, 42, 5),
 (14, 44, 6),
-(15, 44, 8);
+(15, 44, 8),
+(30, 54, 7),
+(31, 55, 7),
+(32, 56, 7);
 
 --
 -- Índices para tablas volcadas
@@ -1336,7 +1333,7 @@ ALTER TABLE `dim_etnia`
 --
 ALTER TABLE `dim_facultad`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `nombre` (`nombre`);
+  ADD UNIQUE KEY `codigo` (`codigo`);
 
 --
 -- Indices de la tabla `dim_nacionalidad`
@@ -1659,7 +1656,7 @@ ALTER TABLE `dim_discapacidad`
 -- AUTO_INCREMENT de la tabla `dim_docente`
 --
 ALTER TABLE `dim_docente`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=161;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=231;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_educacion`
@@ -1719,7 +1716,7 @@ ALTER TABLE `dim_nivel`
 -- AUTO_INCREMENT de la tabla `dim_otroestudio`
 --
 ALTER TABLE `dim_otroestudio`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_patentes`
@@ -1731,19 +1728,19 @@ ALTER TABLE `dim_patentes`
 -- AUTO_INCREMENT de la tabla `dim_premio`
 --
 ALTER TABLE `dim_premio`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_proyecto`
 --
 ALTER TABLE `dim_proyecto`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_publicacion`
 --
 ALTER TABLE `dim_publicacion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_sexo`
@@ -1761,7 +1758,7 @@ ALTER TABLE `dim_status`
 -- AUTO_INCREMENT de la tabla `dim_tipo_docente`
 --
 ALTER TABLE `dim_tipo_docente`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_tipo_estudiante`
@@ -1773,7 +1770,7 @@ ALTER TABLE `dim_tipo_estudiante`
 -- AUTO_INCREMENT de la tabla `dim_titulo`
 --
 ALTER TABLE `dim_titulo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_trabajos`
@@ -1797,37 +1794,37 @@ ALTER TABLE `fact_asignatura_inscrita`
 -- AUTO_INCREMENT de la tabla `fact_docente_facultad`
 --
 ALTER TABLE `fact_docente_facultad`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=175;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_docente_otroestudio`
 --
 ALTER TABLE `fact_docente_otroestudio`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_docente_premio`
 --
 ALTER TABLE `fact_docente_premio`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_docente_proyecto`
 --
 ALTER TABLE `fact_docente_proyecto`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_docente_publicacion`
 --
 ALTER TABLE `fact_docente_publicacion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_docente_titulo`
 --
 ALTER TABLE `fact_docente_titulo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_egresado_certificacion`
@@ -1881,7 +1878,7 @@ ALTER TABLE `fact_estudiante_facultad`
 -- AUTO_INCREMENT de la tabla `history_action`
 --
 ALTER TABLE `history_action`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT de la tabla `parametro_sistema`
@@ -1905,13 +1902,13 @@ ALTER TABLE `role`
 -- AUTO_INCREMENT de la tabla `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT de la tabla `user_role`
 --
 ALTER TABLE `user_role`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- Restricciones para tablas volcadas

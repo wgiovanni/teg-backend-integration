@@ -104,7 +104,7 @@ class StudentFaculty(BD, Resource):
                 }
                 items.append(item)
             result['items'] = items
-            
+
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -179,6 +179,7 @@ class StudentSexFaculty(BD, Resource):
             cut = PointCut("dim_sexo", [result1['id']])
             cell = Cell(browser.cube, cuts = [cut])
             r1 = browser.aggregate(cell, drilldown=["dim_sexo", "dim_facultad"])
+            # todos estudiantes
             result = []
             item = {}
             if r is not None and r1 is not None:
@@ -200,11 +201,30 @@ class StudentSexFaculty(BD, Resource):
                         item = {"facultad": f['nombre'], "masculino": 0, "femenino": 0}
                         result.append(item)
                     flag = False
-                result = sorted(result, key=lambda k: k['facultad']) 
+                result = sorted(result, key=lambda k: k['facultad'])
+                r2 = browser.aggregate(drilldown=["dim_sexo", "dim_estudiante"])
+                items = []
+                for i in r2:
+                    item = {
+                        "cedula": i['dim_estudiante.cedula'],
+                        "nombre": i['dim_estudiante.nombre'],
+                        "apellido": i['dim_estudiante.apellido'],
+                        "fecha_nacimiento": i['dim_estudiante.fecha_nacimiento'].strftime('%Y-%m-%d'),
+                        "telefono1": i['dim_estudiante.telefono1'],
+                        "telefono2": i['dim_estudiante.telefono2'],
+                        "email": i['dim_estudiante.email'],
+                        "estado_procedencia": i['dim_estudiante.edo_procedencia'],
+                        "sexo": i['dim_sexo.codigo']
+                    }
+                    items.append(item)
+                response = {
+                    "facultades": result, 
+                    "items": items
+                }     
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
-        return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }
+        return json.dumps(response), 200, { 'Access-Control-Allow-Origin': '*' }
 
 class StudentInternacionalFaculty(BD, Resource):
     representations = {'application/json': make_response}

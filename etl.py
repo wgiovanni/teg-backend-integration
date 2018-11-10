@@ -525,15 +525,15 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 				"nombre_titulo": item['nomtitulo']
 			}
 			target_cursor.execute(otherStudioQuery.get_query_code, [item['codigo']])
-			project = target_cursor.fetchone()
-			if project is None:
+			otherStudio = target_cursor.fetchone()
+			if otherStudio is None:
 				insert(target_cursor, "otroestudio", item)
 				target_cnx.commit()
 			else:
 				print("Ya existe {}".format(item['codigo']))
 		print("Insercion finalizada")
 
-	elif table == "docente-otro-estudio":
+	elif table == "docente-otroestudio":
 		items = content[ITEMS]
 		for item in items:
 			teacherCode = item['docente']
@@ -548,7 +548,7 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 			SELECT id FROM dim_otroestudio
 			WHERE codigo = %s"""), [otherStudioCode])
 			idOtherStudio = target_cursor.fetchone()
-			print(idOtherStudio[0])
+			#print(idOtherStudio[0])
 
 			if idTeacher[0] is not None and idOtherStudio[0] is not None:
 				target_cursor.execute(dedent("""\
@@ -1241,11 +1241,13 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 
 	elif table == TEACHER_PUBLICATION:
 		items = content[ITEMS]
-		target_cursor.execute("DELETE FROM fact_docente_publicacion")
+		if items != []:
+			target_cursor.execute("DELETE FROM fact_docente_publicacion")
+			target_cnx.commit()
 		for item in items:
 			teacherCode = item['docente']
 			numberCites = item['numerocitaciones']
-			publicationCode = item['codigo']
+			publicationCode = item['publicacion']
 			target_cursor.execute(dedent("""\
 			SELECT d.id as idTeacher, f.id as idFaculty 
 			FROM fact_docente_facultad AS fact 
@@ -1304,10 +1306,12 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 
 	elif table == "docente-proyecto":
 		items = content[ITEMS]
-		target_cursor.execute("DELETE FROM fact_docente_proyecto")
+		if items != []:
+			target_cursor.execute("DELETE FROM fact_docente_proyecto")
+			target_cnx.commit()
 		for item in items:
 			teacherCode = item['docente']
-			projectCode = item['codigo']
+			projectCode = item['proyecto']
 			target_cursor.execute(dedent("""\
 			SELECT id 
 			FROM dim_docente
@@ -1363,7 +1367,9 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 
 	elif table == "docente-otro-estudio":
 		items = content[ITEMS]
-		target_cursor.execute("DELETE FROM fact_docente_otroestudio")
+		if items != []:
+			target_cursor.execute("DELETE FROM fact_docente_otroestudio")
+			target_cnx.commit()
 		for item in items:
 			teacherCode = item['docente']
 			otherStudioCode = item['codigo']
@@ -1421,8 +1427,9 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 
 	elif table == "docente-titulo":
 		items = content[ITEMS]
-		target_cursor.execute("DELETE FROM fact_docente_titulo")
-		target_cnx.commit()
+		if items != []:
+			target_cursor.execute("DELETE FROM fact_docente_titulo")
+			target_cnx.commit()
 		for item in items:
 			teacherCode = item['docente']
 			levelCode = item['nivel']
@@ -1483,9 +1490,11 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 
 	elif table == "docente-premio":
 		items = content[ITEMS]
-		target_cursor.execute("DELETE FROM fact_docente_premio")
+		if items == []:
+			target_cursor.execute("DELETE FROM fact_docente_premio")
+			target_cnx.commit()
 		for item in items:
-			teacherCode = item['cedulaautor']
+			teacherCode = item['docente']
 			target_cursor.execute(dedent("""\
 			SELECT id 
 			FROM dim_docente
@@ -1494,7 +1503,7 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 
 			target_cursor.execute(dedent("""\
 			SELECT id FROM dim_premio
-			WHERE codigo = %s"""), [item['codigo']])
+			WHERE codigo = %s"""), [item['premio']])
 			idPrize = target_cursor.fetchone()
 
 			#target_cursor.execute(dedent("""\

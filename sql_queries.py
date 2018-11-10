@@ -219,7 +219,7 @@ insert_teacher = dedent("""\
 
 update_teacher = dedent("""\
 	UPDATE dim_docente
-	SET cedula = %s, primer_nombre=%s, segundo_nombre=%s, primera_pellido=%s,segundo_apellido=%s, correo=%s, area_de_investigacion=%s
+	SET cedula = %s, primer_nombre=%s, segundo_nombre=%s, primer_apellido=%s,segundo_apellido=%s, correo=%s, area_de_investigacion=%s
 	WHERE id=%s""")
 
 # consulta para publicacion

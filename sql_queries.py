@@ -132,7 +132,7 @@ get_profession_code = dedent("""\
 
 # consultas para facultad
 get_faculty_code = dedent("""\
-	SELECT id FROM dim_facultad WHERE nombre = %s""")
+	SELECT id FROM dim_facultad WHERE codigo = %s""")
 
 # consulta para verificar
 get_relationship_student = dedent("""\
@@ -226,6 +226,19 @@ update_teacher = dedent("""\
 get_publication_code = dedent("""\
 	SELECT id FROM dim_publicacion WHERE codigo = %s""")
 
+# consulta para proyecto
+get_project_code = dedent("""\
+	SELECT id FROM dim_proyecto WHERE codigo = %s""")
+
+# consulta para otroestudio
+get_other_studio_code = dedent("""\
+	SELECT id FROM dim_otroestudio WHERE codigo = %s""")
+
+get_title_code = dedent("""\
+	SELECT id FROM dim_titulo WHERE codigo = %s""")
+
+get_prize_code = dedent("""\
+	SELECT id FROM dim_premio WHERE codigo = %s""")
 
 # consultas para egresados
 get_graduate_code = dedent("""\
@@ -306,6 +319,10 @@ facultyQuery = SqlTableSameParse(get_faculty_code)
 scaleQuery = SqlTableSameParse(get_scale_code)
 gradeQuery = SqlTableSameParse(get_grade_code)
 publicationQuery = SqlTableSameParse(get_publication_code)
+projectQuery = SqlTableSameParse(get_project_code)
+otherStudioQuery = SqlTableSameParse(get_other_studio_code)
+titleQuery = SqlTableSameParse(get_title_code)
+prizeQuery = SqlTableSameParse(get_prize_code)
 studentRelationship = SqlFactRelationship(get_relationship_student)
 teacherFacultyRelationship = SqlFactRelationship(get_relationship_docente_facultad)
 teacherPublicationRelationship = SqlFactRelationship(get_relationship_docente_publication)

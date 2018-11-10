@@ -5,6 +5,7 @@ from cubes import Workspace, Cell, PointCut, Cut
 from flask import make_response
 from pymysql import DatabaseError
 from common.BD import BD
+import datetime
 
 workspace = Workspace()
 workspace.register_default_store("sql", url="mysql+mysqlconnector://root@localhost/prueba")
@@ -20,8 +21,23 @@ class Student(BD, Resource):
             result = self.queryOne("SELECT * FROM DIM_STATUS WHERE CODIGO = %s", [params])
             cut = PointCut("dim_status", [result['id']])
             cell = Cell(browser.cube, cuts = [cut])
-            r = browser.aggregate(cell, drilldown=['dim_status'])
+            r = browser.aggregate(cell, drilldown=['dim_status', 'dim_estudiante', 'dim_facultad'])
             result = {"total-estudiantes": int(r.summary["sumatoria"])}
+            items = []
+            for row in r:
+                item = {
+                    "cedula": row['dim_estudiante.cedula'],
+                    "nombre": row['dim_estudiante.nombre'],
+                    "apellido": row['dim_estudiante.apellido'],
+                    "fecha_nacimiento": row['dim_estudiante.fecha_nacimiento'].strftime('%Y-%m-%d'),
+                    "telefono1": row['dim_estudiante.telefono1'],
+                    "telefono2": row['dim_estudiante.telefono2'],
+                    "email": row['dim_estudiante.email'],
+                    "estado_procedencia": row['dim_estudiante.edo_procedencia'],
+                    "facultad": row['dim_facultad.nombre']
+                }
+                items.append(item)
+            result['items'] = items
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -56,6 +72,7 @@ class StudentFaculty(BD, Resource):
             result = {"total-estudiantes": int(r.summary["sumatoria"])}
             items = []
             for row in r:
+                print(row)
                 item = {"nombre": row['dim_facultad.nombre'], "total": row['sumatoria']}
                 items.append(item)
 
@@ -71,8 +88,23 @@ class StudentFaculty(BD, Resource):
                 flag = False
             items = sorted(items, key=lambda k: k['nombre']) 
             result['facultad'] = items
-
-
+            r = browser.aggregate(drilldown=['dim_estudiante', 'dim_facultad'])
+            items = []
+            for row in r:
+                item = {
+                    "cedula": row['dim_estudiante.cedula'],
+                    "nombre": row['dim_estudiante.nombre'],
+                    "apellido": row['dim_estudiante.apellido'],
+                    "fecha_nacimiento": row['dim_estudiante.fecha_nacimiento'].strftime('%Y-%m-%d'),
+                    "telefono1": row['dim_estudiante.telefono1'],
+                    "telefono2": row['dim_estudiante.telefono2'],
+                    "email": row['dim_estudiante.email'],
+                    "estado_procedencia": row['dim_estudiante.edo_procedencia'],
+                    "facultad": row['dim_facultad.nombre']
+                }
+                items.append(item)
+            result['items'] = items
+            
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 

@@ -33,11 +33,12 @@ class TeacherWithDoctorateFaculty(BD, Resource):
         try:
             params = "Doctorado"
             result = self.queryOne("SELECT * FROM dim_nivel WHERE codigo = %s", [params])
+            
             if result is None:
                 abort(404, message="Resource {} doesn't exists".format(params))
             cut = PointCut("dim_nivel", [result['id']])
             cell = Cell(browser.cube, cuts = [cut])
-            r = browser.aggregate(cell, drilldown=["dim_facultad", "dim_nivel"])
+            r = browser.aggregate(cell, drilldown=["dim_facultad"])
 
             facultades = self.queryAll("SELECT nombre FROM DIM_FACULTAD")
 

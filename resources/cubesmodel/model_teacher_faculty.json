@@ -119,6 +119,7 @@
                 "dim_docente.area_de_investigacion": "dim_docente.area_de_investigacion",
                 "dim_docente.correo": "dim_docente.correo",
                 "dim_facultad.id": "dim_facultad.id",
+                "dim_facultad.codigo": "dim_facultad.codigo",
                 "dim_facultad.nombre": "dim_facultad.nombre",
                 "dim_sexo.id": "dim_sexo.id",
                 "dim_sexo.codigo": "dim_sexo.codigo",

@@ -6,7 +6,7 @@
                 {
                     "name":"estudiante",
                     "label":"Estudiante",
-                    "attributes": ["id", "cedula", "nombre", "apellido", "sexo", "fecha_nacimiento", "email", "edo_procedencia"],
+                    "attributes": ["id", "cedula", "nombre", "apellido", "fecha_nacimiento", "telefono1", "telefono2", "email", "edo_procedencia"],
                     "label_attribute": "nombre"
                 }
           ]
@@ -17,7 +17,7 @@
             {
               "name": "facultad",
               "label":"Facultad",
-              "attributes": ["id", "nombre"],
+              "attributes": ["id", "codigo", "nombre"],
               "label_attribute": "nombre"
             }
           ]
@@ -163,11 +163,11 @@
               "dim_estudiante.cedula": "dim_estudiante.cedula",
               "dim_estudiante.nombre": "dim_estudiante.nombre",
               "dim_estudiante.apellido": "dim_estudiante.apellido",
-              "dim_estudiante.sexo": "dim_estudiante.sexo",
               "dim_estudiante.fecha_nacimiento": "dim_estudiante.fecha_nacimiento",
               "dim_estudiante.email": "dim_estudiante.email",
               "dim_estudiante.edo_procedencia": "dim_estudiante.edo_procedencia",
               "dim_facultad.id": "dim_facultad.id",
+              "dim_facultad.codigo": "dim_facultad.codigo",
               "dim_facultad.nombre": "dim_facultad.nombre",
               "dim_carrera.id": "dim_carrera.id",
               "dim_carrera.nombre": "dim_carrera.nombre",

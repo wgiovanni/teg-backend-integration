@@ -336,10 +336,7 @@ class StudentNationalityFaculty(BD, Resource):
                         "cedula": i['dim_estudiante.cedula'],
                         "nombre": i['dim_estudiante.nombre'],
                         "apellido": i['dim_estudiante.apellido'],
-                        "fecha_nacimiento": i['dim_estudiante.fecha_nacimiento'].strftime('%Y-%m-%d'),
-                        "telefono1": i['dim_estudiante.telefono1'],
                         "email": i['dim_estudiante.email'],
-                        "estado_procedencia": i['dim_estudiante.edo_procedencia'],
                         "nacionalidad": i['dim_nacionalidad.codigo'],
                         "facultad": i['dim_facultad.nombre']
                     }
@@ -393,10 +390,7 @@ class StudentDisabilityFaculty(BD, Resource):
                         "cedula": i['dim_estudiante.cedula'],
                         "nombre": i['dim_estudiante.nombre'],
                         "apellido": i['dim_estudiante.apellido'],
-                        "fecha_nacimiento": i['dim_estudiante.fecha_nacimiento'].strftime('%Y-%m-%d'),
-                        "telefono1": i['dim_estudiante.telefono1'],
                         "email": i['dim_estudiante.email'],
-                        "estado_procedencia": i['dim_estudiante.edo_procedencia'],
                         "discapacidad": i['dim_discapacidad.codigo'],
                         "facultad": i['dim_facultad.nombre']
                     }
@@ -449,10 +443,7 @@ class StudentEthnicGroupFaculty(BD, Resource):
                         "cedula": i['dim_estudiante.cedula'],
                         "nombre": i['dim_estudiante.nombre'],
                         "apellido": i['dim_estudiante.apellido'],
-                        "fecha_nacimiento": i['dim_estudiante.fecha_nacimiento'].strftime('%Y-%m-%d'),
-                        "telefono1": i['dim_estudiante.telefono1'],
                         "email": i['dim_estudiante.email'],
-                        "estado_procedencia": i['dim_estudiante.edo_procedencia'],
                         "etnia": i['dim_etnia.codigo'],
                         "facultad": i['dim_facultad.nombre']
                     }
@@ -492,10 +483,7 @@ class StudentUndergraduateSex(BD, Resource):
                     "cedula": i['dim_estudiante.cedula'],
                     "nombre": i['dim_estudiante.nombre'],
                     "apellido": i['dim_estudiante.apellido'],
-                    "fecha_nacimiento": i['dim_estudiante.fecha_nacimiento'].strftime('%Y-%m-%d'),
-                    "telefono1": i['dim_estudiante.telefono1'],
                     "email": i['dim_estudiante.email'],
-                    "estado_procedencia": i['dim_estudiante.edo_procedencia'],
                     "tipo": i['dim_tipo_estudiante.codigo'],
                     "sexo": i['dim_sexo.codigo']
                 }
@@ -533,10 +521,7 @@ class StudentUndergraduateNacionality(BD, Resource):
                     "nacionalidad": i['dim_nacionalidad.codigo'],
                     "nombre": i['dim_estudiante.nombre'],
                     "apellido": i['dim_estudiante.apellido'],
-                    "fecha_nacimiento": i['dim_estudiante.fecha_nacimiento'].strftime('%Y-%m-%d'),
-                    "telefono1": i['dim_estudiante.telefono1'],
                     "email": i['dim_estudiante.email'],
-                    "estado_procedencia": i['dim_estudiante.edo_procedencia'],
                     "tipo": i['dim_tipo_estudiante.codigo']
                 }
                 items.append(item)

@@ -28,11 +28,25 @@ class TeacherTitle(BD, Resource):
             r = browser.aggregate(cell, drilldown=["dim_nivel"])
             result = {"profesores-doctorado": r.summary["sumatoria"]}
 
+            r = browser.aggregate(drilldown=["dim_nivel", "dim_docente"])
+            items = []
+            for row in r:
+                item = {
+                    "cedula": row['dim_docente.cedula'],
+                    "nombre": row['dim_docente.primer_nombre'],
+                    "apellido": row['dim_docente.primer_apellido'],
+                    "correo": row['dim_docente.correo'],
+                    "area_de_investigacion": row['dim_docente.area_de_investigacion'],
+                    "nivel": row['dim_nivel.codigo']
+                }
+                items.append(item)
+
             workspace.import_model("resources/cubesmodel/model_teacher_faculty.json")
             browser1 = workspace.browser("fact_docente_facultad")
             r1 = browser1.aggregate()
             
             result['total-profesores'] = r1.summary["sumatoria"]
+            result['items'] = items
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 

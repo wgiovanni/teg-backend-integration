@@ -68,7 +68,6 @@ class TeacherPublicationFaculty(BD, Resource):
                 item = {"facultad": faculty['nombre'], "cantidad_publicaciones": r.summary['sumatoria']}
                 result.append(item)
             result = sorted(result, key=lambda k: k['facultad']) 
-                
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -82,18 +81,38 @@ class TeacherCiteFaculty(BD, Resource):
             facultyList = self.queryAll("SELECT * FROM dim_facultad")
             result = []
             for faculty in facultyList:
-                print(faculty)
+                #print(faculty)
                 cut = PointCut("dim_facultad", [faculty['id']])
                 cell = Cell(browser.cube, cuts = [cut])
                 r = browser.aggregate(cell, drilldown=["dim_publicacion", "dim_facultad"])
                 item = {"facultad": faculty['nombre'], "citaciones": r.summary['sumatoria_citacion']}
                 result.append(item)
             result = sorted(result, key=lambda k: k['facultad']) 
-                
+
+            r = browser.aggregate(drilldown=["dim_publicacion", "dim_facultad", "dim_docente"])
+            items=[]
+            for row in r:
+                item = {
+                    "cedula": row['dim_docente.cedula'],
+                    "nombre": row['dim_docente.primer_nombre'],
+                    "apellido": row['dim_docente.primer_apellido'],
+                    "correo": row['dim_docente.correo'],
+                    "area_de_investigacion": row['dim_docente.area_de_investigacion'],
+                    "publicacion": row['dim_publicacion.titulo_publicacion'],
+                    "url_citacion": row['dim_publicacion.url_citacion'],
+                    "url_publicacion": row['dim_publicacion.url_publicacion'],
+                    "numero_citas": row['sumatoria_citacion'],
+                    "facultad": row['dim_facultad.nombre']
+                }
+                items.append(item)
+            response = {
+                "facultades": result,
+                "items": items
+            }        
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
-        return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }
+        return json.dumps(response), 200, { 'Access-Control-Allow-Origin': '*' }
 
 class TeacherCitePublication(BD, Resource):
     representations = {'application/json': make_response}

@@ -140,8 +140,20 @@ class TeacherInternacionals(BD, Resource):
             result = {}
             if r is not None:
                 result = {"profesores-internacionales": r.summary['sumatoria']}
-            r = browser.aggregate()
+            r = browser.aggregate(drilldown=["dim_docente", "dim_facultad", "dim_nacionalidad"])
+            items = []
+            for row in r:
+                item = {
+                    "cedula": row['dim_docente.cedula'],
+                    "nombre": row['dim_docente.primer_nombre'],
+                    "apellido": row['dim_docente.primer_apellido'],
+                    "correo": row['dim_docente.correo'],
+                    "nacionalidad": row['dim_nacionalidad.codigo'],
+                    "facultad": row['dim_facultad.nombre']
+                }
+                items.append(item)
             result['total-profesores'] = r.summary['sumatoria']
+            result['items'] = items
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 

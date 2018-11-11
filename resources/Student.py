@@ -55,8 +55,23 @@ class StudentInternacional(BD, Resource):
             cell = Cell(browser.cube, cuts = [cut])
             r = browser.aggregate(cell, drilldown=['dim_nacionalidad'])
             result = {"estudiantes-internacionales": int(r.summary["sumatoria"])}
-            r = browser.aggregate()
+            r = browser.aggregate(drilldown=["dim_estudiante", "dim_nacionalidad", "dim_facultad"])
+            items = []
+            for row in r:
+                item = {
+                    "cedula": row['dim_estudiante.cedula'],
+                    "nacionalidad": row['dim_nacionalidad.codigo'],
+                    "nombre": row['dim_estudiante.nombre'],
+                    "apellido": row['dim_estudiante.apellido'],
+                    "fecha_nacimiento": row['dim_estudiante.fecha_nacimiento'].strftime('%Y-%m-%d'),
+                    "telefono1": row['dim_estudiante.telefono1'],
+                    "email": row['dim_estudiante.email'],
+                    "estado_procedencia": row['dim_estudiante.edo_procedencia'],
+                    "facultad": row['dim_facultad.nombre']
+                }
+                items.append(item)
             result["total-estudiantes"] = r.summary["sumatoria"]
+            result['items'] = items
 
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
@@ -97,7 +112,6 @@ class StudentFaculty(BD, Resource):
                     "apellido": row['dim_estudiante.apellido'],
                     "fecha_nacimiento": row['dim_estudiante.fecha_nacimiento'].strftime('%Y-%m-%d'),
                     "telefono1": row['dim_estudiante.telefono1'],
-                    "telefono2": row['dim_estudiante.telefono2'],
                     "email": row['dim_estudiante.email'],
                     "estado_procedencia": row['dim_estudiante.edo_procedencia'],
                     "facultad": row['dim_facultad.nombre']
@@ -202,7 +216,7 @@ class StudentSexFaculty(BD, Resource):
                         result.append(item)
                     flag = False
                 result = sorted(result, key=lambda k: k['facultad'])
-                r2 = browser.aggregate(drilldown=["dim_sexo", "dim_estudiante"])
+                r2 = browser.aggregate(drilldown=["dim_sexo", "dim_estudiante", "dim_facultad"])
                 items = []
                 for i in r2:
                     item = {
@@ -211,10 +225,10 @@ class StudentSexFaculty(BD, Resource):
                         "apellido": i['dim_estudiante.apellido'],
                         "fecha_nacimiento": i['dim_estudiante.fecha_nacimiento'].strftime('%Y-%m-%d'),
                         "telefono1": i['dim_estudiante.telefono1'],
-                        "telefono2": i['dim_estudiante.telefono2'],
                         "email": i['dim_estudiante.email'],
                         "estado_procedencia": i['dim_estudiante.edo_procedencia'],
-                        "sexo": i['dim_sexo.codigo']
+                        "sexo": i['dim_sexo.codigo'],
+                        "facultad": i['dim_facultad.nombre']
                     }
                     items.append(item)
                 response = {

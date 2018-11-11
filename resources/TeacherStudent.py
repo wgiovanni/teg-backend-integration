@@ -17,14 +17,42 @@ class TeacherStudent(BD, Resource):
     parser = reqparse.RequestParser()
     def get(self):
         try:
-            r = browser.aggregate()
+            r = browser.aggregate(drilldown=["dim_docente", "dim_facultad"])
+            itemsTeachers = [] 
+            for row in r:
+                item = {
+                    "cedula": row['dim_docente.cedula'],
+                    "nombre": row['dim_docente.primer_nombre'],
+                    "apellido": row['dim_docente.primer_apellido'],
+                    "correo": row['dim_docente.correo'],
+                    "area_de_investigacion": row['dim_docente.area_de_investigacion'],
+                    "facultad": row['dim_facultad.nombre']
+                }
+                itemsTeachers.append(item)
+            
             result = {"total-empleado": r.summary["sumatoria"]}
 
             workspace.import_model("resources/cubesmodel/model_student_faculty.json")
             browser1 = workspace.browser("fact_estudiante_facultad")
-            r1 = browser1.aggregate()
+            r1 = browser1.aggregate(drilldown=["dim_estudiante", "dim_facultad"])
+            print("\n")
+            itemsStudent = []
+            for row in r1:
+                item = {
+                    "cedula": row['dim_estudiante.cedula'],
+                    "nombre": row['dim_estudiante.nombre'],
+                    "apellido": row['dim_estudiante.apellido'],
+                    "fecha_nacimiento": row['dim_estudiante.fecha_nacimiento'].strftime('%Y-%m-%d'),
+                    "telefono1": row['dim_estudiante.telefono1'],
+                    "email": row['dim_estudiante.email'],
+                    "estado_procedencia": row['dim_estudiante.edo_procedencia'],
+                    "facultad": row['dim_facultad.nombre']
+                }
+                itemsStudent.append(item)
             
             result['total-estudiantes'] = r1.summary["sumatoria"]
+            result['items-docentes'] = itemsTeachers
+            result['items-estudiantes'] = itemsStudent
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 

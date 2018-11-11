@@ -332,10 +332,29 @@ class StudentNationalityFaculty(BD, Resource):
                         result.append(item)
                     flag = False
                 result = sorted(result, key=lambda k: k['facultad']) 
+                r = browser.aggregate(drilldown=["dim_estudiante","dim_nacionalidad", "dim_facultad"])
+                items = []
+                for i in r:
+                    item = {
+                        "cedula": i['dim_estudiante.cedula'],
+                        "nombre": i['dim_estudiante.nombre'],
+                        "apellido": i['dim_estudiante.apellido'],
+                        "fecha_nacimiento": i['dim_estudiante.fecha_nacimiento'].strftime('%Y-%m-%d'),
+                        "telefono1": i['dim_estudiante.telefono1'],
+                        "email": i['dim_estudiante.email'],
+                        "estado_procedencia": i['dim_estudiante.edo_procedencia'],
+                        "nacionalidad": i['dim_nacionalidad.codigo'],
+                        "facultad": i['dim_facultad.nombre']
+                    }
+                    items.append(item)
+                response = {
+                    "facultades": result,
+                    "items": items
+                }
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
-        return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }
+        return json.dumps(response), 200, { 'Access-Control-Allow-Origin': '*' }
 
 class StudentDisabilityFaculty(BD, Resource):
     representations = {'application/json': make_response}
@@ -368,11 +387,31 @@ class StudentDisabilityFaculty(BD, Resource):
                         item = {"facultad": f['nombre'], "total-estudiantes-discapacidad": 0}
                         result.append(item)
                     flag = False
-                result = sorted(result, key=lambda k: k['facultad']) 
+                result = sorted(result, key=lambda k: k['facultad'])
+
+                r = browser.aggregate(drilldown=["dim_estudiante","dim_discapacidad", "dim_facultad"])
+                items = []
+                for i in r:
+                    item = {
+                        "cedula": i['dim_estudiante.cedula'],
+                        "nombre": i['dim_estudiante.nombre'],
+                        "apellido": i['dim_estudiante.apellido'],
+                        "fecha_nacimiento": i['dim_estudiante.fecha_nacimiento'].strftime('%Y-%m-%d'),
+                        "telefono1": i['dim_estudiante.telefono1'],
+                        "email": i['dim_estudiante.email'],
+                        "estado_procedencia": i['dim_estudiante.edo_procedencia'],
+                        "discapacidad": i['dim_discapacidad.codigo'],
+                        "facultad": i['dim_facultad.nombre']
+                    }
+                    items.append(item)
+                response = {
+                    "facultades": result,
+                    "items": items
+                } 
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
-        return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }
+        return json.dumps(response), 200, { 'Access-Control-Allow-Origin': '*' }
 
 class StudentEthnicGroupFaculty(BD, Resource):
     representations = {'application/json': make_response}
@@ -405,11 +444,30 @@ class StudentEthnicGroupFaculty(BD, Resource):
                         item = {"facultad": f['nombre'], "total-estudiantes-etnia": 0}
                         result.append(item)
                     flag = False
-                result = sorted(result, key=lambda k: k['facultad']) 
+                result = sorted(result, key=lambda k: k['facultad'])
+                r = browser.aggregate(drilldown=["dim_estudiante","dim_etnia", "dim_facultad"])
+                items = []
+                for i in r:
+                    item = {
+                        "cedula": i['dim_estudiante.cedula'],
+                        "nombre": i['dim_estudiante.nombre'],
+                        "apellido": i['dim_estudiante.apellido'],
+                        "fecha_nacimiento": i['dim_estudiante.fecha_nacimiento'].strftime('%Y-%m-%d'),
+                        "telefono1": i['dim_estudiante.telefono1'],
+                        "email": i['dim_estudiante.email'],
+                        "estado_procedencia": i['dim_estudiante.edo_procedencia'],
+                        "etnia": i['dim_etnia.codigo'],
+                        "facultad": i['dim_facultad.nombre']
+                    }
+                    items.append(item)
+                response = {
+                    "facultades": result,
+                    "items": items
+                }  
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
-        return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }
+        return json.dumps(response), 200, { 'Access-Control-Allow-Origin': '*' }
 
 class StudentUndergraduateSex(BD, Resource):
     representations = {'application/json': make_response}
@@ -429,8 +487,24 @@ class StudentUndergraduateSex(BD, Resource):
             for row in r:
                 print(row)
                 result[row['dim_sexo.codigo']] = row['sumatoria'] 
-            r = browser.aggregate()
+
+            r = browser.aggregate(drilldown=["dim_estudiante", "dim_tipo_estudiante", "dim_sexo"])
+            items = []
+            for i in r:
+                item = {
+                    "cedula": i['dim_estudiante.cedula'],
+                    "nombre": i['dim_estudiante.nombre'],
+                    "apellido": i['dim_estudiante.apellido'],
+                    "fecha_nacimiento": i['dim_estudiante.fecha_nacimiento'].strftime('%Y-%m-%d'),
+                    "telefono1": i['dim_estudiante.telefono1'],
+                    "email": i['dim_estudiante.email'],
+                    "estado_procedencia": i['dim_estudiante.edo_procedencia'],
+                    "tipo": i['dim_tipo_estudiante.codigo'],
+                    "sexo": i['dim_sexo.codigo']
+                }
+                items.append(item)
             result["total-estudiantes-pregrado"] = r.summary["sumatoria"]
+            result['items'] = items
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -454,12 +528,28 @@ class StudentUndergraduateNacionality(BD, Resource):
             for row in r:
                 print(row)
                 result[row['dim_nacionalidad.codigo']] = row['sumatoria'] 
-            r = browser.aggregate()
+            r = browser.aggregate(drilldown=["dim_estudiante", "dim_tipo_estudiante", "dim_nacionalidad"])
+            items = []
+            for i in r:
+                item = {
+                    "cedula": i['dim_estudiante.cedula'],
+                    "nacionalidad": i['dim_nacionalidad.codigo'],
+                    "nombre": i['dim_estudiante.nombre'],
+                    "apellido": i['dim_estudiante.apellido'],
+                    "fecha_nacimiento": i['dim_estudiante.fecha_nacimiento'].strftime('%Y-%m-%d'),
+                    "telefono1": i['dim_estudiante.telefono1'],
+                    "email": i['dim_estudiante.email'],
+                    "estado_procedencia": i['dim_estudiante.edo_procedencia'],
+                    "tipo": i['dim_tipo_estudiante.codigo']
+                }
+                items.append(item)
+                
             if result.get('Extrajero') is None:
                 result['Extranjero'] = 0
             if result.get('Venezolano') is None:
                 result['Venezolano'] = 0
             result["total-estudiantes-pregrado"] = r.summary["sumatoria"]
+            result['items'] = items
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 

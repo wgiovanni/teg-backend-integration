@@ -202,11 +202,27 @@ class TeacherSexFaculty(BD, Resource):
                         item = {"facultad": f['nombre'], "masculino": 0, "femenino": 0}
                         result.append(item)
                     flag = False
-                result = sorted(result, key=lambda k: k['facultad']) 
+                result = sorted(result, key=lambda k: k['facultad'])
+                r = browser.aggregate(drilldown=["dim_docente", "dim_facultad", "dim_sexo"])
+                items = []
+                for row in r:
+                    item = {
+                        "cedula": row['dim_docente.cedula'],
+                        "nombre": row['dim_docente.primer_nombre'],
+                        "apellido": row['dim_docente.primer_apellido'],
+                        "correo": row['dim_docente.correo'],
+                        "sexo": row['dim_sexo.codigo'],
+                        "facultad": row['dim_facultad.nombre']
+                    }
+                    items.append(item)
+                response = {
+                    "facultades": result,
+                    "items": items
+                } 
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
-        return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }
+        return json.dumps(response), 200, { 'Access-Control-Allow-Origin': '*' }
 
 class TeacherNacionalityFaculty(BD, Resource):
     representations = {'application/json': make_response}
@@ -251,10 +267,27 @@ class TeacherNacionalityFaculty(BD, Resource):
                         item = {"facultad": f['nombre'], "venezolano": 0, "extranjero": 0}
                         result.append(item)
                     flag = False
+
+                r = browser.aggregate(drilldown=["dim_docente", "dim_facultad", "dim_nacionalidad"])
+                items = []
+                for row in r:
+                    item = {
+                        "cedula": row['dim_docente.cedula'],
+                        "nombre": row['dim_docente.primer_nombre'],
+                        "apellido": row['dim_docente.primer_apellido'],
+                        "correo": row['dim_docente.correo'],
+                        "nacionalidad": row['dim_nacionalidad.codigo'],
+                        "facultad": row['dim_facultad.nombre']
+                    }
+                    items.append(item)
+                response = {
+                    "facultades": result,
+                    "items": items
+                }
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
-        return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }
+        return json.dumps(response), 200, { 'Access-Control-Allow-Origin': '*' }
 
 class TeacherScale(BD, Resource):
     representations = {'application/json': make_response}
@@ -282,8 +315,21 @@ class TeacherScale(BD, Resource):
                     item = {"nombre": s['nombre'], "total": 0}
                     items.append(item)
                 flag = False
-
             result['escalafon'] = items
+            r = browser.aggregate(drilldown=["dim_escalafon", "dim_docente", "dim_nacionalidad"])
+            items = []
+            for row in r:
+                item = {
+                    "cedula": row['dim_docente.cedula'],
+                    "nombre": row['dim_docente.primer_nombre'],
+                    "apellido": row['dim_docente.primer_apellido'],
+                    "correo": row['dim_docente.correo'],
+                    "nacionalidad": row['dim_nacionalidad.codigo'],
+                    "escalafon": row['dim_escalafon.nombre']
+                }
+                items.append(item)
+            
+            result['items'] = items
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 

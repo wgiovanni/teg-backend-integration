@@ -63,10 +63,7 @@ class StudentInternacional(BD, Resource):
                     "nacionalidad": row['dim_nacionalidad.codigo'],
                     "nombre": row['dim_estudiante.nombre'],
                     "apellido": row['dim_estudiante.apellido'],
-                    "fecha_nacimiento": row['dim_estudiante.fecha_nacimiento'].strftime('%Y-%m-%d'),
-                    "telefono1": row['dim_estudiante.telefono1'],
                     "email": row['dim_estudiante.email'],
-                    "estado_procedencia": row['dim_estudiante.edo_procedencia'],
                     "facultad": row['dim_facultad.nombre']
                 }
                 items.append(item)

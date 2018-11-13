@@ -80,7 +80,7 @@ class TeacherPublicationFaculty(BD, Resource):
                     "publicacion": row['dim_publicacion.titulo_publicacion'],
                     "url_citacion": row['dim_publicacion.url_citacion'],
                     "url_publicacion": row['dim_publicacion.url_publicacion'],
-                    "numero_citas": row['sumatoria_citacion'],
+                    "numero_citas": str(row['sumatoria_citacion']),
                     "facultad": row['dim_facultad.nombre']
                 }
                 items.append(item)
@@ -121,7 +121,7 @@ class TeacherCiteFaculty(BD, Resource):
                     "publicacion": row['dim_publicacion.titulo_publicacion'],
                     "url_citacion": row['dim_publicacion.url_citacion'],
                     "url_publicacion": row['dim_publicacion.url_publicacion'],
-                    "numero_citas": row['sumatoria_citacion'],
+                    "numero_citas": str(row['sumatoria_citacion']),
                     "facultad": row['dim_facultad.nombre']
                 }
                 items.append(item)

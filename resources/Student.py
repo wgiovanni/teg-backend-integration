@@ -276,60 +276,43 @@ class StudentNationalityFaculty(BD, Resource):
 
     def get(self):
         try:
-            params = "Venezolano"
-            result = self.queryOne("SELECT * FROM DIM_NACIONALIDAD WHERE CODIGO = %s", [params])
-            params1 = "Extranjero"
-            result1 = self.queryOne("SELECT * FROM DIM_NACIONALIDAD WHERE CODIGO = %s", [params1])
-            facultades = self.queryAll("SELECT nombre FROM DIM_FACULTAD")
-            if result is None:
-                abort(404, message="Resource {} doesn't exists".format(params))
-            if result1 is None:
-                abort(404, message="Resource {} doesn't exists".format(params1))
-            
-            cut = PointCut("dim_nacionalidad", [result['id']])
-            cell = Cell(browser.cube, cuts = [cut])
-            r = browser.aggregate(cell, drilldown=["dim_nacionalidad", "dim_facultad"])
-            cut = PointCut("dim_nacionalidad", [result1['id']])
-            cell = Cell(browser.cube, cuts = [cut])
-            r1 = browser.aggregate(cell, drilldown=["dim_nacionalidad", "dim_facultad"])
+            facultades = self.queryAll("SELECT codigo FROM DIM_FACULTAD")
+            r = browser.aggregate(drilldown=["dim_nacionalidad", "dim_facultad"])
             result = []
             item = {}
-            if r is not None and r1 is not None:
+            for f in facultades:
+                item = {"facultad": f['codigo']}
+                r = browser.aggregate(drilldown=["dim_nacionalidad", "dim_facultad"])
                 for row in r:
-                    item = {"facultad": row['dim_facultad.nombre']}
-                    for row1 in r1:
-                        if row['dim_facultad.nombre'] == row1['dim_facultad.nombre']:
-                            item["extranjero"] = row1['sumatoria']
-                    item["venezolano"] = row['sumatoria']
-                    if len(item) == 2:
-                        item["extranjero"] = 0
-                    result.append(item)
-                flag = False
-                for f in facultades:
-                    for r in result:
-                        if r['facultad'] == f['nombre']:
-                            flag = True
-                    if flag == False:
-                        item = {"facultad": f['nombre'], "venezolano": 0, "extranjero": 0}
-                        result.append(item)
-                    flag = False
-                result = sorted(result, key=lambda k: k['facultad']) 
-                r = browser.aggregate(drilldown=["dim_estudiante","dim_nacionalidad", "dim_facultad"])
-                items = []
-                for i in r:
-                    item = {
-                        "cedula": i['dim_estudiante.cedula'],
-                        "nombre": i['dim_estudiante.nombre'],
-                        "apellido": i['dim_estudiante.apellido'],
-                        "email": i['dim_estudiante.email'],
-                        "nacionalidad": i['dim_nacionalidad.codigo'],
-                        "facultad": i['dim_facultad.nombre']
-                    }
-                    items.append(item)
-                response = {
-                    "facultades": result,
-                    "items": items
+                    if f['codigo'] == row['dim_facultad.codigo'] and row['dim_nacionalidad.codigo'] == "Extranjero":
+                        item['extranjero'] = row['sumatoria']
+                        print(item)
+                    if f['codigo'] == row['dim_facultad.codigo'] and row['dim_nacionalidad.codigo'] == "Venezolano":
+                        item["venezolano"] = row['sumatoria']
+                        print(item)
+                if item.get('extranjero') is None:
+                    item['extranjero'] = 0
+                if item.get('venezolano') is None:
+                    item["venezolano"] = 0
+                result.append(item)
+           
+            result = sorted(result, key=lambda k: k['facultad']) 
+            r = browser.aggregate(drilldown=["dim_estudiante","dim_nacionalidad", "dim_facultad"])
+            items = []
+            for i in r:
+                item = {
+                    "cedula": i['dim_estudiante.cedula'],
+                    "nombre": i['dim_estudiante.nombre'],
+                    "apellido": i['dim_estudiante.apellido'],
+                    "email": i['dim_estudiante.email'],
+                    "nacionalidad": i['dim_nacionalidad.codigo'],
+                    "facultad": i['dim_facultad.nombre']
                 }
+                items.append(item)
+            response = {
+                "facultades": result,
+                "items": items
+            }
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -543,7 +526,7 @@ class StudentProfessionConstantsFaculty(BD, Resource):
     def get(self, facultad_codigo):
         try:
             params = facultad_codigo
-            result = self.queryOne("SELECT * FROM DIM_FACULTAD WHERE NOMBRE = %s", [params])
+            result = self.queryOne("SELECT * FROM DIM_FACULTAD WHERE CODIGO = %s", [params])
             if result is None:
                 abort(404, message="Resource {} doesn't exists".format(params))
             cut = PointCut("dim_facultad", [result['id']])

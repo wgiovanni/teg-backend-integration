@@ -28,7 +28,7 @@
             {
               "name": "carrera",
               "label":"Carrera",
-              "attributes": ["id", "nombre", "tipo"],
+              "attributes": ["id", "codigo", "nombre"],
               "label_attribute": "nombre"
             }
           ]
@@ -170,8 +170,8 @@
               "dim_facultad.codigo": "dim_facultad.codigo",
               "dim_facultad.nombre": "dim_facultad.nombre",
               "dim_carrera.id": "dim_carrera.id",
+              "dim_carrera.codigo": "dim_carrera.codigo",
               "dim_carrera.nombre": "dim_carrera.nombre",
-              "dim_carrera.tipo": "dim_carrera.tipo",
               "dim_sexo.id": "dim_sexo.id",
               "dim_sexo.codigo": "dim_sexo.codigo",
               "dim_nacionalidad.id": "dim_nacionalidad.id",

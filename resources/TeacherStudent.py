@@ -42,7 +42,7 @@ class TeacherStudent(BD, Resource):
                     "cedula": row['dim_estudiante.cedula'],
                     "nombre": row['dim_estudiante.nombre'],
                     "apellido": row['dim_estudiante.apellido'],
-                    "email": row['dim_estudiante.email'],
+                    "correo": row['dim_estudiante.email'],
                     "facultad": row['dim_facultad.nombre'],
                     "cargo": "estudiante"
                 }

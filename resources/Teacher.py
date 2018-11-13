@@ -165,60 +165,44 @@ class TeacherSexFaculty(BD, Resource):
     parser = reqparse.RequestParser()
     def get(self):
         try:
-            params = "Femenino"
-            result = self.queryOne("SELECT * FROM DIM_SEXO WHERE CODIGO = %s", [params])
-            params1 = "Masculino"
-            result1 = self.queryOne("SELECT * FROM DIM_SEXO WHERE CODIGO = %s", [params1])
-            facultades = self.queryAll("SELECT nombre FROM DIM_FACULTAD")
-            if result is None:
-                abort(404, message="Resource {} doesn't exists".format(params))
-            if result1 is None:
-                abort(404, message="Resource {} doesn't exists".format(params1))
-            
-            cut = PointCut("dim_sexo", [result['id']])
-            cell = Cell(browser.cube, cuts = [cut])
-            r = browser.aggregate(cell, drilldown=["dim_sexo", "dim_facultad"])
-            cut = PointCut("dim_sexo", [result1['id']])
-            cell = Cell(browser.cube, cuts = [cut])
-            r1 = browser.aggregate(cell, drilldown=["dim_sexo", "dim_facultad"])
+            facultades = self.queryAll("SELECT codigo FROM DIM_FACULTAD")
+            r = browser.aggregate(drilldown=["dim_sexo", "dim_facultad"])
             result = []
             item = {}
-            if r is not None and r1 is not None:
+
+            for f in facultades:
+                item = {"facultad": f['codigo']}
+                r = browser.aggregate(drilldown=["dim_sexo", "dim_facultad"])
                 for row in r:
-                    item = {"facultad": row['dim_facultad.nombre']}
-                    for row1 in r1:
-                        if row['dim_facultad.nombre'] == row1['dim_facultad.nombre']:
-                            item["masculino"] = row1['sumatoria']
-                    item["femenino"] = row['sumatoria']
-                    if len(item) == 2:
-                        item["masculino"] = 0
-                    result.append(item)
-                flag = False
-                for f in facultades:
-                    for r in result:
-                        if r['facultad'] == f['nombre']:
-                            flag = True
-                    if flag == False:
-                        item = {"facultad": f['nombre'], "masculino": 0, "femenino": 0}
-                        result.append(item)
-                    flag = False
-                result = sorted(result, key=lambda k: k['facultad'])
-                r = browser.aggregate(drilldown=["dim_docente", "dim_facultad", "dim_sexo"])
-                items = []
-                for row in r:
-                    item = {
-                        "cedula": row['dim_docente.cedula'],
-                        "nombre": row['dim_docente.primer_nombre'],
-                        "apellido": row['dim_docente.primer_apellido'],
-                        "correo": row['dim_docente.correo'],
-                        "sexo": row['dim_sexo.codigo'],
-                        "facultad": row['dim_facultad.nombre']
-                    }
-                    items.append(item)
-                response = {
-                    "facultades": result,
-                    "items": items
-                } 
+                    if f['codigo'] == row['dim_facultad.codigo'] and row['dim_sexo.codigo'] == "Femenino":
+                        item['femenino'] = row['sumatoria']
+                        print(item)
+                    if f['codigo'] == row['dim_facultad.codigo'] and row['dim_sexo.codigo'] == "Masculino":
+                        item["masculino"] = row['sumatoria']
+                        print(item)
+                if item.get('femenino') is None:
+                    item['femenino'] = 0
+                if item.get('masculino') is None:
+                    item["masculino"] = 0
+                result.append(item)
+          
+            result = sorted(result, key=lambda k: k['facultad'])
+            r = browser.aggregate(drilldown=["dim_docente", "dim_facultad", "dim_sexo"])
+            items = []
+            for row in r:
+                item = {
+                    "cedula": row['dim_docente.cedula'],
+                    "nombre": row['dim_docente.primer_nombre'],
+                    "apellido": row['dim_docente.primer_apellido'],
+                    "correo": row['dim_docente.correo'],
+                    "sexo": row['dim_sexo.codigo'],
+                    "facultad": row['dim_facultad.nombre']
+                }
+                items.append(item)
+            response = {
+                "facultades": result,
+                "items": items
+            } 
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -230,60 +214,44 @@ class TeacherNacionalityFaculty(BD, Resource):
 
     def get(self):
         try:
-            params = "Venezolano"
-            result = self.queryOne("SELECT * FROM DIM_NACIONALIDAD WHERE CODIGO = %s", [params])
-            params1 = "Extranjero"
-            result1 = self.queryOne("SELECT * FROM DIM_NACIONALIDAD WHERE CODIGO = %s", [params1])
-            facultades = self.queryAll("SELECT nombre FROM DIM_FACULTAD")
-            if result is None:
-                abort(404, message="Resource {} doesn't exists".format(params))
-            if result1 is None:
-                abort(404, message="Resource {} doesn't exists".format(params1))
+            facultades = self.queryAll("SELECT codigo FROM DIM_FACULTAD")
             
-            cut = PointCut("dim_nacionalidad", [result['id']])
-            cell = Cell(browser.cube, cuts = [cut])
-            r = browser.aggregate(cell, drilldown=["dim_nacionalidad", "dim_facultad"])
-            cut = PointCut("dim_nacionalidad", [result1['id']])
-            cell = Cell(browser.cube, cuts = [cut])
-            r1 = browser.aggregate(cell, drilldown=["dim_nacionalidad", "dim_facultad"])
+            r = browser.aggregate(drilldown=["dim_nacionalidad", "dim_facultad"])
             result = []
             item = {}
-            if r is not None and r1 is not None:
-                for row in r:
-                    item = {"facultad": row['dim_facultad.nombre']}
-                    for row1 in r1:
-                        if row['dim_facultad.nombre'] == row1['dim_facultad.nombre']:
-                            item["extranjero"] = row1['sumatoria']
-                    item["venezolano"] = row['sumatoria']
-                    if len(item) == 2:
-                        item["extranjero"] = 0
-                    result.append(item)
-                flag = False
-                for f in facultades:
-                    for r in result:
-                        if r['facultad'] == f['nombre']:
-                            flag = True
-                    if flag == False:
-                        item = {"facultad": f['nombre'], "venezolano": 0, "extranjero": 0}
-                        result.append(item)
-                    flag = False
 
-                r = browser.aggregate(drilldown=["dim_docente", "dim_facultad", "dim_nacionalidad"])
-                items = []
+            for f in facultades:
+                item = {"facultad": f['codigo']}
+                r = browser.aggregate(drilldown=["dim_nacionalidad", "dim_facultad"])
                 for row in r:
-                    item = {
-                        "cedula": row['dim_docente.cedula'],
-                        "nombre": row['dim_docente.primer_nombre'],
-                        "apellido": row['dim_docente.primer_apellido'],
-                        "correo": row['dim_docente.correo'],
-                        "nacionalidad": row['dim_nacionalidad.codigo'],
-                        "facultad": row['dim_facultad.nombre']
-                    }
-                    items.append(item)
-                response = {
-                    "facultades": result,
-                    "items": items
+                    if f['codigo'] == row['dim_facultad.codigo'] and row['dim_nacionalidad.codigo'] == "Extranjero":
+                        item['extranjero'] = row['sumatoria']
+                        print(item)
+                    if f['codigo'] == row['dim_facultad.codigo'] and row['dim_nacionalidad.codigo'] == "Venezolano":
+                        item["venezolano"] = row['sumatoria']
+                        print(item)
+                if item.get('extranjero') is None:
+                    item['extranjero'] = 0
+                if item.get('venezolano') is None:
+                    item["venezolano"] = 0
+                result.append(item)
+            result = sorted(result, key=lambda k: k['facultad'])
+            r = browser.aggregate(drilldown=["dim_docente", "dim_facultad", "dim_nacionalidad"])
+            items = []
+            for row in r:
+                item = {
+                    "cedula": row['dim_docente.cedula'],
+                    "nombre": row['dim_docente.primer_nombre'],
+                    "apellido": row['dim_docente.primer_apellido'],
+                    "correo": row['dim_docente.correo'],
+                    "nacionalidad": row['dim_nacionalidad.codigo'],
+                    "facultad": row['dim_facultad.nombre']
                 }
+                items.append(item)
+            response = {
+                "facultades": result,
+                "items": items
+            } 
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 

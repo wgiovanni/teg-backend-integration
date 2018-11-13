@@ -43,8 +43,8 @@ class TeacherTitle(BD, Resource):
 
             workspace.import_model("resources/cubesmodel/model_teacher_faculty.json")
             browser1 = workspace.browser("fact_docente_facultad")
-            r1 = browser1.aggregate()
-            
+            r1 = browser1.aggregate(drilldown=["dim_docente"])
+                        
             result['total-profesores'] = r1.summary["sumatoria"]
             result['items'] = items
         except Exception as e:
@@ -67,17 +67,12 @@ class TeacherTitleFaculty(BD, Resource):
            
             result = []
             for row in r:
-                print(row['dim_docente.cedula'])
                 workspace.import_model("resources/cubesmodel/model_teacher_faculty.json")
                 browser1 = workspace.browser("fact_docente_facultad")
                 cut = PointCut("dim_docente", [row['dim_docente.id']])
                 cell = Cell(browser1.cube, cuts = [cut])
                 r1 = browser1.aggregate(cell, drilldown=["dim_docente", "dim_facultad"])
                 for row1 in r1:
-                    print("encontrado")
-                    print(row1)
-                    print(row1['dim_docente.cedula'])
-                    print("\n")
                     item = {
                         "cedula": row['dim_docente.cedula'],
                         "primer_nombre": row['dim_docente.primer_nombre'],
@@ -89,7 +84,6 @@ class TeacherTitleFaculty(BD, Resource):
                     }
                     item['facultad'] = row1['dim_facultad.nombre']
                     result.append(item)
-
 
             facultades = self.queryAll("SELECT nombre FROM DIM_FACULTAD")
             count = 0

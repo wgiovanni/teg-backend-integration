@@ -28,6 +28,7 @@ from resources.GraduateCertification import GraduateCertification
 from resources.GraduateEducation import GraduateEducation
 from resources.GraduateStudiosUc import GraduateStudiosUc
 from resources.GraduateVolunteering import GraduateVolunteering
+from resources.Carga import Carga
 # metodos
 from etl import etl_process2
 
@@ -148,6 +149,7 @@ api.add_resource(GraduateEducation, '/egresado-educacion')
 api.add_resource(GraduateStudiosUc, '/egresado-estudios')
 api.add_resource(GraduateVolunteering, '/egresado-voluntariado')
 
+api.add_resource(Carga, '/carga')
 
 
 if __name__ == "__main__":

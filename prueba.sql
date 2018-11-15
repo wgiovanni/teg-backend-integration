@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 14-11-2018 a las 22:13:53
+-- Tiempo de generación: 15-11-2018 a las 20:44:38
 -- Versión del servidor: 10.1.36-MariaDB
 -- Versión de PHP: 7.2.11
 
@@ -30,20 +30,172 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `dim_ano` (
   `id` int(11) NOT NULL,
-  `ano` int(11) NOT NULL
+  `codigo` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Volcado de datos para la tabla `dim_ano`
 --
 
-INSERT INTO `dim_ano` (`id`, `ano`) VALUES
-(1, 2010),
-(2, 2011),
-(3, 2012),
-(4, 2013),
-(5, 2014),
-(6, 2015);
+INSERT INTO `dim_ano` (`id`, `codigo`) VALUES
+(324, 1892),
+(325, 1893),
+(326, 1894),
+(327, 1895),
+(328, 1896),
+(329, 1897),
+(330, 1898),
+(331, 1899),
+(332, 1900),
+(333, 1901),
+(334, 1902),
+(335, 1903),
+(336, 1904),
+(337, 1905),
+(338, 1906),
+(339, 1907),
+(340, 1908),
+(341, 1909),
+(342, 1910),
+(343, 1911),
+(344, 1912),
+(345, 1913),
+(346, 1914),
+(347, 1915),
+(348, 1916),
+(349, 1917),
+(350, 1918),
+(351, 1919),
+(352, 1920),
+(353, 1921),
+(354, 1922),
+(355, 1923),
+(356, 1924),
+(357, 1925),
+(358, 1926),
+(359, 1927),
+(360, 1928),
+(361, 1929),
+(362, 1930),
+(363, 1931),
+(364, 1932),
+(365, 1933),
+(366, 1934),
+(367, 1935),
+(368, 1936),
+(369, 1937),
+(370, 1938),
+(371, 1939),
+(372, 1940),
+(373, 1941),
+(374, 1942),
+(375, 1943),
+(376, 1944),
+(377, 1945),
+(378, 1946),
+(379, 1947),
+(380, 1948),
+(381, 1949),
+(382, 1950),
+(383, 1951),
+(384, 1952),
+(385, 1953),
+(386, 1954),
+(387, 1955),
+(388, 1956),
+(389, 1957),
+(390, 1958),
+(391, 1959),
+(392, 1960),
+(393, 1961),
+(394, 1962),
+(395, 1963),
+(396, 1964),
+(397, 1965),
+(398, 1966),
+(399, 1967),
+(400, 1968),
+(401, 1969),
+(402, 1970),
+(403, 1971),
+(404, 1972),
+(405, 1973),
+(406, 1974),
+(407, 1975),
+(408, 1976),
+(409, 1977),
+(410, 1978),
+(411, 1979),
+(412, 1980),
+(413, 1981),
+(414, 1982),
+(415, 1983),
+(416, 1984),
+(417, 1985),
+(418, 1986),
+(419, 1987),
+(420, 1988),
+(421, 1989),
+(422, 1990),
+(423, 1991),
+(424, 1992),
+(425, 1993),
+(426, 1994),
+(427, 1995),
+(428, 1996),
+(429, 1997),
+(430, 1998),
+(431, 1999),
+(432, 2000),
+(433, 2001),
+(434, 2002),
+(435, 2003),
+(436, 2004),
+(437, 2005),
+(438, 2006),
+(439, 2007),
+(440, 2008),
+(441, 2009),
+(442, 2010),
+(443, 2011),
+(444, 2012),
+(445, 2013),
+(446, 2014),
+(447, 2015),
+(448, 2016),
+(449, 2017),
+(450, 2018),
+(451, 2019),
+(452, 2020),
+(453, 2021),
+(454, 2022),
+(455, 2023),
+(456, 2024),
+(457, 2025),
+(458, 2026),
+(459, 2027),
+(460, 2028),
+(461, 2029),
+(462, 2030),
+(463, 2031),
+(464, 2032),
+(465, 2033),
+(466, 2034),
+(467, 2035),
+(468, 2036),
+(469, 2037),
+(470, 2038),
+(471, 2039),
+(472, 2040),
+(473, 2041),
+(474, 2042),
+(475, 2043),
+(476, 2044),
+(477, 2045),
+(478, 2046),
+(479, 2047),
+(480, 2048),
+(481, 2049);
 
 -- --------------------------------------------------------
 
@@ -262,17 +414,6 @@ INSERT INTO `dim_cursos` (`id`, `codigo`, `nombre`, `url`, `fecha_creacion`, `fe
 (28, '3', 'Curso Java', 'http://platzi.com/java', '2018-10-29 23:42:32', '2018-10-29 23:42:32'),
 (29, '4', 'Curso Angular', 'http://platzi.com/angular', '2018-10-29 23:42:32', '2018-10-29 23:42:32'),
 (30, '5', 'Curso basico PHP', 'http://platzi.com/lgomez/phpbasico', '2018-10-29 23:42:32', '2018-10-29 23:42:32');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `dim_dia`
---
-
-CREATE TABLE `dim_dia` (
-  `id` int(11) NOT NULL,
-  `codigo` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -524,17 +665,6 @@ INSERT INTO `dim_facultad` (`id`, `codigo`, `nombre`, `created_date`, `updated_d
 (61, 'FACE', 'Ciencias de la Educación', '2018-10-18 19:46:57', '2018-11-10 01:45:03'),
 (62, 'ODONTOLOGIA', 'Odontología', '2018-10-18 19:46:57', '2018-11-10 01:44:17'),
 (64, 'FACYT', 'Ciencias y Tecnología', '2018-10-18 19:46:57', '2018-11-10 01:43:57');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `dim_mes`
---
-
-CREATE TABLE `dim_mes` (
-  `id` int(11) NOT NULL,
-  `mes` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -870,31 +1000,6 @@ CREATE TABLE `fact_asignatura_inscrita` (
   `id_asignatura_inscrita` int(11) NOT NULL,
   `cantidad` int(11) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `fact_carga`
---
-
-CREATE TABLE `fact_carga` (
-  `id` int(11) NOT NULL,
-  `id_carga` int(11) NOT NULL,
-  `id_ano` int(11) NOT NULL,
-  `cantidad` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Volcado de datos para la tabla `fact_carga`
---
-
-INSERT INTO `fact_carga` (`id`, `id_carga`, `id_ano`, `cantidad`) VALUES
-(1, 1, 1, 233),
-(2, 2, 1, 7655),
-(3, 3, 3, 898),
-(4, 4, 5, 4564),
-(5, 5, 5, 1234),
-(6, 6, 6, 5500);
 
 -- --------------------------------------------------------
 
@@ -1271,6 +1376,7 @@ CREATE TABLE `fact_estudiante_facultad` (
   `id_discapacidad` int(11) NOT NULL,
   `id_etnia` int(11) NOT NULL,
   `id_tipo` int(11) NOT NULL,
+  `id_ano` int(11) NOT NULL,
   `cantidad` int(11) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -1278,17 +1384,14 @@ CREATE TABLE `fact_estudiante_facultad` (
 -- Volcado de datos para la tabla `fact_estudiante_facultad`
 --
 
-INSERT INTO `fact_estudiante_facultad` (`id`, `id_estudiante`, `id_facultad`, `id_carrera`, `id_sexo`, `id_nacionalidad`, `id_status`, `id_discapacidad`, `id_etnia`, `id_tipo`, `cantidad`) VALUES
-(7, 7, 64, 117, 6, 13, 1, 1, 1, 1, 1),
-(8, 8, 64, 118, 7, 13, 1, 1, 1, 1, 1),
-(9, 9, 64, 117, 7, 13, 1, 2, 2, 1, 1),
-(10, 10, 64, 119, 7, 13, 2, 1, 1, 2, 1),
-(11, 11, 64, 120, 6, 13, 1, 1, 2, 2, 1),
-(12, 12, 64, 120, 6, 14, 2, 2, 1, 1, 1),
-(13, 13, 61, 117, 6, 14, 1, 2, 1, 1, 1),
-(14, 14, 59, 118, 7, 13, 1, 1, 1, 1, 1),
-(15, 15, 60, 119, 6, 13, 1, 2, 2, 2, 1),
-(16, 16, 57, 118, 7, 14, 1, 1, 1, 1, 1);
+INSERT INTO `fact_estudiante_facultad` (`id`, `id_estudiante`, `id_facultad`, `id_carrera`, `id_sexo`, `id_nacionalidad`, `id_status`, `id_discapacidad`, `id_etnia`, `id_tipo`, `id_ano`, `cantidad`) VALUES
+(17, 7, 64, 117, 6, 13, 1, 1, 1, 1, 444, 1),
+(18, 8, 60, 185, 6, 13, 1, 2, 1, 1, 443, 1),
+(19, 9, 57, 141, 7, 14, 1, 1, 2, 1, 444, 1),
+(20, 10, 61, 193, 7, 13, 2, 1, 1, 1, 445, 1),
+(21, 11, 64, 121, 6, NULL, 1, 1, 1, 1, 443, 1),
+(22, 13, 62, 136, 7, 14, 1, 1, 1, 2, 450, 1),
+(23, 14, 58, 129, 6, 13, 1, 1, 1, 2, 448, 1);
 
 -- --------------------------------------------------------
 
@@ -1434,7 +1537,9 @@ INSERT INTO `history_action` (`id`, `username`, `action`, `module`, `date`) VALU
 (142, 'vicerrector', 'Ingreso al sistema', 'Usuarios', '2018-11-13 12:44:25'),
 (143, 'vicerrector', 'Ingreso al sistema', 'Usuarios', '2018-11-14 13:05:34'),
 (144, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-14 20:27:37'),
-(145, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-14 21:09:45');
+(145, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-14 21:09:45'),
+(146, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-15 13:00:21'),
+(147, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-15 13:06:03');
 
 -- --------------------------------------------------------
 
@@ -1589,7 +1694,8 @@ INSERT INTO `user_role` (`id`, `id_user`, `id_role`) VALUES
 -- Indices de la tabla `dim_ano`
 --
 ALTER TABLE `dim_ano`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigo` (`codigo`);
 
 --
 -- Indices de la tabla `dim_asignatura_inscrita`
@@ -1628,13 +1734,6 @@ ALTER TABLE `dim_certificacion`
 -- Indices de la tabla `dim_cursos`
 --
 ALTER TABLE `dim_cursos`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `codigo` (`codigo`);
-
---
--- Indices de la tabla `dim_dia`
---
-ALTER TABLE `dim_dia`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `codigo` (`codigo`);
 
@@ -1702,13 +1801,6 @@ ALTER TABLE `dim_etnia`
 ALTER TABLE `dim_facultad`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `codigo` (`codigo`);
-
---
--- Indices de la tabla `dim_mes`
---
-ALTER TABLE `dim_mes`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `mes` (`mes`);
 
 --
 -- Indices de la tabla `dim_nacionalidad`
@@ -1816,14 +1908,6 @@ ALTER TABLE `fact_asignatura_inscrita`
   ADD KEY `id_status` (`id_status`),
   ADD KEY `id_carrera` (`id_carrera`),
   ADD KEY `id_facultad` (`id_facultad`);
-
---
--- Indices de la tabla `fact_carga`
---
-ALTER TABLE `fact_carga`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `id_carga` (`id_carga`),
-  ADD KEY `id_ano` (`id_ano`);
 
 --
 -- Indices de la tabla `fact_docente_facultad`
@@ -1950,7 +2034,8 @@ ALTER TABLE `fact_estudiante_facultad`
   ADD KEY `id_status` (`id_status`),
   ADD KEY `id_discapacidad` (`id_discapacidad`),
   ADD KEY `id_etnia` (`id_etnia`),
-  ADD KEY `id_tipo` (`id_tipo`);
+  ADD KEY `id_tipo` (`id_tipo`),
+  ADD KEY `id_ano` (`id_ano`);
 
 --
 -- Indices de la tabla `history_action`
@@ -2003,7 +2088,7 @@ ALTER TABLE `user_role`
 -- AUTO_INCREMENT de la tabla `dim_ano`
 --
 ALTER TABLE `dim_ano`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=482;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_asignatura_inscrita`
@@ -2040,12 +2125,6 @@ ALTER TABLE `dim_certificacion`
 --
 ALTER TABLE `dim_cursos`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
-
---
--- AUTO_INCREMENT de la tabla `dim_dia`
---
-ALTER TABLE `dim_dia`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_discapacidad`
@@ -2100,12 +2179,6 @@ ALTER TABLE `dim_etnia`
 --
 ALTER TABLE `dim_facultad`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
-
---
--- AUTO_INCREMENT de la tabla `dim_mes`
---
-ALTER TABLE `dim_mes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_nacionalidad`
@@ -2198,12 +2271,6 @@ ALTER TABLE `fact_asignatura_inscrita`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `fact_carga`
---
-ALTER TABLE `fact_carga`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
 -- AUTO_INCREMENT de la tabla `fact_docente_facultad`
 --
 ALTER TABLE `fact_docente_facultad`
@@ -2285,13 +2352,13 @@ ALTER TABLE `fact_egresado_voluntariado`
 -- AUTO_INCREMENT de la tabla `fact_estudiante_facultad`
 --
 ALTER TABLE `fact_estudiante_facultad`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT de la tabla `history_action`
 --
 ALTER TABLE `history_action`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=146;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=148;
 
 --
 -- AUTO_INCREMENT de la tabla `parametro_sistema`
@@ -2336,13 +2403,6 @@ ALTER TABLE `fact_asignatura_inscrita`
   ADD CONSTRAINT `fact_asignatura_inscrita_ibfk_3` FOREIGN KEY (`id_asignatura_inscrita`) REFERENCES `dim_asignatura_inscrita` (`id`),
   ADD CONSTRAINT `fact_asignatura_inscrita_ibfk_4` FOREIGN KEY (`id_carrera`) REFERENCES `dim_carrera` (`id`),
   ADD CONSTRAINT `fact_asignatura_inscrita_ibfk_5` FOREIGN KEY (`id_status`) REFERENCES `dim_status` (`id`);
-
---
--- Filtros para la tabla `fact_carga`
---
-ALTER TABLE `fact_carga`
-  ADD CONSTRAINT `fact_carga_ibfk_1` FOREIGN KEY (`id_ano`) REFERENCES `dim_ano` (`id`),
-  ADD CONSTRAINT `fact_carga_ibfk_2` FOREIGN KEY (`id_carga`) REFERENCES `dim_carga` (`id`);
 
 --
 -- Filtros para la tabla `fact_docente_facultad`
@@ -2441,6 +2501,7 @@ ALTER TABLE `fact_egresado_voluntariado`
 --
 ALTER TABLE `fact_estudiante_facultad`
   ADD CONSTRAINT `fact_estudiante_facultad_ibfk_1` FOREIGN KEY (`id_estudiante`) REFERENCES `dim_estudiante` (`id`),
+  ADD CONSTRAINT `fact_estudiante_facultad_ibfk_10` FOREIGN KEY (`id_ano`) REFERENCES `dim_ano` (`id`),
   ADD CONSTRAINT `fact_estudiante_facultad_ibfk_2` FOREIGN KEY (`id_facultad`) REFERENCES `dim_facultad` (`id`),
   ADD CONSTRAINT `fact_estudiante_facultad_ibfk_3` FOREIGN KEY (`id_carrera`) REFERENCES `dim_carrera` (`id`),
   ADD CONSTRAINT `fact_estudiante_facultad_ibfk_4` FOREIGN KEY (`id_nacionalidad`) REFERENCES `dim_nacionalidad` (`id`),

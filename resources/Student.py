@@ -4,8 +4,10 @@ from textwrap import dedent
 from cubes import Workspace, Cell, PointCut, Cut
 from flask import make_response, request
 from pymysql import DatabaseError
+import requests
 from common.BD import BD
 import datetime
+from constants import ROLE_USER_STUDENT, CONTENT_TYPE
 
 workspace = Workspace()
 workspace.register_default_store("sql", url="mysql+mysqlconnector://root@localhost/prueba")
@@ -38,6 +40,16 @@ class Student(BD, Resource):
                 }
                 items.append(item)
             result['items'] = items
+            retreived = []
+            retreived = self.queryAll(dedent("""\
+            SELECT u.first_name, u.email, u.phone, u.address 
+            FROM role as r 
+            INNER JOIN user_role as ur 
+            ON (r.id = ur.id_role) 
+            INNER JOIN user as u 
+            ON (ur.id_user = u.id) 
+            WHERE r.name = %s"""), [ROLE_USER_STUDENT])
+            result['recuperado'] = retreived		
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -184,6 +196,17 @@ class StudentPerYear(BD, Resource):
 
             result = sorted(result, key=lambda k: k['ano']) 
             response = result
+
+            retreived = []
+            retreived = self.queryAll(dedent("""\
+            SELECT u.first_name, u.email, u.phone, u.address 
+            FROM role as r 
+            INNER JOIN user_role as ur 
+            ON (r.id = ur.id_role) 
+            INNER JOIN user as u 
+            ON (ur.id_user = u.id) 
+            WHERE r.name = %s"""), [ROLE_USER_STUDENT])
+            response['recuperado'] = retreived
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -328,6 +351,16 @@ class StudentYearFaculty(BD, Resource):
 
             result = sorted(result, key=lambda k: k['ano']) 
             response = result
+            retreived = []
+            retreived = self.queryAll(dedent("""\
+            SELECT u.first_name, u.email, u.phone, u.address 
+            FROM role as r 
+            INNER JOIN user_role as ur 
+            ON (r.id = ur.id_role) 
+            INNER JOIN user as u 
+            ON (ur.id_user = u.id) 
+            WHERE r.name = %s"""), [ROLE_USER_STUDENT])
+            response['recuperado'] = retreived
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -359,6 +392,17 @@ class StudentInternacional(BD, Resource):
                 items.append(item)
             result["total-estudiantes"] = r.summary["sumatoria"]
             result['items'] = items
+
+            retreived = []
+            retreived = self.queryAll(dedent("""\
+            SELECT u.first_name, u.email, u.phone, u.address 
+            FROM role as r 
+            INNER JOIN user_role as ur 
+            ON (r.id = ur.id_role) 
+            INNER JOIN user as u 
+            ON (ur.id_user = u.id) 
+            WHERE r.name = %s"""), [ROLE_USER_STUDENT])
+            result['recuperado'] = retreived
 
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
@@ -406,6 +450,17 @@ class StudentFaculty(BD, Resource):
                 items.append(item)
             result['items'] = items
 
+            retreived = []
+            retreived = self.queryAll(dedent("""\
+            SELECT u.first_name, u.email, u.phone, u.address 
+            FROM role as r 
+            INNER JOIN user_role as ur 
+            ON (r.id = ur.id_role) 
+            INNER JOIN user as u 
+            ON (ur.id_user = u.id) 
+            WHERE r.name = %s"""), [ROLE_USER_STUDENT])
+            result['recuperado'] = retreived
+
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -427,6 +482,7 @@ class StudentMaleFaculty(BD, Resource):
             for row in r:
                 item = {"sexo": row['dim_sexo.codigo'], "facultad": row['dim_facultad.nombre'], "total": row['sumatoria']}
                 result.append(item)
+            
         except DatabaseError as e:
             self.rollback()
             abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
@@ -506,7 +562,19 @@ class StudentSexFaculty(BD, Resource):
             response = {
                 "facultades": result, 
                 "items": items
-            }     
+            }
+    
+            retreived = []
+            retreived = self.queryAll(dedent("""\
+            SELECT u.first_name, u.email, u.phone, u.address 
+            FROM role as r 
+            INNER JOIN user_role as ur 
+            ON (r.id = ur.id_role) 
+            INNER JOIN user as u 
+            ON (ur.id_user = u.id) 
+            WHERE r.name = %s"""), [ROLE_USER_STUDENT])
+        
+            response['recuperado'] = retreived     
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -528,6 +596,17 @@ class StudentInternacionalFaculty(BD, Resource):
             for row in r:
                 item = {"nacionalidad": row['dim_nacionalidad.codigo'], "facultad": row['dim_facultad.nombre'], "total": row['sumatoria']}
                 result.append(item)
+
+            retreived = []
+            retreived = self.queryAll(dedent("""\
+            SELECT u.first_name, u.email, u.phone, u.address 
+            FROM role as r 
+            INNER JOIN user_role as ur 
+            ON (r.id = ur.id_role) 
+            INNER JOIN user as u 
+            ON (ur.id_user = u.id) 
+            WHERE r.name = %s"""), [ROLE_USER_STUDENT])
+            result['recuperado'] = retreived  
         except DatabaseError as e:
             self.rollback()
             abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
@@ -552,6 +631,17 @@ class StudentNacionalFaculty(BD, Resource):
             for row in r:
                 item = {"sexo": row['dim_nacionalidad.codigo'], "facultad": row['dim_facultad.nombre'], "total": row['sumatoria']}
                 result.append(item)
+
+            retreived = []
+            retreived = self.queryAll(dedent("""\
+            SELECT u.first_name, u.email, u.phone, u.address 
+            FROM role as r 
+            INNER JOIN user_role as ur 
+            ON (r.id = ur.id_role) 
+            INNER JOIN user as u 
+            ON (ur.id_user = u.id) 
+            WHERE r.name = %s"""), [ROLE_USER_STUDENT])
+            result['recuperado'] = retreived  
         except DatabaseError as e:
             self.rollback()
             abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
@@ -603,6 +693,16 @@ class StudentNationalityFaculty(BD, Resource):
                 "facultades": result,
                 "items": items
             }
+            retreived = []
+            retreived = self.queryAll(dedent("""\
+            SELECT u.first_name, u.email, u.phone, u.address 
+            FROM role as r 
+            INNER JOIN user_role as ur 
+            ON (r.id = ur.id_role) 
+            INNER JOIN user as u 
+            ON (ur.id_user = u.id) 
+            WHERE r.name = %s"""), [ROLE_USER_STUDENT])
+            response['recuperado'] = retreived  
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -656,7 +756,17 @@ class StudentDisabilityFaculty(BD, Resource):
                 response = {
                     "facultades": result,
                     "items": items
-                } 
+                }
+                retreived = []
+                retreived = self.queryAll(dedent("""\
+                SELECT u.first_name, u.email, u.phone, u.address 
+                FROM role as r 
+                INNER JOIN user_role as ur 
+                ON (r.id = ur.id_role) 
+                INNER JOIN user as u 
+                ON (ur.id_user = u.id) 
+                WHERE r.name = %s"""), [ROLE_USER_STUDENT])
+                response['recuperado'] = retreived   
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -709,7 +819,17 @@ class StudentEthnicGroupFaculty(BD, Resource):
                 response = {
                     "facultades": result,
                     "items": items
-                }  
+                } 
+                retreived = []
+                retreived = self.queryAll(dedent("""\
+                SELECT u.first_name, u.email, u.phone, u.address 
+                FROM role as r 
+                INNER JOIN user_role as ur 
+                ON (r.id = ur.id_role) 
+                INNER JOIN user as u 
+                ON (ur.id_user = u.id) 
+                WHERE r.name = %s"""), [ROLE_USER_STUDENT])
+                response['recuperado'] = retreived   
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -748,6 +868,16 @@ class StudentUndergraduateSex(BD, Resource):
                 items.append(item)
             result["total-estudiantes-pregrado"] = r.summary["sumatoria"]
             result['items'] = items
+            retreived = []
+            retreived = self.queryAll(dedent("""\
+            SELECT u.first_name, u.email, u.phone, u.address 
+            FROM role as r 
+            INNER JOIN user_role as ur 
+            ON (r.id = ur.id_role) 
+            INNER JOIN user as u 
+            ON (ur.id_user = u.id) 
+            WHERE r.name = %s"""), [ROLE_USER_STUDENT])
+            result['recuperado'] = retreived  
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -790,6 +920,16 @@ class StudentUndergraduateNacionality(BD, Resource):
                 result['Venezolano'] = 0
             result["total-estudiantes-pregrado"] = r.summary["sumatoria"]
             result['items'] = items
+            retreived = []
+            retreived = self.queryAll(dedent("""\
+            SELECT u.first_name, u.email, u.phone, u.address 
+            FROM role as r 
+            INNER JOIN user_role as ur 
+            ON (r.id = ur.id_role) 
+            INNER JOIN user as u 
+            ON (ur.id_user = u.id) 
+            WHERE r.name = %s"""), [ROLE_USER_STUDENT])
+            result['recuperado'] = retreived  
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 

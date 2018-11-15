@@ -112,6 +112,16 @@ insert_type_student = dedent("""\
 get_type_student_code_verify = dedent("""\
 	SELECT id FROM dim_tipo_estudiante WHERE codigo = %s OR codigo = %s""")
 
+# Año
+get_year_code = dedent("""\
+	SELECT id FROM dim_ano WHERE codigo = %s""") 
+
+insert_year = dedent("""\
+	INSERT INTO dim_ano (codigo) VALUES (%s)""")
+
+get_year_code_verify = dedent("""\
+	SELECT id FROM dim_ano WHERE codigo = %s OR codigo = %s""")
+
 # consultas para estudiante
 get_student_code = dedent("""\
 	SELECT id FROM dim_estudiante WHERE cedula = %s""")
@@ -310,6 +320,7 @@ typeTeacherQuery = SqlTableStatic(get_type_teacher_code, insert_type_teacher, ge
 disabilityQuery = SqlTableStatic(get_disability_code, insert_disability, get_disability_code_verify)
 ethnicGroupQuery = SqlTableStatic(get_ethnic_group_code, insert_ethnic_group, get_ethnic_group_code_verify)
 typeStudentQuery = SqlTableStatic(get_type_student_code, insert_type_student, get_type_student_code_verify)
+yearQuery = SqlTableStatic(get_year_code, insert_year, get_year_code_verify)
 studentQuery = SqlFact(get_student_code, insert_student, update_student)
 teacherQuery = SqlFact(get_teacher_code, insert_teacher, update_teacher)
 graduateQuery = SqlFact(get_graduate_code, insert_graduate, update_graduate)

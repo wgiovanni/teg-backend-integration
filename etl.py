@@ -13,7 +13,7 @@ from sql_queries import publicationQuery, scaleQuery, studentRelationship, grade
 from sql_queries import graduateQuery, studiosUcQuery, certificationQuery, coursesQuery, educationQuery, educationQuery, patentsQuery
 from sql_queries import jobsQuery, volunteeringQuery, graduateJobsRelationship, graduatePatentsRelationship, graduateCertificationRelationship 
 from sql_queries import graduateCoursesRelationship, graduateEducationRelationship, graduateVolunteeringRelationship, typeTeacherQuery, projectQuery
-from sql_queries import otherStudioQuery, titleQuery, prizeQuery
+from sql_queries import otherStudioQuery, titleQuery, prizeQuery, yearQuery
 from constants import LOAD_INITIAL_UPDATE, ENDPOINT_LOAD_STUDENTS, ENDPOINT_LOAD_TEACHERS, ENDPOINT_LOAD_GRADUATES, DATE_UPDATE, CONTENT_TYPE
 from constants import DIMENSION, FACT, ITEMS
 from constants import STUDENT, PROFESSION, FACULTY, STUDENT_PROFESSION_FACULTY, TEACHER, SCALE, GRADE, PUBLICATION, TEACHER_PUBLICATION, TEACHER_FACULTY, GRADUATE, STUDIOS_UC
@@ -228,6 +228,10 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 			idTypeStudent = target_cursor.fetchone()
 			print("etnia: {}".format(idTypeStudent))
 
+			yearCode = item['ano']
+			target_cursor.execute(yearQuery.get_query_code, [yearCode])
+			idYear = target_cursor.fetchone()
+			print("ano: {}".format(idYear))
 
 			# aqui iran todas las dimensiones que saldran de estudiantes
 			student = [
@@ -251,8 +255,8 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 
 			target_cursor.execute(dedent("""\
 			INSERT INTO FACT_ESTUDIANTE_FACULTAD 
-				(id_estudiante, id_sexo, id_nacionalidad, id_status, id_discapacidad, id_etnia, id_tipo)
-			VALUES (%s, %s, %s, %s, %s, %s, %s)"""), [idStudent[0], idSex[0], idNationality[0], idStatus[0], idDisability[0], idEthnicGroup[0], idTypeStudent[0]])
+				(id_estudiante, id_sexo, id_nacionalidad, id_status, id_discapacidad, id_etnia, id_tipo, id_ano)
+			VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"""), [idStudent[0], idSex[0], idNationality[0], idStatus[0], idDisability[0], idEthnicGroup[0], idTypeStudent[0], idYear[0]])
 			target_cnx.commit()
 	elif table == PROFESSION:
 		print("DEMAS TABLAS")
@@ -1039,6 +1043,11 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 			idTypeStudent = target_cursor.fetchone()
 			print("tipo: {}".format(idTypeStudent))
 
+			yearCode = item['ano']
+			target_cursor.execute(yearQuery.get_query_code, [yearCode])
+			idYear = target_cursor.fetchone()
+			print("ano: {}".format(idYear))
+
 			student = [
 				item[IDENTIFICATION_CARD],  
 				item[FIRST_NAME_ATRIBUTE], 
@@ -1061,8 +1070,8 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 				if idFact is not None:
 					target_cursor.execute(dedent("""\
 					UPDATE fact_estudiante_facultad
-					SET id_estudiante=%s, id_sexo=%s, id_nacionalidad=%s, id_status=%s, id_discapacidad=%s, id_etnia=%s, id_tipo=%s
-					WHERE id = %s"""), [idStudentExist[0], idSex[0], idNationality[0], idStatus[0], idDisability[0], idEthnicGroup[0], idTypeStudent[0], idFact[0]])
+					SET id_estudiante=%s, id_sexo=%s, id_nacionalidad=%s, id_status=%s, id_discapacidad=%s, id_etnia=%s, id_tipo=%s, id_ano=%s
+					WHERE id = %s"""), [idStudentExist[0], idSex[0], idNationality[0], idStatus[0], idDisability[0], idEthnicGroup[0], idTypeStudent[0], idYear[0], idFact[0]])
 					target_cnx.commit()
 				else: 
 					print("No existe el registro")

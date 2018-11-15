@@ -43,4 +43,6 @@ FEMALE = "Femenino"
 NATIONAL = "Venezolano"
 INTERNACIONAL = "Extranjero"
 
+ROLE_USER_STUDENT = "facultad_estudiante"
+
 

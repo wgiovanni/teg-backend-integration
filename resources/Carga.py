@@ -8,11 +8,6 @@ from common.BD import BD
 import datetime
 from flask import request
 
-workspace = Workspace()
-workspace.register_default_store("sql", url="mysql+mysqlconnector://root@localhost/prueba")
-workspace.import_model("resources/cubesmodel/model_prueba.json")
-browser = workspace.browser("fact_carga")
-
 class Carga(BD, Resource):
     representations = {'application/json': make_response}
     parser = reqparse.RequestParser()

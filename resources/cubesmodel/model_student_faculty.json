@@ -104,12 +104,23 @@
               "label_attribute": "codigo"
             }
           ]
+        },
+        {
+          "name":"dim_ano",
+          "levels": [
+                 {
+                     "name":"ano",
+                     "label":"Ano",
+                     "attributes": ["id", "codigo"],
+                     "label_attribute": "codigo"
+                 }
+           ]
         }
     ],
     "cubes": [
         {
             "name": "fact_estudiante_facultad",
-            "dimensions": ["dim_estudiante", "dim_facultad", "dim_carrera", "dim_sexo", "dim_nacionalidad", "dim_status", "dim_discapacidad", "dim_etnia", "dim_tipo_estudiante"],
+            "dimensions": ["dim_estudiante", "dim_facultad", "dim_carrera", "dim_sexo", "dim_nacionalidad", "dim_status", "dim_discapacidad", "dim_etnia", "dim_tipo_estudiante", "dim_ano"],
             "measures": [
               {"name": "cantidad", "label": "Cantidad"}
             ],
@@ -156,6 +167,10 @@
               {
                 "master": "fact_estudiante_facultad.id_tipo",
                 "detail": "dim_tipo_estudiante.id"
+              },
+              {
+                "master": "fact_estudiante_facultad.id_ano",
+                "detail": "dim_ano.id"
               }
             ],
             "mappings": {
@@ -183,7 +198,9 @@
               "dim_etnia.id": "dim_etnia.id",
               "dim_etnia.codigo": "dim_etnia.codigo",
               "dim_tipo_estudiante.id": "dim_tipo_estudiante.id",
-              "dim_tipo_estudiante.codigo": "dim_tipo_estudiante.codigo"
+              "dim_tipo_estudiante.codigo": "dim_tipo_estudiante.codigo",
+              "dim_ano.id": "dim_ano.id",
+              "dim_ano.codigo": "dim_ano.codigo"
             }
         }
     ]

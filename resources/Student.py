@@ -2,7 +2,7 @@ from flask_restful import abort, Resource, reqparse
 import simplejson as json
 from textwrap import dedent
 from cubes import Workspace, Cell, PointCut, Cut
-from flask import make_response
+from flask import make_response, request
 from pymysql import DatabaseError
 from common.BD import BD
 import datetime
@@ -42,6 +42,296 @@ class Student(BD, Resource):
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
         return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }
+
+class StudentPerYear(BD, Resource):
+    representations = {'application/json': make_response}
+    parser = reqparse.RequestParser()
+    def post(self):
+        try:
+            parameter = request.get_json(force=True)
+            parameterYear1 = parameter['desde']
+            parameterYear2 = parameter['hasta']
+            result = []
+            if type(parameterYear1) is int and type(parameterYear2) is int:
+                year = self.queryAll("SELECT * FROM dim_ano where id >= %s and id <= %s order by codigo ASC", [parameterYear1, parameterYear2])
+                for y in year:
+                    cut = PointCut("dim_ano", [y['id']])
+                    cell = Cell(browser.cube, cuts = [cut])
+                    r = browser.aggregate(cell, drilldown = ["dim_ano"])
+                    item = {
+                        "ano": y['codigo'],
+                        "total": int(r.summary["sumatoria"])
+                    }
+                    result.append(item)
+                flag = False
+                auxResult = []
+                respaldo = {}
+                for y in year:
+                    for r in result:
+                        if y['codigo'] == r['ano']:
+                            flag = True
+                            respaldo = r
+                    if flag == False:
+                        print("entro")
+                        item = {
+                            "ano": y['codigo'],
+                            "total": 0
+                        }
+                        result.append(item)
+                        auxResult.append(item)
+                    else:
+                        auxResult.append(respaldo)
+                    flag = False
+                result = auxResult
+
+            if type(parameterYear1) is str and type(parameterYear2) is str:
+                year = self.queryAll("SELECT * FROM dim_ano ORDER BY codigo ASC")
+                for y in year:
+                    cut = PointCut("dim_ano", [y['id']])
+                    cell = Cell(browser.cube, cuts = [cut])
+                    r = browser.aggregate(cell, drilldown = ["dim_ano"])
+                    item = {
+                        "ano": y['codigo'],
+                        "total": int(r.summary["sumatoria"])
+                    }
+                    result.append(item)
+                flag = False
+                auxResult = []
+                respaldo = {}
+                for y in year:
+                    for r in result:
+                        if y['codigo'] == r['ano']:
+                            flag = True
+                            respaldo = r
+                    if flag == False:
+                        print("entro")
+                        item = {
+                            "ano": y['codigo'],
+                            "total": 0
+                        }
+                        result.append(item)
+                        auxResult.append(item)
+                    else:
+                        auxResult.append(respaldo)
+                    flag = False
+                result = auxResult
+            
+            if type(parameterYear1) is str and type(parameterYear2) is int:
+                year = self.queryAll("SELECT * FROM dim_ano WHERE id <= %s ORDER BY codigo ASC", [parameterYear2])
+                for y in year:
+                    cut = PointCut("dim_ano", [y['id']])
+                    cell = Cell(browser.cube, cuts = [cut])
+                    r = browser.aggregate(cell, drilldown = ["dim_ano"])
+                    item = {
+                        "ano": y['codigo'],
+                        "total": int(r.summary["sumatoria"])
+                    }
+                    result.append(item)
+                
+                flag = False
+                auxResult = []
+                respaldo = {}
+                for y in year:
+                    for r in result:
+                        if y['codigo'] == r['ano']:
+                            flag = True
+                            respaldo = r
+                    if flag == False:
+                        print("entro")
+                        item = {
+                            "ano": y['codigo'],
+                            "total": 0
+                        }
+                        result.append(item)
+                        auxResult.append(item)
+                    else:
+                        auxResult.append(respaldo)
+                    flag = False
+                result = auxResult
+
+            if type(parameterYear1) is int and type(parameterYear2) is str:
+                year = self.queryAll("SELECT * FROM dim_ano WHERE id >= %s ORDER BY codigo ASC", [parameterYear1])
+                for y in year:
+                    cut = PointCut("dim_ano", [y['id']])
+                    cell = Cell(browser.cube, cuts = [cut])
+                    r = browser.aggregate(cell, drilldown = ["dim_ano"])
+                    item = {
+                        "ano": y['codigo'],
+                        "total": int(r.summary["sumatoria"])
+                    }
+                    result.append(item)
+
+                flag = False
+                auxResult = []
+                respaldo = {}
+                for y in year:
+                    for r in result:
+                        if y['codigo'] == r['ano']:
+                            flag = True
+                            respaldo = r
+
+                    if flag == False:
+                        item = {
+                            "ano": y['codigo'],
+                            "total": 0
+                        }
+                        result.append(item)
+                        auxResult.append(item)
+                    else:
+                        auxResult.append(respaldo)
+                    flag = False
+                result = auxResult
+
+            result = sorted(result, key=lambda k: k['ano']) 
+            response = result
+        except Exception as e:
+            abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
+
+        return json.dumps(response), 200, { 'Access-Control-Allow-Origin': '*' }
+        
+class StudentYearFaculty(BD, Resource):
+    representations = {'application/json': make_response}
+    parser = reqparse.RequestParser()
+    def post(self):
+        try:
+            parameter = request.get_json(force=True)
+            print(parameter)
+            parameterYear1 = parameter['desde']
+            parameterYear2 = parameter['hasta']
+            parameterFaculty = parameter['facultad'] 
+            result = []
+            if type(parameterYear1) is int and type(parameterYear2) is int:
+                facultad = self.queryOne("SELECT * FROM dim_facultad WHERE id = %s", [parameterFaculty])
+                year = self.queryAll("SELECT * FROM dim_ano where id >= %s and id <= %s order by codigo ASC", [parameterYear1, parameterYear2])
+                cut = PointCut("dim_facultad", [facultad['id']])
+                cell = Cell(browser.cube, cuts = [cut])
+                r = browser.aggregate(cell, drilldown = ["dim_ano", "dim_facultad"])
+                for row in r:
+                    item = {
+                        "ano": row['dim_ano.codigo'],
+                        "total": int(r.summary["sumatoria"])
+                    }
+                    result.append(item)
+                flag = False
+                auxResult = []
+                respaldo = {}
+                for y in year:
+                    for r in result:
+                        if y['codigo'] == r['ano']:
+                            flag = True
+                            respaldo = r
+                    if flag == False:
+                        item = {
+                            "ano": y['codigo'],
+                            "total": 0
+                        }
+                        result.append(item)
+                        auxResult.append(item)
+                    else:
+                        auxResult.append(respaldo)
+                    flag = False
+                result = auxResult
+
+            if type(parameterYear1) is str and type(parameterYear2) is str:
+                facultad = self.queryOne("SELECT * FROM dim_facultad WHERE id = %s", [parameterFaculty])
+                year = self.queryAll("SELECT * FROM dim_ano ORDER BY codigo ASC")
+                cut = PointCut("dim_facultad", [facultad['id']])
+                cell = Cell(browser.cube, cuts = [cut])
+                r = browser.aggregate(cell, drilldown = ["dim_ano", "dim_facultad"])
+                for row in r:
+                    print(row)
+                    item = {
+                        "ano": row['dim_ano.codigo'],
+                        "total": int(r.summary["sumatoria"])
+                    }
+                    result.append(item)
+                flag = False
+                for y in year:
+                    for r in result:
+                        if y['codigo'] == r['ano']:
+                            flag = True
+
+                    if flag == False:
+                        item = {
+                            "ano": y['codigo'],
+                            "total": 0
+                        }
+                        result.append(item)
+
+                    flag = False
+            
+            if type(parameterYear1) is str and type(parameterYear2) is int:
+                facultad = self.queryOne("SELECT * FROM dim_facultad WHERE id = %s", [parameterFaculty])
+                year = self.queryAll("SELECT * FROM dim_ano WHERE id <= %s ORDER BY codigo ASC", [parameterYear2])
+                cut = PointCut("dim_facultad", [facultad['id']])
+                cell = Cell(browser.cube, cuts = [cut])
+                r = browser.aggregate(cell, drilldown = ["dim_ano", "dim_facultad"])
+                for row in r:
+                    item = {
+                        "ano": row['dim_ano.codigo'],
+                        "total": int(r.summary["sumatoria"])
+                    }
+                    result.append(item)
+                flag = False
+                auxResult = []
+                respaldo = {}
+                for y in year:
+                    for r in result:
+                        if y['codigo'] == r['ano']:
+                            flag = True
+                            respaldo = r
+                    if flag == False:
+                        print("entro")
+                        item = {
+                            "ano": y['codigo'],
+                            "total": 0
+                        }
+                        result.append(item)
+                        auxResult.append(item)
+                    else:
+                        auxResult.append(respaldo)
+                    flag = False
+                result = auxResult
+
+            if type(parameterYear1) is int and type(parameterYear2) is str:
+                facultad = self.queryOne("SELECT * FROM dim_facultad WHERE id = %s", [parameterFaculty])
+                year = self.queryAll("SELECT * FROM dim_ano WHERE id >= %s ORDER BY codigo ASC", [parameterYear1])
+                cut = PointCut("dim_facultad", [facultad['id']])
+                cell = Cell(browser.cube, cuts = [cut])
+                r = browser.aggregate(cell, drilldown = ["dim_ano", "dim_facultad"])
+                for row in r:
+                    item = {
+                        "ano": row['dim_ano.codigo'],
+                        "total": int(r.summary["sumatoria"])
+                    }
+                    result.append(item)
+                flag = False
+                auxResult = []
+                respaldo = {}
+                for y in year:
+                    for r in result:
+                        if y['codigo'] == r['ano']:
+                            flag = True
+                            respaldo = r
+
+                    if flag == False:
+                        item = {
+                            "ano": y['codigo'],
+                            "total": 0
+                        }
+                        result.append(item)
+                        auxResult.append(item)
+                    else:
+                        auxResult.append(respaldo)
+                    flag = False
+                result = auxResult
+
+            result = sorted(result, key=lambda k: k['ano']) 
+            response = result
+        except Exception as e:
+            abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
+
+        return json.dumps(response), 200, { 'Access-Control-Allow-Origin': '*' }
 
 
 class StudentInternacional(BD, Resource):

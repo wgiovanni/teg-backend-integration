@@ -12,7 +12,7 @@ from resources.SystemParameter import SystemParameterList, SystemParameter
 from resources.Student import Student, StudentMaleFaculty, StudentFemaleFaculty, StudentSexFaculty, StudentUndergraduateSex
 from resources.Student import StudentEthnicGroupFaculty, StudentDisabilityFaculty, StudentInternacionalFaculty, StudentNacionalFaculty 
 from resources.Student import StudentNationalityFaculty, StudentProfessionFaculty, StudentProfessionConstantsFaculty, StudentInternacional 
-from resources.Student import StudentFaculty, StudentUndergraduateNacionality
+from resources.Student import StudentFaculty, StudentUndergraduateNacionality, StudentPerYear, StudentYearFaculty
 from resources.InscribedCourse import InscribedCourseStudent, InscribedCourseStudentFaculty
 from resources.TeacherPublication import TeacherPublication, TeacherPublicationFaculty, TeacherCiteFaculty, TeacherCitePublication
 from resources.Teacher import Teacher, TeacherSexFaculty, TeacherScale, TeacherNacionalityFaculty, TeacherWithDoctorateFaculty, TeacherGradeFaculty, TeacherWithDoctorate, TeacherInternacionals, TeacherNational
@@ -29,6 +29,7 @@ from resources.GraduateEducation import GraduateEducation
 from resources.GraduateStudiosUc import GraduateStudiosUc
 from resources.GraduateVolunteering import GraduateVolunteering
 from resources.Carga import Carga
+from resources.Full import Year, Faculty
 # metodos
 from etl import etl_process2
 
@@ -60,9 +61,12 @@ def extraction():
 	
 	return "Hola mundo"
 
+
 # route para parametros del sistema
 api.add_resource(SystemParameterList, '/parametroSistema')
 api.add_resource(SystemParameter, '/parametroSistema/<systemParameter_id>')
+api.add_resource(Year, '/year')
+api.add_resource(Faculty, '/faculty')
 
 # cantidad de estudiantes totales
 api.add_resource(Student, '/estudiantes-total')
@@ -94,6 +98,10 @@ api.add_resource(StudentEthnicGroupFaculty, '/estudiantes-etnia-facultad')
 api.add_resource(StudentUndergraduateSex, '/estudiantes-pregrado-sexo')
 # matricula de pregrado por nacionalidad
 api.add_resource(StudentUndergraduateNacionality, '/estudiantes-pregrado-nacionalidad')
+# cantidad de estudiantes por año
+api.add_resource(StudentPerYear, '/estudiantes-ano')
+# cantidad de estudiantes por facultad y por año
+api.add_resource(StudentYearFaculty, '/estudiantes-ano-facultad')
 
 # Cube para las materias inscritas
 api.add_resource(InscribedCourseStudent, '/asignatura-inscrita-estudiante')

@@ -4,7 +4,6 @@ from textwrap import dedent
 from cubes import Workspace, Cell, PointCut, Cut
 from flask import make_response, request
 from pymysql import DatabaseError
-import requests
 from common.BD import BD
 import datetime
 from constants import ROLE_USER_STUDENT, CONTENT_TYPE
@@ -84,7 +83,7 @@ class StudentPerYear(BD, Resource):
                             flag = True
                             respaldo = r
                     if flag == False:
-                        print("entro")
+                        #print("entro")
                         item = {
                             "ano": y['codigo'],
                             "total": 0
@@ -206,7 +205,11 @@ class StudentPerYear(BD, Resource):
             INNER JOIN user as u 
             ON (ur.id_user = u.id) 
             WHERE r.name = %s"""), [ROLE_USER_STUDENT])
-            response['recuperado'] = retreived
+
+            response = {
+                "anos": result,
+                "recuperado": retreived
+            }
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -232,7 +235,7 @@ class StudentYearFaculty(BD, Resource):
                 for row in r:
                     item = {
                         "ano": row['dim_ano.codigo'],
-                        "total": int(r.summary["sumatoria"])
+                        "total": int(row["sumatoria"])
                     }
                     result.append(item)
                 flag = False
@@ -262,17 +265,20 @@ class StudentYearFaculty(BD, Resource):
                 cell = Cell(browser.cube, cuts = [cut])
                 r = browser.aggregate(cell, drilldown = ["dim_ano", "dim_facultad"])
                 for row in r:
-                    print(row)
+                    #print(row)
                     item = {
                         "ano": row['dim_ano.codigo'],
-                        "total": int(r.summary["sumatoria"])
+                        "total": int(row["sumatoria"])
                     }
                     result.append(item)
                 flag = False
+                auxResult = []
+                respaldo = {}
                 for y in year:
                     for r in result:
                         if y['codigo'] == r['ano']:
                             flag = True
+                            respaldo = r
 
                     if flag == False:
                         item = {
@@ -280,8 +286,12 @@ class StudentYearFaculty(BD, Resource):
                             "total": 0
                         }
                         result.append(item)
+                        auxResult.append(item)
+                    else:
+                        auxResult.append(respaldo)
 
                     flag = False
+                result = auxResult
             
             if type(parameterYear1) is str and type(parameterYear2) is int:
                 facultad = self.queryOne("SELECT * FROM dim_facultad WHERE id = %s", [parameterFaculty])
@@ -292,7 +302,7 @@ class StudentYearFaculty(BD, Resource):
                 for row in r:
                     item = {
                         "ano": row['dim_ano.codigo'],
-                        "total": int(r.summary["sumatoria"])
+                        "total": int(row["sumatoria"])
                     }
                     result.append(item)
                 flag = False
@@ -304,7 +314,7 @@ class StudentYearFaculty(BD, Resource):
                             flag = True
                             respaldo = r
                     if flag == False:
-                        print("entro")
+                        #print("entro")
                         item = {
                             "ano": y['codigo'],
                             "total": 0
@@ -325,7 +335,7 @@ class StudentYearFaculty(BD, Resource):
                 for row in r:
                     item = {
                         "ano": row['dim_ano.codigo'],
-                        "total": int(r.summary["sumatoria"])
+                        "total": int(row["sumatoria"])
                     }
                     result.append(item)
                 flag = False
@@ -350,7 +360,6 @@ class StudentYearFaculty(BD, Resource):
                 result = auxResult
 
             result = sorted(result, key=lambda k: k['ano']) 
-            response = result
             retreived = []
             retreived = self.queryAll(dedent("""\
             SELECT u.first_name, u.email, u.phone, u.address 
@@ -360,7 +369,11 @@ class StudentYearFaculty(BD, Resource):
             INNER JOIN user as u 
             ON (ur.id_user = u.id) 
             WHERE r.name = %s"""), [ROLE_USER_STUDENT])
-            response['recuperado'] = retreived
+    
+            response = {
+                "anos": result,
+                "recuperado": retreived
+            }
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 

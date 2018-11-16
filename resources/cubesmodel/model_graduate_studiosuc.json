@@ -21,12 +21,45 @@
               "label_attribute": "codigo"
             }
           ]
+        },
+        {
+            "name":"dim_ano",
+            "levels": [
+                {
+                    "name":"ano",
+                    "label":"Ano",
+                    "attributes": ["id", "codigo"],
+                    "label_attribute": "codigo"
+                }
+            ]
+        },
+        {
+            "name":"dim_facultad",
+            "levels": [
+              {
+                "name": "facultad",
+                "label":"Facultad",
+                "attributes": ["id", "codigo", "nombre"],
+                "label_attribute": "nombre"
+              }
+            ]
+        },
+        {
+            "name":"dim_carrera",
+            "levels": [
+                {
+                "name": "carrera",
+                "label":"Carrera",
+                "attributes": ["id", "codigo", "nombre"],
+                "label_attribute": "nombre"
+                }
+            ]
         }
     ],
     "cubes": [
         {
             "name": "fact_egresado_estudiosuc",
-            "dimensions": ["dim_egresado", "dim_estudiosuc"],
+            "dimensions": ["dim_egresado", "dim_estudiosuc", "dim_ano", "dim_facultad", "dim_carrera"],
             "measures": [
                 {"name": "cantidad", "label": "Cantidad"}
             ],
@@ -45,6 +78,18 @@
                 {
                     "master": "fact_egresado_estudiosuc.id_estudiosuc",
                     "detail": "dim_estudiosuc.id"
+                },
+                {
+                    "master": "fact_egresado_estudiosuc.id_ano",
+                    "detail": "dim_ano.id"
+                },
+                {
+                    "master": "fact_egresado_estudiosuc.id_facultad",
+                    "detail": "dim_facultad.id"
+                },
+                {
+                    "master": "fact_egresado_estudiosuc.id_carrera",
+                    "detail": "dim_carrera.id"
                 }
             ],
             "mappings": {
@@ -62,7 +107,15 @@
               "dim_estudiosuc.id": "dim_estudiosuc.id",
               "dim_estudiosuc.codigo": "dim_estudiosuc.codigo",
               "dim_estudiosuc.anho_grado": "dim_estudiosuc.anho_grado",
-              "dim_estudiosuc.url_certificacion": "dim_estudiosuc.url_certificacion"
+              "dim_estudiosuc.url_certificacion": "dim_estudiosuc.url_certificacion",
+              "dim_ano.id": "dim_ano.id",
+              "dim_ano.codigo": "dim_ano.codigo",
+              "dim_facultad.id": "dim_facultad.id",
+              "dim_facultad.codigo": "dim_facultad.codigo",
+              "dim_facultad.nombre": "dim_facultad.nombre",
+              "dim_carrera.id": "dim_carrera.id",
+              "dim_carrera.codigo": "dim_carrera.codigo",
+              "dim_carrera.nombre": "dim_carrera.nombre"
             }
         }
     ]

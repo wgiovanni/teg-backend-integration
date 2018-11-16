@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 15-11-2018 a las 20:44:38
+-- Tiempo de generación: 16-11-2018 a las 19:09:20
 -- Versión del servidor: 10.1.36-MariaDB
 -- Versión de PHP: 7.2.11
 
@@ -1272,6 +1272,7 @@ CREATE TABLE `fact_egresado_estudiosuc` (
   `id_estudiosuc` int(11) NOT NULL,
   `id_facultad` int(11) NOT NULL,
   `id_carrera` int(11) NOT NULL,
+  `id_ano` int(11) NOT NULL,
   `cantidad` int(11) NOT NULL DEFAULT '1',
   `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -1281,11 +1282,11 @@ CREATE TABLE `fact_egresado_estudiosuc` (
 -- Volcado de datos para la tabla `fact_egresado_estudiosuc`
 --
 
-INSERT INTO `fact_egresado_estudiosuc` (`id`, `id_egresado`, `id_estudiosuc`, `id_facultad`, `id_carrera`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(1, 29, 37, 64, 117, 1, '2018-10-29 23:42:34', '2018-10-29 23:42:34'),
-(2, 30, 38, 64, 119, 1, '2018-10-29 23:42:34', '2018-10-29 23:42:34'),
-(3, 31, 39, 64, 117, 1, '2018-10-29 23:42:34', '2018-10-29 23:42:34'),
-(4, 31, 40, 64, 118, 1, '2018-10-29 23:42:34', '2018-10-29 23:42:34');
+INSERT INTO `fact_egresado_estudiosuc` (`id`, `id_egresado`, `id_estudiosuc`, `id_facultad`, `id_carrera`, `id_ano`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
+(1, 29, 37, 64, 117, 442, 1, '2018-10-29 23:42:34', '2018-11-16 13:19:13'),
+(2, 30, 38, 64, 119, 443, 1, '2018-10-29 23:42:34', '2018-11-16 13:19:17'),
+(3, 31, 39, 64, 117, 443, 1, '2018-10-29 23:42:34', '2018-11-16 13:19:29'),
+(4, 31, 40, 61, 118, 446, 1, '2018-10-29 23:42:34', '2018-11-16 15:01:33');
 
 -- --------------------------------------------------------
 
@@ -1539,7 +1540,27 @@ INSERT INTO `history_action` (`id`, `username`, `action`, `module`, `date`) VALU
 (144, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-14 20:27:37'),
 (145, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-14 21:09:45'),
 (146, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-15 13:00:21'),
-(147, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-15 13:06:03');
+(147, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-15 13:06:03'),
+(148, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-15 21:41:46'),
+(149, 'Admin', 'Agregó un usuario', 'Usuarios', '2018-11-15 21:48:20'),
+(150, 'Admin', 'Eliminó un usuario', 'Usuarios', '2018-11-15 21:48:25'),
+(151, 'Admin', 'Agregó un usuario', 'Usuarios', '2018-11-15 21:48:47'),
+(152, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-15 21:52:00'),
+(153, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-15 21:54:46'),
+(154, 'Admin', 'Modificó un parámetro del sistema', 'Integración', '2018-11-15 22:00:35'),
+(155, 'Admin', 'Modificó un parámetro del sistema', 'Integración', '2018-11-15 22:00:42'),
+(156, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-15 22:07:58'),
+(157, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-15 22:20:55'),
+(158, 'Admin', 'Modificó un usuario', 'Usuarios', '2018-11-15 22:22:27'),
+(159, 'Admin', 'Eliminó un usuario', 'Usuarios', '2018-11-15 22:23:59'),
+(160, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-15 23:06:44'),
+(161, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-16 12:07:12'),
+(162, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-16 12:12:49'),
+(163, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-16 12:14:16'),
+(164, 'vicerrector', 'Ingreso al sistema', 'Usuarios', '2018-11-16 12:14:48'),
+(165, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-16 13:07:57'),
+(166, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-16 15:26:39'),
+(167, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-16 17:48:20');
 
 -- --------------------------------------------------------
 
@@ -1562,7 +1583,7 @@ CREATE TABLE `parametro_sistema` (
 --
 
 INSERT INTO `parametro_sistema` (`id`, `codigo`, `nombre`, `descripcion`, `definicion`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(1, 'CARGA_INICIAL_ACTUALIZACION', 'CARGA_INICIAL_ACTUALIZACION', 'Parametro que toma valores boleanos para la carga inicial (1) y la actualizacion (0)', '0', '2018-10-18 20:35:32', '2018-11-10 20:54:10'),
+(1, 'CARGA_INICIAL_ACTUALIZACION', 'CARGA_INICIAL_ACTUALIZACION', 'Parametro que toma valores boleanos para la carga inicial (1) y la actualizacion (0)', '0', '2018-10-18 20:35:32', '2018-11-15 22:00:42'),
 (2, 'RUTA_CARGA_ESTUDIANTES', 'RUTA_CARGA_ESTUDIANTES', 'Endpoint o ruta para la carga inicial del modulo de estudiantes', 'http://127.0.0.1:8082/api/v1/estudiantes', '2018-10-18 20:38:51', '2018-10-29 19:06:57'),
 (3, 'RUTA_CARGA_PROFESORES', 'RUTA_CARGA_PROFESORES', 'Endpoint o ruta para la carga inicial del modulo de profesores', 'http://127.0.0.1:8083/docentes', '2018-10-18 20:40:26', '2018-11-10 15:52:41'),
 (4, 'RUTA_CARGA_EGRESADOS', 'RUTA_CARGA_EGRESADOS', 'Endpoint o ruta para la carga inicial del modulo de egresados', 'http://127.0.0.1:8082/api/v1/egresados', '2018-10-18 21:31:21', '2018-10-29 00:04:17'),
@@ -1625,6 +1646,8 @@ CREATE TABLE `user` (
   `last_name` varchar(50) NOT NULL,
   `username` varchar(50) NOT NULL,
   `email` varchar(100) NOT NULL,
+  `phone` varchar(50) NOT NULL,
+  `address` varchar(300) NOT NULL,
   `password` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -1632,24 +1655,24 @@ CREATE TABLE `user` (
 -- Volcado de datos para la tabla `user`
 --
 
-INSERT INTO `user` (`id`, `first_name`, `last_name`, `username`, `email`, `password`) VALUES
-(42, 'Admin', 'Admin', 'Admin', 'Admin@gmail.com', '123456'),
-(44, 'vicerrector', 'vicerrector', 'vicerrector', 'vicerrector@gmail.com', '123456'),
-(54, 'Ingeneria', 'Ingeneria', 'INGENIERIA', 'Ingeneria@gmail.com', '123456'),
-(55, 'aja', 'aja', 'aja', 'aja@gmail.com', '123456'),
-(56, 'Face', 'face', 'FACE', 'Face_estudiante@gmail.com', '123456'),
-(57, 'Facyt', 'Facyt', 'FACYT', 'Facyt_estudiante@gmail.com', '123'),
-(58, 'Faces', 'Faces', 'FACES', 'Faces@gmail.com', '123456'),
-(59, 'Fcs', 'Fcs', 'FCS', 'Fcs@gmail.com', '123456'),
-(60, 'odontologia', 'odontologia', 'ODONTOLOGIA', 'odontologia_estudiante@gmail.com', '123456'),
-(61, 'derecho_estudiante', 'derecho_estudiante', 'FCJP', 'Fcjp_estudiante@gmail.com', '12345'),
-(62, 'Facyt', 'Facyt', 'Facyt_docente', 'Facyt@gmail.com', '123'),
-(63, 'Face', 'Face', 'Face_docente', 'Face_docente@hotmail.com', '123'),
-(64, 'Fcjp', 'Fcjp', 'Fcjp_docente', 'Fcjp_docente@gmail.com', '123'),
-(65, 'Odontologia', 'Odontologia', 'Odontologia_docente', 'Odontologia_docente@gmail.com', '123'),
-(66, 'Fcs', 'Fcs', 'Fcs_docente', 'Fcs_docente@gmail.com', '123'),
-(67, 'Faces', 'Faces', 'Faces_docente', 'Faces_docente@gmail.com', '123'),
-(68, 'Ingeneria', 'Ingeneria', 'Ingeneria_docente', 'Ingeneria_docente@gmail.com', '123');
+INSERT INTO `user` (`id`, `first_name`, `last_name`, `username`, `email`, `phone`, `address`, `password`) VALUES
+(42, 'Admin', 'Admin', 'Admin', 'Admin@gmail.com', '04122345768', 'direccion administrador', '123456'),
+(44, 'vicerrector', 'vicerrector', 'vicerrector', 'vicerrector@gmail.com', '04122345768', 'direccion', '123456'),
+(54, 'Ingeneria', 'Ingeneria', 'INGENIERIA', 'Ingeneria@gmail.com', '04122345768', 'direccion', '123456'),
+(55, 'aja', 'aja', 'aja', 'aja@gmail.com', '04122345768', 'direccion', '123456'),
+(56, 'Face', 'face', 'FACE', 'Face_estudiante@gmail.com', '04122345768', 'direccion', '123456'),
+(57, 'Facyt', 'Facyt', 'FACYT', 'Facyt_estudiante@gmail.com', '04122345768', 'direccion', '123'),
+(58, 'Faces', 'Faces', 'FACES', 'Faces@gmail.com', '04122345768', 'direccion', '123456'),
+(59, 'Fcs', 'Fcs', 'FCS', 'Fcs@gmail.com', '04122345768', 'direccion', '123456'),
+(60, 'odontologia', 'odontologia', 'ODONTOLOGIA', 'odontologia_estudiante@gmail.com', '04122345768', 'direccion', '123456'),
+(61, 'derecho_estudiante', 'derecho_estudiante', 'FCJP', 'Fcjp_estudiante@gmail.com', '04122345768', 'direccion', '12345'),
+(62, 'Facyt', 'Facyt', 'Facyt_docente', 'Facyt@gmail.com', '04122345768', 'direccion', '123'),
+(63, 'Face', 'Face', 'Face_docente', 'Face_docente@hotmail.com', '04122345768', 'direccion', '123'),
+(64, 'Fcjp', 'Fcjp', 'Fcjp_docente', 'Fcjp_docente@gmail.com', '04122345768', 'direccion', '123'),
+(65, 'Odontologia', 'Odontologia', 'Odontologia_docente', 'Odontologia_docente@gmail.com', '04122345768', 'direccion', '123'),
+(66, 'Fcs', 'Fcs', 'Fcs_docente', 'Fcs_docente@gmail.com', '04122345768', 'direccion', '123'),
+(67, 'Faces', 'Faces', 'Faces_docente', 'Faces_docente@gmail.com', '04122345768', 'direccion', '123'),
+(68, 'Ingeneria', 'Ingeneria', 'Ingeneria_docente', 'Ingeneria_docente@gmail.com', '04122345768', 'direccion', '123');
 
 -- --------------------------------------------------------
 
@@ -1995,7 +2018,8 @@ ALTER TABLE `fact_egresado_estudiosuc`
   ADD KEY `id_egresado` (`id_egresado`),
   ADD KEY `id_estudiosuc` (`id_estudiosuc`),
   ADD KEY `id_facultad` (`id_facultad`),
-  ADD KEY `id_carrera` (`id_carrera`);
+  ADD KEY `id_carrera` (`id_carrera`),
+  ADD KEY `id_ano` (`id_ano`);
 
 --
 -- Indices de la tabla `fact_egresado_patentes`
@@ -2358,7 +2382,7 @@ ALTER TABLE `fact_estudiante_facultad`
 -- AUTO_INCREMENT de la tabla `history_action`
 --
 ALTER TABLE `history_action`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=148;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=168;
 
 --
 -- AUTO_INCREMENT de la tabla `parametro_sistema`
@@ -2382,13 +2406,13 @@ ALTER TABLE `role`
 -- AUTO_INCREMENT de la tabla `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
 
 --
 -- AUTO_INCREMENT de la tabla `user_role`
 --
 ALTER TABLE `user_role`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
 
 --
 -- Restricciones para tablas volcadas
@@ -2480,7 +2504,8 @@ ALTER TABLE `fact_egresado_estudiosuc`
   ADD CONSTRAINT `fact_egresado_estudiosuc_ibfk_1` FOREIGN KEY (`id_facultad`) REFERENCES `dim_facultad` (`id`),
   ADD CONSTRAINT `fact_egresado_estudiosuc_ibfk_2` FOREIGN KEY (`id_estudiosuc`) REFERENCES `dim_estudiosuc` (`id`),
   ADD CONSTRAINT `fact_egresado_estudiosuc_ibfk_3` FOREIGN KEY (`id_carrera`) REFERENCES `dim_carrera` (`id`),
-  ADD CONSTRAINT `fact_egresado_estudiosuc_ibfk_4` FOREIGN KEY (`id_egresado`) REFERENCES `dim_egresado` (`id`);
+  ADD CONSTRAINT `fact_egresado_estudiosuc_ibfk_4` FOREIGN KEY (`id_egresado`) REFERENCES `dim_egresado` (`id`),
+  ADD CONSTRAINT `fact_egresado_estudiosuc_ibfk_5` FOREIGN KEY (`id_ano`) REFERENCES `dim_ano` (`id`);
 
 --
 -- Filtros para la tabla `fact_egresado_patentes`

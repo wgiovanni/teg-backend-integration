@@ -26,7 +26,7 @@ from resources.GraduateJobs import GraduateJobs
 from resources.GraduateCourses import GraduateCourses
 from resources.GraduateCertification import GraduateCertification
 from resources.GraduateEducation import GraduateEducation
-from resources.GraduateStudiosUc import GraduateStudiosUc
+from resources.GraduateStudiosUc import GraduateFaculty, GraduatePerYear, GraduateFacultyYear
 from resources.GraduateVolunteering import GraduateVolunteering
 from resources.Carga import Carga
 from resources.Full import Year, Faculty
@@ -154,7 +154,13 @@ api.add_resource(GraduateJobs, '/egresado-trabajos')
 api.add_resource(GraduateCourses, '/egresado-cursos')
 api.add_resource(GraduateCertification, '/egresado-certificacion')
 api.add_resource(GraduateEducation, '/egresado-educacion')
-api.add_resource(GraduateStudiosUc, '/egresado-estudios')
+# cantidad de egresados por facultad
+api.add_resource(GraduateFaculty, '/egresado-facultad')
+# cantidad de egresados por año
+api.add_resource(GraduatePerYear, '/egresado-ano')
+# cantidad de egresados por facultad y año
+api.add_resource(GraduateFacultyYear, '/egresado-ano-facultad')
+
 api.add_resource(GraduateVolunteering, '/egresado-voluntariado')
 
 api.add_resource(Carga, '/carga')

@@ -6,6 +6,7 @@ from flask import make_response
 from pymysql import DatabaseError
 from common.BD import BD
 from datetime import datetime
+from constants import ROLE_USER_TEACHER
 
 workspace = Workspace()
 workspace.register_default_store("sql", url="mysql+mysqlconnector://root@localhost/prueba")
@@ -42,12 +43,7 @@ class TeacherPublication(BD, Resource):
                 
                 teacher["publicaciones"] = publications
                 result.append(teacher)
-
-                    
-            #print(int(r.summary["sumatoria"]))
-            #print(int(r.summary["sumatoria_citacion"]))
-            
-            #result = {"total-estudiantes": int(r.summary["sumatoria"])}
+                
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
@@ -61,7 +57,6 @@ class TeacherPublicationFaculty(BD, Resource):
             facultyList = self.queryAll("SELECT * FROM dim_facultad")
             result = []
             for faculty in facultyList:
-                print(faculty)
                 cut = PointCut("dim_facultad", [faculty['id']])
                 cell = Cell(browser.cube, cuts = [cut])
                 r = browser.aggregate(cell, drilldown=["dim_publicacion", "dim_facultad"])
@@ -84,9 +79,19 @@ class TeacherPublicationFaculty(BD, Resource):
                     "facultad": row['dim_facultad.nombre']
                 }
                 items.append(item)
+            retreived = []
+            retreived = self.queryAll(dedent("""\
+            SELECT u.first_name, u.email, u.phone, u.address 
+            FROM role as r 
+            INNER JOIN user_role as ur 
+            ON (r.id = ur.id_role) 
+            INNER JOIN user as u 
+            ON (ur.id_user = u.id) 
+            WHERE r.name = %s"""), [ROLE_USER_TEACHER])
             response = {
                 "facultades": result,
-                "items": items
+                "items": items,
+                "recuperado": retreived
             }         
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
@@ -125,9 +130,19 @@ class TeacherCiteFaculty(BD, Resource):
                     "facultad": row['dim_facultad.nombre']
                 }
                 items.append(item)
+            retreived = []
+            retreived = self.queryAll(dedent("""\
+            SELECT u.first_name, u.email, u.phone, u.address 
+            FROM role as r 
+            INNER JOIN user_role as ur 
+            ON (r.id = ur.id_role) 
+            INNER JOIN user as u 
+            ON (ur.id_user = u.id) 
+            WHERE r.name = %s"""), [ROLE_USER_TEACHER])
             response = {
                 "facultades": result,
-                "items": items
+                "items": items,
+                "recuperado": retreived
             }        
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))

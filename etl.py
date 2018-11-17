@@ -725,6 +725,7 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 
 					target_cursor.execute(studiosUcQuery.get_query_code, [studiosUcCode])
 					idStudiosUc = target_cursor.fetchone()
+					idYear = idStudiosUc[1].split("-")
 
 					target_cursor.execute(facultyQuery.get_query_code, [facultyCode])
 					idFaculty = target_cursor.fetchone()
@@ -735,8 +736,8 @@ def distributionCargaInitial(target_cnx, table: str, content: dict):
 					if idStudiosUc is not None and idFaculty is not None and idProfession is not None and idGraduate is not None:
 						target_cursor.execute(dedent("""\
 						INSERT INTO FACT_EGRESADO_ESTUDIOSUC 
-							(id_egresado, id_estudiosuc, id_facultad, id_carrera)
-						VALUES (%s, %s, %s, %s)"""), [idGraduate[0], idStudiosUc[0], idFaculty[0], idProfession[0]])
+							(id_egresado, id_estudiosuc, id_facultad, id_carrera, id_ano)
+						VALUES (%s, %s, %s, %s, %s)"""), [idGraduate[0], idStudiosUc[0], idFaculty[0], idProfession[0], idYear[0]])
 						target_cnx.commit()
 					else: 
 						print("Error")
@@ -1959,6 +1960,49 @@ def distributionUpdate(target_cnx, table: str, content: dict):
 						INSERT INTO fact_egresado_voluntariado 
 						(id_egresado, id_voluntariado)
 						VALUES (%s, %s)"""), [idGraduate[0], idVolunteering[0]])
+						print("Registro insertado")
+						
+					target_cnx.commit()
+		print("Actualizacion finalizada")
+
+	elif table == "egresado-estudiosuc":
+		items = content[ITEMS]
+		for item in items:
+			target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
+			idGraduate = target_cursor.fetchone()
+
+			studiosUcList = item["estudiosuc"]
+
+			if studiosUcList is not None:
+				for i in studiosUcList:
+					studiosUcCode = i['codigo']
+					facultyCode = i['facultad']
+					professionCode = i['carrera']
+
+					target_cursor.execute(studiosUcQuery.get_query_code, [studiosUcCode])
+					idStudiosUc = target_cursor.fetchone()
+					idYear = idStudiosUc[1].split("-")
+
+					target_cursor.execute(facultyQuery.get_query_code, [facultyCode])
+					idFaculty = target_cursor.fetchone()
+
+					target_cursor.execute(professionQuery.get_query_code, [professionCode])
+					idProfession = target_cursor.fetchone()
+
+					target_cursor.execute(graduateStudiosUcRelationship.get_query_code, [studiosUcCode])
+					idFact = target_cursor.fetchone()
+
+					if idFact is not None:
+						target_cursor.execute(dedent("""\
+						UPDATE fact_egresado_estudiosuc
+						SET id_egresado=%s, id_estudios=%s, id_facultad=%s, id_carrera=%s, id_ano=%s 
+						WHERE id=%s;"""), [idGraduate[0], idStudiosUc[0], idFaculty[0], idProfession[0], idYear[0], idFact[0]])
+						print("Registro actualizado")
+					else:
+						target_cursor.execute(dedent("""\
+						INSERT INTO fact_egresado_estudiosuc 
+						(id_egresado, id_estudiosuc, id_facultad, id_carrera, id_ano)
+						VALUES (%s, %s, %s, %s, %s)"""), [idGraduate[0], idStudiosUc[0], idFaculty[0], idProfession[0], idYear[0]])
 						print("Registro insertado")
 						
 					target_cnx.commit()

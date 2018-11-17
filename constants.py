@@ -44,5 +44,6 @@ NATIONAL = "Venezolano"
 INTERNACIONAL = "Extranjero"
 
 ROLE_USER_STUDENT = "facultad_estudiante"
+ROLE_USER_TEACHER = "facultad_docente"
 
 

@@ -209,6 +209,12 @@ get_relationship_graduate_volunteering = dedent("""\
 	ON (fact.id_voluntariado = v.id) 
 	WHERE v.codigo = %s""")
 
+get_relationship_graduate_studiosuc = dedent("""\
+	SELECT fact.id
+	FROM fact_egresado_estudiosuc AS fact
+	INNER JOIN dim_estudiosuc AS v
+	ON (fact.id_estudiosuc = v.id) 
+	WHERE v.codigo = %s""")
 
 # consulta para escalafon
 get_scale_code = dedent("""\
@@ -266,7 +272,7 @@ update_graduate = dedent("""\
 	
 # consultas para estudios uc
 get_estudiosUc_code = dedent("""\
-	SELECT id FROM dim_estudiosuc WHERE codigo = %s""")
+	SELECT id, anho_grado FROM dim_estudiosuc WHERE codigo = %s""")
 
 insert_estudiosUc = dedent("""\
 	INSERT INTO dim_estudiosuc
@@ -343,6 +349,7 @@ graduateCertificationRelationship = SqlFactRelationship(get_relationship_graduat
 graduateCoursesRelationship = SqlFactRelationship(get_relationship_graduate_courses)
 graduateEducationRelationship = SqlFactRelationship(get_relationship_graduate_education)
 graduateVolunteeringRelationship = SqlFactRelationship(get_relationship_graduate_volunteering)
+graduateStudiosUcRelationship = SqlFactRelationship(get_relationship_graduate_studiosuc)
 certificationQuery = SqlTableSameParse(get_certification_code)
 coursesQuery = SqlTableSameParse(get_courses_code)
 educationQuery = SqlTableSameParse(get_education_code)

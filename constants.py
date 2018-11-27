@@ -1,6 +1,6 @@
 LOAD_INITIAL_UPDATE = "CARGA_INICIAL_ACTUALIZACION"
 ENDPOINT_LOAD_STUDENTS = "RUTA_CARGA_ESTUDIANTES"
-ENDPOINT_LOAD_TEACHERS = "RUTA_CARGA_PROFESORES"
+ENDPOINT_LOAD_TEACHERS = "RUTA_CARGA_DOCENTES"
 ENDPOINT_LOAD_GRADUATES = "RUTA_CARGA_EGRESADOS"
 DATE_UPDATE = "FECHA_ACTUALIZACION"
 
@@ -47,3 +47,72 @@ ROLE_USER_STUDENT = "facultad_estudiante"
 ROLE_USER_TEACHER = "facultad_docente"
 
 
+# constantes de tablas precargadas
+STATUS_ACTIVE = "Active"
+STATUS_INACTIVE = "Inactivo"
+
+ETNIA_FALSE = "NO PERTENEZCO A UN PUEBLO INDIGENA"
+ETNIA_TRUE = "SI PERTENEZCO A UN PUEBLO INDIGENA"
+
+DISABILITY_FALSE = "NO POSEO NINGUNA DISCAPACIDAD"
+DISABILITY_TRUE = "SI POSEO DISCAPACIDAD"
+
+UNDERGRADUATE = "Pregrado"
+POSTGRADUATE = "Postgrado"
+
+TYPE_TEACHER = [
+    {
+        "codigo": "Investigador"
+    },
+    {
+        "codigo": "Contratado"
+    },
+    {
+        "codigo": "Normal"
+    }
+]
+
+FACULTIES = [
+    {
+        "codigo": "INGENIERIA",
+        "nombre": "Ingeniería"
+    },
+    {
+        "codigo": "FCJP",
+        "nombre": "Ciencias Jurídicas y Políticas"
+    },
+    {
+        "codigo": "FCS",
+        "nombre": "Ciencias de la Salud"
+    },
+    {
+        "codigo": "FACES",
+        "nombre": "Ciencias de la Educación"
+    },
+    {
+        "codigo": "ODONTOLOGIA",
+        "nombre": "Odontología"
+    },
+    {
+        "codigo": "FACYT",
+        "nombre": "Ciencias y Tecnología"
+    }
+]
+
+LIST_SCALE = [
+    {
+        "nombre": "Instructor"
+    },
+    {
+        "nombre": "Asistente"
+    },
+    {
+        "nombre": "Agregado"
+    },
+    {
+        "nombre": "Asociado"
+    },
+    {
+        "nombre": "Titular"
+    }
+]

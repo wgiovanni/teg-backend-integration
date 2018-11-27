@@ -64,11 +64,11 @@ class StudentPerYear(BD, Resource):
             parameterYear2 = parameter['hasta']
             result = []
             if type(parameterYear1) is int and type(parameterYear2) is int:
-                year = self.queryAll("SELECT * FROM dim_ano where id >= %s and id <= %s order by codigo ASC", [parameterYear1, parameterYear2])
+                year = self.queryAll("SELECT * FROM dim_tiempo where id >= %s and id <= %s order by codigo ASC", [parameterYear1, parameterYear2])
                 for y in year:
-                    cut = PointCut("dim_ano", [y['id']])
+                    cut = PointCut("dim_tiempo", [y['id']])
                     cell = Cell(browser.cube, cuts = [cut])
-                    r = browser.aggregate(cell, drilldown = ["dim_ano"])
+                    r = browser.aggregate(cell, drilldown = ["dim_tiempo"])
                     item = {
                         "ano": y['codigo'],
                         "total": int(r.summary["sumatoria"])
@@ -96,11 +96,11 @@ class StudentPerYear(BD, Resource):
                 result = auxResult
 
             if type(parameterYear1) is str and type(parameterYear2) is str:
-                year = self.queryAll("SELECT * FROM dim_ano ORDER BY codigo ASC")
+                year = self.queryAll("SELECT * FROM dim_tiempo ORDER BY codigo ASC")
                 for y in year:
-                    cut = PointCut("dim_ano", [y['id']])
+                    cut = PointCut("dim_tiempo", [y['id']])
                     cell = Cell(browser.cube, cuts = [cut])
-                    r = browser.aggregate(cell, drilldown = ["dim_ano"])
+                    r = browser.aggregate(cell, drilldown = ["dim_tiempo"])
                     item = {
                         "ano": y['codigo'],
                         "total": int(r.summary["sumatoria"])
@@ -128,11 +128,11 @@ class StudentPerYear(BD, Resource):
                 result = auxResult
             
             if type(parameterYear1) is str and type(parameterYear2) is int:
-                year = self.queryAll("SELECT * FROM dim_ano WHERE id <= %s ORDER BY codigo ASC", [parameterYear2])
+                year = self.queryAll("SELECT * FROM dim_tiempo WHERE id <= %s ORDER BY codigo ASC", [parameterYear2])
                 for y in year:
-                    cut = PointCut("dim_ano", [y['id']])
+                    cut = PointCut("dim_tiempo", [y['id']])
                     cell = Cell(browser.cube, cuts = [cut])
-                    r = browser.aggregate(cell, drilldown = ["dim_ano"])
+                    r = browser.aggregate(cell, drilldown = ["dim_tiempo"])
                     item = {
                         "ano": y['codigo'],
                         "total": int(r.summary["sumatoria"])
@@ -161,11 +161,11 @@ class StudentPerYear(BD, Resource):
                 result = auxResult
 
             if type(parameterYear1) is int and type(parameterYear2) is str:
-                year = self.queryAll("SELECT * FROM dim_ano WHERE id >= %s ORDER BY codigo ASC", [parameterYear1])
+                year = self.queryAll("SELECT * FROM dim_tiempo WHERE id >= %s ORDER BY codigo ASC", [parameterYear1])
                 for y in year:
-                    cut = PointCut("dim_ano", [y['id']])
+                    cut = PointCut("dim_tiempo", [y['id']])
                     cell = Cell(browser.cube, cuts = [cut])
-                    r = browser.aggregate(cell, drilldown = ["dim_ano"])
+                    r = browser.aggregate(cell, drilldown = ["dim_tiempo"])
                     item = {
                         "ano": y['codigo'],
                         "total": int(r.summary["sumatoria"])
@@ -228,13 +228,13 @@ class StudentYearFaculty(BD, Resource):
             result = []
             if type(parameterYear1) is int and type(parameterYear2) is int:
                 facultad = self.queryOne("SELECT * FROM dim_facultad WHERE id = %s", [parameterFaculty])
-                year = self.queryAll("SELECT * FROM dim_ano where id >= %s and id <= %s order by codigo ASC", [parameterYear1, parameterYear2])
+                year = self.queryAll("SELECT * FROM dim_tiempo where id >= %s and id <= %s order by codigo ASC", [parameterYear1, parameterYear2])
                 cut = PointCut("dim_facultad", [facultad['id']])
                 cell = Cell(browser.cube, cuts = [cut])
-                r = browser.aggregate(cell, drilldown = ["dim_ano", "dim_facultad"])
+                r = browser.aggregate(cell, drilldown = ["dim_tiempo", "dim_facultad"])
                 for row in r:
                     item = {
-                        "ano": row['dim_ano.codigo'],
+                        "ano": row['dim_tiempo.codigo'],
                         "total": int(row["sumatoria"])
                     }
                     result.append(item)
@@ -260,14 +260,14 @@ class StudentYearFaculty(BD, Resource):
 
             if type(parameterYear1) is str and type(parameterYear2) is str:
                 facultad = self.queryOne("SELECT * FROM dim_facultad WHERE id = %s", [parameterFaculty])
-                year = self.queryAll("SELECT * FROM dim_ano ORDER BY codigo ASC")
+                year = self.queryAll("SELECT * FROM dim_tiempo ORDER BY codigo ASC")
                 cut = PointCut("dim_facultad", [facultad['id']])
                 cell = Cell(browser.cube, cuts = [cut])
-                r = browser.aggregate(cell, drilldown = ["dim_ano", "dim_facultad"])
+                r = browser.aggregate(cell, drilldown = ["dim_tiempo", "dim_facultad"])
                 for row in r:
                     #print(row)
                     item = {
-                        "ano": row['dim_ano.codigo'],
+                        "ano": row['dim_tiempo.codigo'],
                         "total": int(row["sumatoria"])
                     }
                     result.append(item)
@@ -295,13 +295,13 @@ class StudentYearFaculty(BD, Resource):
             
             if type(parameterYear1) is str and type(parameterYear2) is int:
                 facultad = self.queryOne("SELECT * FROM dim_facultad WHERE id = %s", [parameterFaculty])
-                year = self.queryAll("SELECT * FROM dim_ano WHERE id <= %s ORDER BY codigo ASC", [parameterYear2])
+                year = self.queryAll("SELECT * FROM dim_tiempo WHERE id <= %s ORDER BY codigo ASC", [parameterYear2])
                 cut = PointCut("dim_facultad", [facultad['id']])
                 cell = Cell(browser.cube, cuts = [cut])
-                r = browser.aggregate(cell, drilldown = ["dim_ano", "dim_facultad"])
+                r = browser.aggregate(cell, drilldown = ["dim_tiempo", "dim_facultad"])
                 for row in r:
                     item = {
-                        "ano": row['dim_ano.codigo'],
+                        "ano": row['dim_tiempo.codigo'],
                         "total": int(row["sumatoria"])
                     }
                     result.append(item)
@@ -328,13 +328,13 @@ class StudentYearFaculty(BD, Resource):
 
             if type(parameterYear1) is int and type(parameterYear2) is str:
                 facultad = self.queryOne("SELECT * FROM dim_facultad WHERE id = %s", [parameterFaculty])
-                year = self.queryAll("SELECT * FROM dim_ano WHERE id >= %s ORDER BY codigo ASC", [parameterYear1])
+                year = self.queryAll("SELECT * FROM dim_tiempo WHERE id >= %s ORDER BY codigo ASC", [parameterYear1])
                 cut = PointCut("dim_facultad", [facultad['id']])
                 cell = Cell(browser.cube, cuts = [cut])
-                r = browser.aggregate(cell, drilldown = ["dim_ano", "dim_facultad"])
+                r = browser.aggregate(cell, drilldown = ["dim_tiempo", "dim_facultad"])
                 for row in r:
                     item = {
-                        "ano": row['dim_ano.codigo'],
+                        "ano": row['dim_tiempo.codigo'],
                         "total": int(row["sumatoria"])
                     }
                     result.append(item)
@@ -485,15 +485,15 @@ class StudentMaleFaculty(BD, Resource):
     def get(self):
         try:
             params = "Masculino"
-            result = self.queryOne("SELECT * FROM DIM_SEXO WHERE CODIGO = %s", [params])
+            result = self.queryOne("SELECT * FROM dim_genero WHERE CODIGO = %s", [params])
             if result is None:
                 abort(404, message="Resource {} doesn't exists".format(params))
-            cut = PointCut("dim_sexo", [result['id']])
+            cut = PointCut("dim_genero", [result['id']])
             cell = Cell(browser.cube, cuts = [cut])
-            r = browser.aggregate(cell, drilldown=["dim_sexo", "dim_facultad"])
+            r = browser.aggregate(cell, drilldown=["dim_genero", "dim_facultad"])
             result = []
             for row in r:
-                item = {"sexo": row['dim_sexo.codigo'], "facultad": row['dim_facultad.nombre'], "total": row['sumatoria']}
+                item = {"sexo": row['dim_genero.codigo'], "facultad": row['dim_facultad.nombre'], "total": row['sumatoria']}
                 result.append(item)
             
         except DatabaseError as e:
@@ -510,15 +510,15 @@ class StudentFemaleFaculty(BD, Resource):
     def get(self):
         try:
             params = "Femenino"
-            result = self.queryOne("SELECT * FROM DIM_SEXO WHERE CODIGO = %s", [params])
+            result = self.queryOne("SELECT * FROM dim_genero WHERE CODIGO = %s", [params])
             if result is None:
                 abort(404, message="Resource {} doesn't exists".format(params))
-            cut = PointCut("dim_sexo", [result['id']])
+            cut = PointCut("dim_genero", [result['id']])
             cell = Cell(browser.cube, cuts = [cut])
-            r = browser.aggregate(cell, drilldown=["dim_sexo", "dim_facultad"])
+            r = browser.aggregate(cell, drilldown=["dim_genero", "dim_facultad"])
             result = []
             for row in r:
-                item = {"sexo": row['dim_sexo.codigo'], "facultad": row['dim_facultad.nombre'], "total": row['sumatoria']}
+                item = {"sexo": row['dim_genero.codigo'], "facultad": row['dim_facultad.nombre'], "total": row['sumatoria']}
                 result.append(item)
         except DatabaseError as e:
             self.rollback()
@@ -535,7 +535,7 @@ class StudentSexFaculty(BD, Resource):
         try:
             facultades = self.queryAll("SELECT codigo FROM DIM_FACULTAD")
             
-            r = browser.aggregate(drilldown=["dim_sexo", "dim_facultad"])
+            r = browser.aggregate(drilldown=["dim_genero", "dim_facultad"])
             for row in r:
                 print(row)
             result = []
@@ -543,11 +543,11 @@ class StudentSexFaculty(BD, Resource):
 
             for f in facultades:
                 item = {"facultad": f['codigo']}
-                r = browser.aggregate(drilldown=["dim_sexo", "dim_facultad"])
+                r = browser.aggregate(drilldown=["dim_genero", "dim_facultad"])
                 for row in r:
-                    if f['codigo'] == row['dim_facultad.codigo'] and row['dim_sexo.codigo'] == "Femenino":
+                    if f['codigo'] == row['dim_facultad.codigo'] and row['dim_genero.codigo'] == "Femenino":
                         item['femenino'] = row['sumatoria']
-                    if f['codigo'] == row['dim_facultad.codigo'] and row['dim_sexo.codigo'] == "Masculino":
+                    if f['codigo'] == row['dim_facultad.codigo'] and row['dim_genero.codigo'] == "Masculino":
                         item["masculino"] = row['sumatoria']
                 if item.get('femenino') is None:
                     item['femenino'] = 0
@@ -557,7 +557,7 @@ class StudentSexFaculty(BD, Resource):
 
             result = sorted(result, key=lambda k: k['facultad'])
 
-            r2 = browser.aggregate(drilldown=["dim_sexo", "dim_estudiante", "dim_facultad"])
+            r2 = browser.aggregate(drilldown=["dim_genero", "dim_estudiante", "dim_facultad"])
             items = []
             for i in r2:
                 item = {
@@ -568,7 +568,7 @@ class StudentSexFaculty(BD, Resource):
                     "telefono1": i['dim_estudiante.telefono1'],
                     "email": i['dim_estudiante.email'],
                     "estado_procedencia": i['dim_estudiante.edo_procedencia'],
-                    "sexo": i['dim_sexo.codigo'],
+                    "sexo": i['dim_genero.codigo'],
                     "facultad": i['dim_facultad.nombre']
                 }
                 items.append(item)
@@ -861,13 +861,13 @@ class StudentUndergraduateSex(BD, Resource):
             
             cut = PointCut("dim_tipo_estudiante", [result['id']])
             cell = Cell(browser.cube, cuts = [cut])
-            r = browser.aggregate(cell, drilldown=["dim_tipo_estudiante", "dim_sexo"])
+            r = browser.aggregate(cell, drilldown=["dim_tipo_estudiante", "dim_genero"])
             result = {}
             for row in r:
                 print(row)
-                result[row['dim_sexo.codigo']] = row['sumatoria'] 
+                result[row['dim_genero.codigo']] = row['sumatoria'] 
 
-            r = browser.aggregate(drilldown=["dim_estudiante", "dim_tipo_estudiante", "dim_sexo"])
+            r = browser.aggregate(drilldown=["dim_estudiante", "dim_tipo_estudiante", "dim_genero"])
             items = []
             for i in r:
                 item = {
@@ -876,7 +876,7 @@ class StudentUndergraduateSex(BD, Resource):
                     "apellido": i['dim_estudiante.apellido'],
                     "email": i['dim_estudiante.email'],
                     "tipo": i['dim_tipo_estudiante.codigo'],
-                    "sexo": i['dim_sexo.codigo']
+                    "sexo": i['dim_genero.codigo']
                 }
                 items.append(item)
             result["total-estudiantes-pregrado"] = r.summary["sumatoria"]
@@ -911,6 +911,7 @@ class StudentUndergraduateNacionality(BD, Resource):
             cell = Cell(browser.cube, cuts = [cut])
             r = browser.aggregate(cell, drilldown=["dim_tipo_estudiante", "dim_nacionalidad"])
             result = {}
+            result["total-estudiantes-pregrado"] = r.summary["sumatoria"]
             for row in r:
                 print(row)
                 result[row['dim_nacionalidad.codigo']] = row['sumatoria'] 
@@ -927,11 +928,11 @@ class StudentUndergraduateNacionality(BD, Resource):
                 }
                 items.append(item)
                 
-            if result.get('Extrajero') is None:
+            if result.get('Extranjero') is None:
                 result['Extranjero'] = 0
             if result.get('Venezolano') is None:
                 result['Venezolano'] = 0
-            result["total-estudiantes-pregrado"] = r.summary["sumatoria"]
+             
             result['items'] = items
             retreived = []
             retreived = self.queryAll(dedent("""\

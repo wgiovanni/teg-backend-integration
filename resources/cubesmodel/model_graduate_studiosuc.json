@@ -23,7 +23,7 @@
           ]
         },
         {
-            "name":"dim_ano",
+            "name":"dim_tiempo",
             "levels": [
                 {
                     "name":"ano",
@@ -59,7 +59,7 @@
     "cubes": [
         {
             "name": "fact_egresado_estudiosuc",
-            "dimensions": ["dim_egresado", "dim_estudiosuc", "dim_ano", "dim_facultad", "dim_carrera"],
+            "dimensions": ["dim_egresado", "dim_estudiosuc", "dim_tiempo", "dim_facultad", "dim_carrera"],
             "measures": [
                 {"name": "cantidad", "label": "Cantidad"}
             ],
@@ -80,8 +80,8 @@
                     "detail": "dim_estudiosuc.id"
                 },
                 {
-                    "master": "fact_egresado_estudiosuc.id_ano",
-                    "detail": "dim_ano.id"
+                    "master": "fact_egresado_estudiosuc.id_tiempo",
+                    "detail": "dim_tiempo.id"
                 },
                 {
                     "master": "fact_egresado_estudiosuc.id_facultad",
@@ -108,8 +108,8 @@
               "dim_estudiosuc.codigo": "dim_estudiosuc.codigo",
               "dim_estudiosuc.anho_grado": "dim_estudiosuc.anho_grado",
               "dim_estudiosuc.url_certificacion": "dim_estudiosuc.url_certificacion",
-              "dim_ano.id": "dim_ano.id",
-              "dim_ano.codigo": "dim_ano.codigo",
+              "dim_tiempo.id": "dim_tiempo.id",
+              "dim_tiempo.codigo": "dim_tiempo.codigo",
               "dim_facultad.id": "dim_facultad.id",
               "dim_facultad.codigo": "dim_facultad.codigo",
               "dim_facultad.nombre": "dim_facultad.nombre",

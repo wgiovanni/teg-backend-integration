@@ -13,7 +13,6 @@ from resources.Student import Student, StudentMaleFaculty, StudentFemaleFaculty,
 from resources.Student import StudentEthnicGroupFaculty, StudentDisabilityFaculty, StudentInternacionalFaculty, StudentNacionalFaculty 
 from resources.Student import StudentNationalityFaculty, StudentProfessionFaculty, StudentProfessionConstantsFaculty, StudentInternacional 
 from resources.Student import StudentFaculty, StudentUndergraduateNacionality, StudentPerYear, StudentYearFaculty
-from resources.InscribedCourse import InscribedCourseStudent, InscribedCourseStudentFaculty
 from resources.TeacherPublication import TeacherPublication, TeacherPublicationFaculty, TeacherCiteFaculty, TeacherCitePublication
 from resources.Teacher import Teacher, TeacherSexFaculty, TeacherScale, TeacherNacionalityFaculty, TeacherWithDoctorateFaculty, TeacherGradeFaculty, TeacherWithDoctorate, TeacherInternacionals, TeacherNational
 from resources.TeacherTitle import TeacherTitle, TeacherTitleFaculty
@@ -31,7 +30,7 @@ from resources.GraduateVolunteering import GraduateVolunteering
 from resources.Carga import Carga
 from resources.Full import Year, Faculty
 # metodos
-from etl import etl_process2
+from etl import etl_process
 
 def sensor():
 	#print(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) # Se obtiene local para la actualizacion de la data cuando se ejecute el job
@@ -57,7 +56,7 @@ CORS(app)
 @app.route('/')
 def extraction():
 	#target_cnx = mysql.connector.connect(**datawarehouse_db_config)
-	etl_process2()
+	etl_process()
 	
 	return "Hola mundo"
 
@@ -102,10 +101,6 @@ api.add_resource(StudentUndergraduateNacionality, '/estudiantes-pregrado-naciona
 api.add_resource(StudentPerYear, '/estudiantes-ano')
 # cantidad de estudiantes por facultad y por año
 api.add_resource(StudentYearFaculty, '/estudiantes-ano-facultad')
-
-# Cube para las materias inscritas
-api.add_resource(InscribedCourseStudent, '/asignatura-inscrita-estudiante')
-api.add_resource(InscribedCourseStudentFaculty, '/asignatura-inscrita-estudiante/<facultad_codigo>')
 
 
 # docentes

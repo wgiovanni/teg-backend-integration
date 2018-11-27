@@ -23,7 +23,7 @@
           ]
         },
         {
-            "name":"dim_sexo",
+            "name":"dim_genero",
             "levels": [
               {
                 "name": "sexo",
@@ -71,7 +71,7 @@
     "cubes": [
         {
             "name": "fact_docente_facultad",
-            "dimensions": ["dim_docente", "dim_facultad", "dim_sexo", "dim_tipo_docente", "dim_escalafon", "dim_nacionalidad"],
+            "dimensions": ["dim_docente", "dim_facultad", "dim_genero", "dim_tipo_docente", "dim_escalafon", "dim_nacionalidad"],
             "measures": [
                 {"name": "cantidad", "label": "Cantidad"}
             ],
@@ -92,11 +92,11 @@
                     "detail": "dim_facultad.id"
                 },
                 {
-                    "master": "fact_docente_facultad.id_sexo",
-                    "detail": "dim_sexo.id"
+                    "master": "fact_docente_facultad.id_genero",
+                    "detail": "dim_genero.id"
                 },
                 {
-                    "master": "fact_docente_facultad.id_tipo",
+                    "master": "fact_docente_facultad.id_tipo_docente",
                     "detail": "dim_tipo_docente.id"
                 },
                 {
@@ -121,8 +121,8 @@
                 "dim_facultad.id": "dim_facultad.id",
                 "dim_facultad.codigo": "dim_facultad.codigo",
                 "dim_facultad.nombre": "dim_facultad.nombre",
-                "dim_sexo.id": "dim_sexo.id",
-                "dim_sexo.codigo": "dim_sexo.codigo",
+                "dim_genero.id": "dim_genero.id",
+                "dim_genero.codigo": "dim_genero.codigo",
                 "dim_nacionalidad.id": "dim_nacionalidad.id",
                 "dim_nacionalidad.codigo": "dim_nacionalidad.codigo",
                 "dim_tipo_docente.id": "dim_tipo_docente.id",

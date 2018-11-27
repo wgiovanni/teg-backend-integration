@@ -64,13 +64,13 @@ get_nationality_code_verify = dedent("""\
 	SELECT id FROM dim_nacionalidad WHERE codigo = %s OR codigo = %s""")	
 
 get_sex_code = dedent("""\
-	SELECT id FROM dim_sexo WHERE codigo = %s""") 
+	SELECT id FROM dim_genero WHERE codigo = %s""") 
 
 insert_sex = dedent("""\
-	INSERT INTO dim_sexo (codigo) VALUES (%s)""")
+	INSERT INTO dim_genero (codigo) VALUES (%s)""")
 
 get_sex_code_verify = dedent("""\
-	SELECT id FROM dim_sexo WHERE codigo = %s OR codigo = %s""")
+	SELECT id FROM dim_genero WHERE codigo = %s OR codigo = %s""")
 
 # status
 get_status_code = dedent("""\
@@ -114,13 +114,13 @@ get_type_student_code_verify = dedent("""\
 
 # Año
 get_year_code = dedent("""\
-	SELECT id FROM dim_ano WHERE codigo = %s""") 
+	SELECT id FROM dim_tiempo WHERE codigo = %s""") 
 
 insert_year = dedent("""\
-	INSERT INTO dim_ano (codigo) VALUES (%s)""")
+	INSERT INTO dim_tiempo (codigo) VALUES (%s)""")
 
 get_year_code_verify = dedent("""\
-	SELECT id FROM dim_ano WHERE codigo = %s OR codigo = %s""")
+	SELECT id FROM dim_tiempo WHERE codigo = %s OR codigo = %s""")
 
 # consultas para estudiante
 get_student_code = dedent("""\

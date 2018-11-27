@@ -34,7 +34,7 @@
           ]
         },
         {
-          "name":"dim_sexo",
+          "name":"dim_genero",
           "levels": [
             {
               "name": "sexo",
@@ -106,7 +106,7 @@
           ]
         },
         {
-          "name":"dim_ano",
+          "name":"dim_tiempo",
           "levels": [
                  {
                      "name":"ano",
@@ -120,7 +120,7 @@
     "cubes": [
         {
             "name": "fact_estudiante_facultad",
-            "dimensions": ["dim_estudiante", "dim_facultad", "dim_carrera", "dim_sexo", "dim_nacionalidad", "dim_status", "dim_discapacidad", "dim_etnia", "dim_tipo_estudiante", "dim_ano"],
+            "dimensions": ["dim_estudiante", "dim_facultad", "dim_carrera", "dim_genero", "dim_nacionalidad", "dim_status", "dim_discapacidad", "dim_etnia", "dim_tipo_estudiante", "dim_tiempo"],
             "measures": [
               {"name": "cantidad", "label": "Cantidad"}
             ],
@@ -145,8 +145,8 @@
                 "detail": "dim_carrera.id"
               },
               {
-                "master": "fact_estudiante_facultad.id_sexo",
-                "detail": "dim_sexo.id"
+                "master": "fact_estudiante_facultad.id_genero",
+                "detail": "dim_genero.id"
               },
               {
                 "master": "fact_estudiante_facultad.id_nacionalidad",
@@ -165,12 +165,12 @@
                 "detail": "dim_etnia.id"
               },
               {
-                "master": "fact_estudiante_facultad.id_tipo",
+                "master": "fact_estudiante_facultad.id_tipo_estudiante",
                 "detail": "dim_tipo_estudiante.id"
               },
               {
-                "master": "fact_estudiante_facultad.id_ano",
-                "detail": "dim_ano.id"
+                "master": "fact_estudiante_facultad.id_tiempo",
+                "detail": "dim_tiempo.id"
               }
             ],
             "mappings": {
@@ -187,8 +187,8 @@
               "dim_carrera.id": "dim_carrera.id",
               "dim_carrera.codigo": "dim_carrera.codigo",
               "dim_carrera.nombre": "dim_carrera.nombre",
-              "dim_sexo.id": "dim_sexo.id",
-              "dim_sexo.codigo": "dim_sexo.codigo",
+              "dim_genero.id": "dim_genero.id",
+              "dim_genero.codigo": "dim_genero.codigo",
               "dim_nacionalidad.id": "dim_nacionalidad.id",
               "dim_nacionalidad.codigo": "dim_nacionalidad.codigo",
               "dim_status.id": "dim_status.id",
@@ -199,8 +199,8 @@
               "dim_etnia.codigo": "dim_etnia.codigo",
               "dim_tipo_estudiante.id": "dim_tipo_estudiante.id",
               "dim_tipo_estudiante.codigo": "dim_tipo_estudiante.codigo",
-              "dim_ano.id": "dim_ano.id",
-              "dim_ano.codigo": "dim_ano.codigo"
+              "dim_tiempo.id": "dim_tiempo.id",
+              "dim_tiempo.codigo": "dim_tiempo.codigo"
             }
         }
     ]

@@ -177,18 +177,18 @@ class TeacherSexFaculty(BD, Resource):
     def get(self):
         try:
             facultades = self.queryAll("SELECT codigo FROM DIM_FACULTAD")
-            r = browser.aggregate(drilldown=["dim_sexo", "dim_facultad"])
+            r = browser.aggregate(drilldown=["dim_genero", "dim_facultad"])
             result = []
             item = {}
 
             for f in facultades:
                 item = {"facultad": f['codigo']}
-                r = browser.aggregate(drilldown=["dim_sexo", "dim_facultad"])
+                r = browser.aggregate(drilldown=["dim_genero", "dim_facultad"])
                 for row in r:
-                    if f['codigo'] == row['dim_facultad.codigo'] and row['dim_sexo.codigo'] == "Femenino":
+                    if f['codigo'] == row['dim_facultad.codigo'] and row['dim_genero.codigo'] == "Femenino":
                         item['femenino'] = row['sumatoria']
                         print(item)
-                    if f['codigo'] == row['dim_facultad.codigo'] and row['dim_sexo.codigo'] == "Masculino":
+                    if f['codigo'] == row['dim_facultad.codigo'] and row['dim_genero.codigo'] == "Masculino":
                         item["masculino"] = row['sumatoria']
                         print(item)
                 if item.get('femenino') is None:
@@ -198,7 +198,7 @@ class TeacherSexFaculty(BD, Resource):
                 result.append(item)
           
             result = sorted(result, key=lambda k: k['facultad'])
-            r = browser.aggregate(drilldown=["dim_docente", "dim_facultad", "dim_sexo"])
+            r = browser.aggregate(drilldown=["dim_docente", "dim_facultad", "dim_genero"])
             items = []
             for row in r:
                 item = {
@@ -206,7 +206,7 @@ class TeacherSexFaculty(BD, Resource):
                     "nombre": row['dim_docente.primer_nombre'],
                     "apellido": row['dim_docente.primer_apellido'],
                     "correo": row['dim_docente.correo'],
-                    "sexo": row['dim_sexo.codigo'],
+                    "sexo": row['dim_genero.codigo'],
                     "facultad": row['dim_facultad.nombre']
                 }
                 items.append(item)

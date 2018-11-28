@@ -13,7 +13,7 @@ class Year(BD, Resource):
     parser = reqparse.RequestParser()
     def get(self):
         try:
-            result = self.queryAll("SELECT * FROM dim_ano")
+            result = self.queryAll("SELECT * FROM dim_tiempo")
 
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))

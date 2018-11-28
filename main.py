@@ -39,26 +39,26 @@ def sensor():
 def sensor1():
 	print(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) # Se obtiene local para la actualizacion de la data cuando se ejecute el job
 	print("Scheduler esta vivo11111111111111111111111!")
-#def extraction():
-#	etl_process2()
 
-#sched = BackgroundScheduler(deamon=True)
-#sched.add_job(main, 'interval', minutes=1)
+def extraction():
+	etl_process()
+	return "Hola mundo"
+
+sched = BackgroundScheduler(deamon=True)
+sched.add_job(extraction, 'interval', minutes=1)
 #sched.add_job(sensor, trigger='interval', seconds=10)
 #sched.add_job(sensor1, 'interval', seconds=20)
-#sched.start()
+sched.start()
 
 app = Flask(__name__)
 api = Api(app, prefix="/api/v1")
 # enable CORS
 CORS(app)
 
-@app.route('/')
-def extraction():
-	#target_cnx = mysql.connector.connect(**datawarehouse_db_config)
-	etl_process()
-	
-	return "Hola mundo"
+#@app.route('/')
+# def extraction():
+# 	etl_process()
+# 	return "Hola mundo"
 
 
 # route para parametros del sistema
@@ -162,5 +162,4 @@ api.add_resource(Carga, '/carga')
 
 
 if __name__ == "__main__":
-	#main()
 	app.run(debug=True)

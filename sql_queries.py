@@ -138,7 +138,7 @@ update_student = dedent("""\
 
 # consultas para carrera
 get_profession_code = dedent("""\
-	SELECT id FROM dim_carrera WHERE nombre = %s""")
+	SELECT * FROM dim_carrera WHERE nombre = %s""")
 
 # consultas para facultad
 get_faculty_code = dedent("""\
@@ -149,7 +149,7 @@ get_relationship_student = dedent("""\
 	SELECT fact.id 
 	FROM fact_estudiante_facultad AS fact 
 	INNER JOIN dim_estudiante AS e 
-	ON (fact.id_estudiante = e.id) WHERE cedula = %s""")
+	ON (fact.id_estudiante = e.id) WHERE e.cedula = %s""")
 
 # consulta para verificar docente_facultad
 get_relationship_docente_facultad = dedent("""\

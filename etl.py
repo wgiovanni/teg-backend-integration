@@ -2,6 +2,7 @@
 from flask_restful import abort
 import psycopg2
 import mysql.connector
+from pymysql import DatabaseError
 from datetime import datetime
 from textwrap import dedent
 import simplejson as json
@@ -43,12 +44,12 @@ def etl_process():
 			#actualizacion
 			print("Actualizacion")
 			print(systemParameterDate[4])
-			dataList = requestUpdate(target_cnx, systemParameterDate[4])
+			dataList = requestCargaInitial(target_cnx)
 			
 			for data in dataList:
 				#print(data)
 				keyList= data.keys()
-				#keyList = sorted(keyList)
+				keyList = sorted(keyList)
 				for key in keyList:
 					#print("KEY:{}".format(key))
 					if dimension in key:
@@ -114,7 +115,7 @@ def requestCargaInitial(target_cnx):
 	endPointTeacher = target_cursor.fetchone()
 	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_GRADUATES])
 	endPointGraduated = target_cursor.fetchone()
-	#pathList.append(endPointStudent[4])
+	pathList.append(endPointStudent[4])
 	pathList.append(endPointTeacher[4])
 	#pathList.append(endPointGraduated[4])
 	print(pathList)
@@ -145,7 +146,7 @@ def requestUpdate(target_cnx, lastUpdate):
 	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_GRADUATES])
 	endPointGraduated = target_cursor.fetchone()
 	#pathList.append(endPointStudent[4]+"/{}".format(lastUpdate))
-	pathList.append(endPointTeacher[4]+"/{}".format(lastUpdate))
+	#pathList.append(endPointTeacher[4]+"/{}".format(lastUpdate))
 	#pathList.append(endPointGraduated[4]+"{}".format(lastUpdate)) 
 	print(pathList)
 	result = []
@@ -177,9 +178,11 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 			# nacionalidad
 			print(item)
 			nationalityCode = item[NACIONALITY_ATTRIBUTE]
-			if nationalityCode == "V" or nationalityCode == "v":
+			if nationalityCode == "V" or nationalityCode == "v" or nationalityCode == "VENEZUELA":
 				nationalityCode = NATIONAL
 			elif nationalityCode == "E" or nationalityCode == "e":
+				nationalityCode = INTERNACIONAL
+			else:
 				nationalityCode = INTERNACIONAL
 			target_cursor.execute(nationalityQuery.get_query_code, [nationalityCode])
 			idNationality = target_cursor.fetchone()
@@ -196,7 +199,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 			print("sexo: {}".format(idSex))
 
 			# status
-			statusCode = item['status']
+			statusCode = item['estatus']
 			if statusCode == 0:
 				statusCode = STATUS_ACTIVE
 			elif statusCode == 1:
@@ -227,29 +230,39 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 			print("etnia: {}".format(idEthnicGroup))
 
 			# tipo de estudiante
-			typeStudentCode = item['tipo']
-			if typeStudentCode == 0:
+			typeStudentCode = item['tipo_estudio']
+			if typeStudentCode == "0":
 				typeStudentCode = UNDERGRADUATE
-			elif typeStudentCode == 1:
+			elif typeStudentCode == "1":
 				typeStudentCode = POSTGRADUATE
 			target_cursor.execute(typeStudentQuery.get_query_code, [typeStudentCode])
 			idTypeStudent = target_cursor.fetchone()
 			print("tipo: {}".format(idTypeStudent))
 
 			# año
-			yearCode = item['ano']
+			yearCode = item['anno_entrada']
 			target_cursor.execute(yearQuery.get_query_code, [yearCode])
 			idYear = target_cursor.fetchone()
 			print("ano: {}".format(idYear))
 
+			# carrera
+			professionCode = item[PROFESSION]
+			target_cursor.execute(professionQuery.get_query_code, [professionCode])
+			idProfession = target_cursor.fetchone()
+
+			# facultad
+			facultyCode = item[FACULTY]
+			target_cursor.execute(facultyQuery.get_query_code, [facultyCode])
+			idFaculty = target_cursor.fetchone()
+
 			student = [
 				item[IDENTIFICATION_CARD],  
-				item[FIRST_NAME_ATRIBUTE], 
-				item[LAST_NAME_ATRIBUTE], 
+				item["primer_nombre"], 
+				item["primer_apellido"], 
 				item[BIRTH_DATE_ATTRIBUTE],
 				item[PHONE_ONE_ATTRIBUTE], 
 				item[PHONE_TWO_ATTRIBUTE],
-				item[EMAIL_ATTRIBUTE],
+				item["email"],
 				item[STATE_PROVENANCE_ATTRIBUTE]
 			]
 
@@ -257,50 +270,80 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 			idStudentExist = target_cursor.fetchone()
 
 			if idStudentExist is not None:
-				# actualizacion
-				student.append(idStudentExist[0])
-				target_cursor.execute(studentQuery.update_query, student)
-				target_cnx.commit()
-				target_cursor.execute(studentRelationship.get_query_code,[item[IDENTIFICATION_CARD]])
-				idFact = target_cursor.fetchone()
-				if idFact is not None:
+				# actualizar estudiante
+				try:
+					student.append(idStudentExist[0])
+					target_cursor.execute(studentQuery.update_query, student)
+					target_cnx.commit()
+				except mysql.connector.Error as e:
+					print("error")
+					target_cnx.rollback()
+			else:
+				# insertar estudiante
+				try:
+					target_cursor.execute(studentQuery.load_query, student)
+					target_cnx.commit()
+				except mysql.connector.Error as e:
+					print("error")
+					target_cnx.rollback()
+
+			target_cursor.execute(studentRelationship.get_query_code,[item[IDENTIFICATION_CARD]])
+			idFact = target_cursor.fetchone()
+
+			if idFact is not None:
+				try:
 					target_cursor.execute(dedent("""\
 					UPDATE fact_estudiante_facultad
-					SET id_estudiante=%s, id_genero=%s, id_nacionalidad=%s, id_status=%s, id_discapacidad=%s, id_etnia=%s, id_tipo_estudiante=%s, id_tiempo=%s
-					WHERE id = %s"""), [idStudentExist[0], idSex[0], idNationality[0], idStatus[0], idDisability[0], idEthnicGroup[0], idTypeStudent[0], idYear[0], idFact[0]])
-					target_cnx.commit()
+					SET id_estudiante=%s, id_genero=%s, id_nacionalidad=%s, id_status=%s, id_discapacidad=%s, id_etnia=%s, id_tipo_estudiante=%s, id_tiempo=%s, id_facultad=%s, id_carrera=%s
+					WHERE id = %s"""), [idStudentExist[0], idSex[0], idNationality[0], idStatus[0], idDisability[0], idEthnicGroup[0], idTypeStudent[0], idYear[0], idFaculty[0], idProfession[0], idFact[0]])
 					print("Actualizado")
-				else: 
-					print("No existe el registro")
-				
+				except mysql.connector.Error as e:
+					print("error")
+					target_cnx.rollback()
 			else:
-				# insercion			
-				target_cursor.execute(studentQuery.load_query, student)
-				target_cnx.commit()
-				target_cursor.execute(studentQuery.get_query_code, [item[IDENTIFICATION_CARD]])
-				idStudent = target_cursor.fetchone()
-				target_cursor.execute(dedent("""\
-				INSERT INTO FACT_ESTUDIANTE_FACULTAD 
-					(id_estudiante, id_genero, id_nacionalidad, id_status, id_discapacidad, id_etnia, id_tipo_estudiante, id_tiempo)
-				VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"""), [idStudent[0], idSex[0], idNationality[0], idStatus[0], idDisability[0], idEthnicGroup[0], idTypeStudent[0], idYear[0]])
-				target_cnx.commit()
-				print("Insertado")
-	
+				# insercion
+				print("INSERCION")
+				try:			
+					target_cursor.execute(studentQuery.get_query_code, [item[IDENTIFICATION_CARD]])
+					idStudent = target_cursor.fetchone()
+					target_cursor.execute(dedent("""\
+					INSERT INTO FACT_ESTUDIANTE_FACULTAD 
+						(id_estudiante, id_genero, id_nacionalidad, id_status, id_discapacidad, id_etnia, id_tipo_estudiante, id_tiempo, id_facultad, id_carrera)
+					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""), [idStudent[0], idSex[0], idNationality[0], idStatus[0], idDisability[0], idEthnicGroup[0], idTypeStudent[0], idYear[0], idFaculty[0], idProfession[0]])
+					print("Insertado")
+				except mysql.connector.Error as e:
+					print("error")
+					target_cnx.rollback()
+			target_cnx.commit()
+
 	elif table == PROFESSION:
 		print("Cargando carrera...")
 		items = content[ITEMS]
 		for item in items:
-			print(item)
-			target_cursor.execute(professionQuery.get_query_code, [item[FIRST_NAME_ATRIBUTE]])
+			#print(item)
+			target_cursor.execute(professionQuery.get_query_code, [item["nombre"]])
 			row = target_cursor.fetchone()
-			if row is not None:
-				update(target_cursor, table, item, {"id": row[0]})
-			else: 
-				insert(target_cursor, table, item)
-			target_cnx.commit()
+			#print(row)
+			item = {
+				"codigo": item['nombre'],
+				"nombre": item['nombre']
+			}
+			try:
+				if row is not None:
+					#print("entro")
+					update(target_cursor, table, item, {"id": row[0]})
+				else:
+					#print("entro2")
+					#target_cursor.execute("INSERT INTO DIM_CARRERA (codigo, nombre) VALUES (%s,%s) ON ON DUPLICATE KEY UPDATE codigo=codigo, nombre=nombre", [item["nombre"], i]) 
+					insert(target_cursor, table, item)
+				target_cnx.commit()
+			except mysql.connector.Error as e:
+				print("Roolback")
+			
 		print("Insercion finalizada")
 
 	elif table == STUDENT_PROFESSION_FACULTY:
+		'''
 		print("Cargando Hechos Estudiante...")
 		items = content[ITEMS]
 		for item in items:
@@ -323,18 +366,24 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 			print(idStudent[0])
 			print(idFaculty[0])
 			print(idProfession[0])
-			print(idFact[0])
+			#print(idFact[0])
 
 			if idFact is not None:
-				target_cursor.execute(dedent("""\
-				UPDATE fact_estudiante_facultad
-				SET id_estudiante=%s, id_facultad=%s, id_carrera=%s
-				WHERE id=%s"""), [idStudent[0], idFaculty[0], idProfession[0], idFact[0]])
-				target_cnx.commit()
-				print("Registro actualizado")
+				try:
+					target_cursor.execute(dedent("""\
+					UPDATE fact_estudiante_facultad
+					SET id_estudiante=%s, id_facultad=%s, id_carrera=%s
+					WHERE id=%s"""), [idStudent[0], idFaculty[0], idProfession[0], idFact[0]])
+					target_cnx.commit()
+					print("Registro actualizado")
+				except mysql.connector.Error as e:
+					print("error")
+					target_cnx.rollback()
 			else:
 				print("Registro no existe")
+		#target_cnx.commit()
 		print("Insercion finalizada")
+		'''
 
 	elif table == TEACHER:
 		print("DOCENTE")
@@ -392,32 +441,38 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 			target_cursor.execute(teacherQuery.get_query_code, [item[IDENTIFICATION_CARD]])
 			idTeacherExits = target_cursor.fetchone()
 			if idTeacherExits is not None:
-				teacher.append(idTeacherExits[0])
-				target_cursor.execute(teacherQuery.update_query, teacher)
-				target_cnx.commit()
-				target_cursor.execute(teacherFacultyRelationship.get_query_code, [item[IDENTIFICATION_CARD]])
-				idFact = target_cursor.fetchone()
-				if idFact is not None:
-					target_cursor.execute(dedent("""\
-						UPDATE fact_docente_facultad
-						SET id_docente=%s, id_genero=%s, id_nacionalidad=%s, id_escalafon=%s, id_tipo_docente=%s, id_facultad=%s
-						WHERE id=%s"""), [idTeacherExits[0], idSex[0], idNationality[0], idScale[0], idTypeTeacher[0], idFaculty[0], idFact[0]])
+				try:
+					teacher.append(idTeacherExits[0])
+					target_cursor.execute(teacherQuery.update_query, teacher)
 					target_cnx.commit()
-					print("Actualizado")
-				else:
-					print("No existe el registro")
-			else:
-				target_cursor.execute(teacherQuery.load_query, teacher)
-				target_cnx.commit()
+					target_cursor.execute(teacherFacultyRelationship.get_query_code, [item[IDENTIFICATION_CARD]])
+					idFact = target_cursor.fetchone()
+					if idFact is not None:
+							target_cursor.execute(dedent("""\
+								UPDATE fact_docente_facultad
+								SET id_docente=%s, id_genero=%s, id_nacionalidad=%s, id_escalafon=%s, id_tipo_docente=%s, id_facultad=%s
+								WHERE id=%s"""), [idTeacherExits[0], idSex[0], idNationality[0], idScale[0], idTypeTeacher[0], idFaculty[0], idFact[0]])
+							target_cnx.commit()
+							print("Actualizado")
+					else:
+						print("No existe el registro")
+				except mysql.connector.Error as e:
+					print("Roolback")
 
-				target_cursor.execute(teacherQuery.get_query_code, [item[IDENTIFICATION_CARD]])
-				idTeacher = target_cursor.fetchone()
-				target_cursor.execute(dedent("""\
-				INSERT INTO FACT_DOCENTE_FACULTAD 
-					(id_docente, id_genero, id_nacionalidad, id_escalafon, id_tipo_docente, id_facultad)
-				VALUES (%s, %s, %s, %s, %s, %s)"""), [idTeacher[0], idSex[0], idNationality[0], idScale[0], idTypeTeacher[0], idFaculty[0]])
-				target_cnx.commit()
-				print("Insertado")
+			else:
+				try:
+					target_cursor.execute(teacherQuery.load_query, teacher)
+					target_cnx.commit()
+					target_cursor.execute(teacherQuery.get_query_code, [item[IDENTIFICATION_CARD]])
+					idTeacher = target_cursor.fetchone()
+					target_cursor.execute(dedent("""\
+					INSERT INTO FACT_DOCENTE_FACULTAD 
+						(id_docente, id_genero, id_nacionalidad, id_escalafon, id_tipo_docente, id_facultad)
+					VALUES (%s, %s, %s, %s, %s, %s)"""), [idTeacher[0], idSex[0], idNationality[0], idScale[0], idTypeTeacher[0], idFaculty[0]])
+					target_cnx.commit()
+					print("Insertado")
+				except mysql.connector.Error as e:
+					print("Roolback")
 
 		print("ACTUALIZACION DOCENTE FINALIZADA")
 
@@ -434,10 +489,20 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 			target_cursor.execute(publicationQuery.get_query_code, [item['codigo']])
 			publication = target_cursor.fetchone()
 			if publication is None:
-				insert(target_cursor, "publicacion", item)
-				target_cnx.commit()
+				try:
+					insert(target_cursor, "publicacion", item)
+					target_cnx.commit()
+				except mysql.connector.Error as e:
+					print("Roolback")
+				#target_cnx.commit()
 			else:
+				try:
+					update(target_cursor, "publicacion", item, {'id':publication[0]})
+					target_cnx.commit()
+				except mysql.connector.Error as e:
+					print("Roolback")
 				print("Ya existe {}".format(item['codigo']))
+
 		print("Insercion finalizada")
 
 	elif table == TEACHER_PUBLICATION:
@@ -466,14 +531,17 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 			idPublication = target_cursor.fetchone()
 
 			if ids[0] is not None and idPublication[0] is not None and ids[1] is not None:
-				target_cursor.execute(dedent("""\
-				INSERT INTO fact_docente_publicacion
-				(id_docente, id_facultad, id_publicacion, cantidad_citas)
-				VALUES (%s, %s, %s, %s)"""), [ids[0], ids[1], idPublication[0], numberCites])
+				try:
+					target_cursor.execute(dedent("""\
+					INSERT INTO fact_docente_publicacion
+					(id_docente, id_facultad, id_publicacion, cantidad_citas)
+					VALUES (%s, %s, %s, %s)"""), [ids[0], ids[1], idPublication[0], numberCites])
+				except mysql.connector.Error as e:
+					print("Roolback")
 			else: 
 				print("Error")
 			print("Insercion finalizada")
-
+		target_cnx.commit()
 	elif table == "proyecto":
 		items = content[ITEMS]
 		print("INSERCION PROYECTO")
@@ -582,11 +650,18 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 			target_cursor.execute(titleQuery.get_query_code, [item['codigo']])
 			title = target_cursor.fetchone()
 			if title is None:
-				insert(target_cursor, "titulo", item)
-				target_cnx.commit()
+				try:
+					insert(target_cursor, "titulo", item)
+				except mysql.connector.Error as e:
+					print("Roolback")
 			else:
+				try:
+					update(target_cursor, "titulo", item, {'id': title[0]})
+				except mysql.connector.Error as e:
+					print("Roolback")
 				print("Ya existe {}".format(item['codigo']))
 		print("Insercion finalizada")
+		target_cnx.commit()
 
 	elif table == "docente-titulo":
 		items = content[ITEMS]
@@ -617,13 +692,17 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 			idTitle = target_cursor.fetchone()
 
 			if idTeacher[0] is not None and idLevel[0] is not None and idTitle[0] is not None:
-				target_cursor.execute(dedent("""\
-				INSERT INTO fact_docente_titulo
-				(id_docente, id_titulo, id_nivel)
-				VALUES (%s, %s, %s)"""), [idTeacher[0], idTitle[0], idLevel[0]])
+				try:
+					target_cursor.execute(dedent("""\
+					INSERT INTO fact_docente_titulo
+					(id_docente, id_titulo, id_nivel)
+					VALUES (%s, %s, %s)"""), [idTeacher[0], idTitle[0], idLevel[0]])
+				except mysql.connector.Error as e:
+					print("Roolback")
 			else:
 				print("Error")
 			print("Insercion finalizada")
+		target_cnx.commit()
 
 	elif table == "premio":
 		items = content[ITEMS]

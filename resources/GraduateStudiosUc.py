@@ -46,7 +46,7 @@ class GraduateFaculty(BD, Resource):
             items = []
             for row in r:
                 item = {
-                    "cedula": row['dim_egresado.identificacion'],
+                    "cedula": row['dim_egresado.cedula'],
                     "nombre": row['dim_egresado.primer_nombre'],
                     "apellido": row['dim_egresado.primer_apellido'],
                     "email": row['dim_egresado.correo'],
@@ -203,7 +203,7 @@ class GraduatePerYear(BD, Resource):
             items = []
             for row in r:
                 item = {
-                    "cedula": row['dim_egresado.identificacion'],
+                    "cedula": row['dim_egresado.cedula'],
                     "nombre": row['dim_egresado.primer_nombre'],
                     "apellido": row['dim_egresado.primer_apellido'],
                     "email": row['dim_egresado.correo'],
@@ -367,7 +367,7 @@ class GraduateFacultyYear(BD, Resource):
             items = []
             for row in r:
                 item = {
-                    "cedula": row['dim_egresado.identificacion'],
+                    "cedula": row['dim_egresado.cedula'],
                     "nombre": row['dim_egresado.primer_nombre'],
                     "apellido": row['dim_egresado.primer_apellido'],
                     "email": row['dim_egresado.correo'],

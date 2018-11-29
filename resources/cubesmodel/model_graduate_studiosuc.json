@@ -6,8 +6,8 @@
                 {
                     "name":"egresado",
                     "label":"Egresado",
-                    "attributes": ["id", "nombre_usuario", "primer_nombre", "segundo_nombre","primer_apellido", "segundo_apellido", "descripcion", "intereses","correo", "telefono", "identificacion"],
-                    "label_attribute": "nombre_usuario"
+                    "attributes": ["id", "cedula", "primer_nombre", "segundo_nombre","primer_apellido", "segundo_apellido","correo", "telefono"],
+                    "label_attribute": "cedula"
                 }
             ]
         },
@@ -94,16 +94,13 @@
             ],
             "mappings": {
               "dim_egresado.id": "dim_egresado.id",
-              "dim_egresado.nombre_usuario": "dim_egresado.nombre_usuario",
               "dim_egresado.primer_nombre": "dim_egresado.primer_nombre",
               "dim_egresado.segundo_nombre": "dim_egresado.segundo_nombre",
               "dim_egresado.primer_apellido": "dim_egresado.primer_apellido",
               "dim_egresado.segundo_apellido": "dim_egresado.segundo_apellido",
-              "dim_egresado.descripcion": "dim_egresado.descripcion",
-              "dim_egresado.intereses": "dim_egresado.intereses",
               "dim_egresado.correo": "dim_egresado.correo",
               "dim_egresado.telefono": "dim_egresado.telefono",
-              "dim_egresado.identificacion": "dim_egresado.identificacion",
+              "dim_egresado.cedula": "dim_egresado.cedula",
               "dim_estudiosuc.id": "dim_estudiosuc.id",
               "dim_estudiosuc.codigo": "dim_estudiosuc.codigo",
               "dim_estudiosuc.anho_grado": "dim_estudiosuc.anho_grado",

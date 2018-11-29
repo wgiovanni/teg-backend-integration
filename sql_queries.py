@@ -258,7 +258,7 @@ get_prize_code = dedent("""\
 
 # consultas para egresados
 get_graduate_code = dedent("""\
-	SELECT id FROM dim_egresado WHERE nombre_usuario = %s""")
+	SELECT id FROM dim_egresado WHERE cedula = %s""")
 
 insert_graduate = dedent("""\
 	INSERT INTO dim_egresado

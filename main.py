@@ -40,26 +40,25 @@ def sensor1():
 	print(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) # Se obtiene local para la actualizacion de la data cuando se ejecute el job
 	print("Scheduler esta vivo11111111111111111111111!")
 
-def extraction():
-	etl_process()
-	return "Hola mundo"
 
-sched = BackgroundScheduler(deamon=True)
-sched.add_job(extraction, 'interval', minutes=1)
+
+# sched = BackgroundScheduler(deamon=True)
+# sched.add_job(extraction, 'interval', minutes=60)
+# sched.start()
+
 #sched.add_job(sensor, trigger='interval', seconds=10)
 #sched.add_job(sensor1, 'interval', seconds=20)
-sched.start()
+
 
 app = Flask(__name__)
 api = Api(app, prefix="/api/v1")
 # enable CORS
 CORS(app)
 
-#@app.route('/')
-# def extraction():
-# 	etl_process()
-# 	return "Hola mundo"
-
+@app.route('/')
+def extraction():
+	etl_process()
+	return "Hola mundo"
 
 # route para parametros del sistema
 api.add_resource(SystemParameterList, '/parametroSistema')
@@ -136,7 +135,7 @@ api.add_resource(TeacherTitle, '/profesor-doctorado-proporcion')
 # premios
 api.add_resource(TeacherPrize, '/profesores-premios')
 # proyectos
-api.add_resource(TeacherProject, '/profesores-proyecto')
+api.add_resource(TeacherProject, '/profesores-proyectos')
 # otros estudios
 api.add_resource(TeacherOtherStudios, '/profesores-otrosestudios')
 

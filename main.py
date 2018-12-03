@@ -2,10 +2,11 @@
 from variables import *
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
 from flask_restful import Api
 import mysql.connector
+import simplejson as json
 
 # Resources
 from resources.SystemParameter import SystemParameterList, SystemParameter
@@ -27,7 +28,6 @@ from resources.GraduateCertification import GraduateCertification
 from resources.GraduateEducation import GraduateEducation
 from resources.GraduateStudiosUc import GraduateFaculty, GraduatePerYear, GraduateFacultyYear
 from resources.GraduateVolunteering import GraduateVolunteering
-from resources.Carga import Carga
 from resources.Full import Year, Faculty
 # metodos
 from etl import etl_process
@@ -57,6 +57,7 @@ CORS(app)
 
 @app.route('/')
 def extraction():
+	
 	etl_process()
 	return "Hola mundo"
 
@@ -144,21 +145,19 @@ api.add_resource(TeacherOtherStudios, '/profesores-otrosestudios')
 
 # egresados
 api.add_resource(GraduatePatents, '/egresado-patentes')
-api.add_resource(GraduateJobs, '/egresado-trabajos')
+api.add_resource(GraduateVolunteering, '/egresado-voluntariado')
 api.add_resource(GraduateCourses, '/egresado-cursos')
 api.add_resource(GraduateCertification, '/egresado-certificacion')
 api.add_resource(GraduateEducation, '/egresado-educacion')
+
 # cantidad de egresados por facultad
 api.add_resource(GraduateFaculty, '/egresado-facultad')
 # cantidad de egresados por año
 api.add_resource(GraduatePerYear, '/egresado-ano')
 # cantidad de egresados por facultad y año
 api.add_resource(GraduateFacultyYear, '/egresado-ano-facultad')
-
-api.add_resource(GraduateVolunteering, '/egresado-voluntariado')
-
-api.add_resource(Carga, '/carga')
-
+# trabajos de los egresados
+api.add_resource(GraduateJobs, '/egresado-trabajos')
 
 if __name__ == "__main__":
 	app.run(debug=True)

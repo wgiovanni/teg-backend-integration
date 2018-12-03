@@ -19,14 +19,33 @@ class GraduateJobs(BD, Resource):
     parser = reqparse.RequestParser()
     def get(self):
         try:
-           
-            #cut = PointCut("dim_egresado", [ids])
-            #cell = Cell(browser.cube, cuts = [cut])
-            r = browser.aggregate(drilldown=["dim_egresado", "dim_trabajos"])
+            r = browser.aggregate(drilldown=["dim_egresado"])
+            graduates = []
             for row in r:
-                print(row)
-                print("\n")
+                cut = PointCut("dim_egresado", [row['dim_egresado.id']])
+                cell = Cell(browser.cube, cuts = [cut])
+                r1 = browser.aggregate(cell, drilldown=["dim_trabajos", "dim_egresado"])
+                listJobs = []
+                for row1 in r1:
+                    job = {
+                        "nombre": row1['dim_trabajos.nombre_empresa'],
+                        "cargo": row1['dim_trabajos.cargo'],
+                        "fecha": row1['dim_trabajos.fecha'].strftime('%Y-%m-%d')
+                    }
+                    listJobs.append(job)
+                item = {
+                    "cedula": row['dim_egresado.cedula'],
+                    "nombre": row['dim_egresado.primer_nombre'],
+                    "apellido": row['dim_egresado.primer_apellido'],
+                    "trabajos": listJobs
+                }
+                graduates.append(item)
+                graduates = sorted(graduates, key=lambda k: k['cedula']) 
+            result = {
+                "items": graduates,
+                "recuperado": "SIGEUC"
+            }
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
-        return json.dumps([]), 200, { 'Access-Control-Allow-Origin': '*' }
+        return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }

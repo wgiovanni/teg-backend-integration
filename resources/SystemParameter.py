@@ -69,10 +69,17 @@ class SystemParameter(BD, Resource):
 			if result is None:
 				abort(404, message="Resource {} doesn't exist".format(systemParameter_id))
 			# datos de auditoria
+			ip = ''
+			if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
+				ip = request.environ['REMOTE_ADDR']
+			else:
+				ip = request.environ['HTTP_X_FORWARDED_FOR']
 			audit = {
 				"username": username,
 				"action": 'Modificó un parámetro del sistema',
-				"module": 'Integración'
+				"module": 'Integración',
+				"ip": ip,
+				"status": True
 			}
 			self.insert('HISTORY_ACTION', audit)
 			self.commit()

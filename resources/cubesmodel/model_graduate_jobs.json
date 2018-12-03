@@ -6,8 +6,8 @@
                 {
                     "name":"egresado",
                     "label":"Egresado",
-                    "attributes": ["id", "nombre_usuario", "primer_nombre", "segundo_nombre","primer_apellido", "segundo_apellido", "descripcion", "intereses","correo", "telefono", "identificacion"],
-                    "label_attribute": "nombre_usuario"
+                    "attributes": ["id", "primer_nombre", "segundo_nombre","primer_apellido", "segundo_apellido", "correo", "telefono", "cedula"],
+                    "label_attribute": "cedula"
                 }
             ]
         },
@@ -17,7 +17,7 @@
             {
               "name": "trabajos",
               "label":"Trabajos",
-              "attributes": ["id", "codigo", "nombre_empresa", "cargo", "descripcion"],
+              "attributes": ["id", "codigo", "nombre_empresa", "cargo", "descripcion", "url", "fecha"],
               "label_attribute": "codigo"
             }
           ]
@@ -49,22 +49,18 @@
             ],
             "mappings": {
               "dim_egresado.id": "dim_egresado.id",
-              "dim_egresado.nombre_usuario": "dim_egresado.nombre_usuario",
               "dim_egresado.primer_nombre": "dim_egresado.primer_nombre",
               "dim_egresado.segundo_nombre": "dim_egresado.segundo_nombre",
               "dim_egresado.primer_apellido": "dim_egresado.primer_apellido",
               "dim_egresado.segundo_apellido": "dim_egresado.segundo_apellido",
-              "dim_egresado.descripcion": "dim_egresado.descripcion",
-              "dim_egresado.intereses": "dim_egresado.intereses",
               "dim_egresado.correo": "dim_egresado.correo",
               "dim_egresado.telefono": "dim_egresado.telefono",
-              "dim_egresado.identificacion": "dim_egresado.identificacion",
+              "dim_egresado.cedula": "dim_egresado.cedula",
               "dim_trabajos.id": "dim_trabajos.id",
-              "dim_trabajos.codigo": "dim_trabajos.codigo",
-              "dim_trabajos.titulo": "dim_trabajos.titulo",
+              "dim_trabajos.nombre_empresa": "dim_trabajos.nombre_empresa",
+              "dim_trabajos.cargo": "dim_trabajos.cargo",
               "dim_trabajos.descripcion": "dim_trabajos.descripcion",
-              "dim_trabajos.numero": "dim_trabajos.numero",
-              "dim_trabajos.inventores": "dim_trabajos.inventores",
+              "dim_trabajos.codigo": "dim_trabajos.codigo",
               "dim_trabajos.fecha": "dim_trabajos.fecha",
               "dim_trabajos.url": "dim_trabajos.url"
             }

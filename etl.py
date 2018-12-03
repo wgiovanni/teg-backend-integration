@@ -891,7 +891,9 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 					"nombre_empresa": item['nombreempresa'],
 					"cargo": item['cargo'],
 					"descripcion": item['descripcion'],
-					"codigo": item['codigo']
+					"codigo": item['codigo'],
+					"url": item['url'],
+					"fecha": item['fecha']
 				}
 				target_cursor.execute(jobsQuery.get_query_code, [item['codigo']])
 				job = target_cursor.fetchone()

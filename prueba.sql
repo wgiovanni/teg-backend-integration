@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 29-11-2018 a las 02:03:10
+-- Tiempo de generación: 03-12-2018 a las 22:15:32
 -- Versión del servidor: 10.1.36-MariaDB
 -- Versión de PHP: 7.2.11
 
@@ -1035,7 +1035,9 @@ INSERT INTO `dim_status` (`id`, `codigo`) VALUES
 (129, 'Active'),
 (130, 'Inactivo'),
 (131, 'Active'),
-(132, 'Inactivo');
+(132, 'Inactivo'),
+(133, 'Active'),
+(134, 'Inactivo');
 
 -- --------------------------------------------------------
 
@@ -1287,6 +1289,8 @@ CREATE TABLE `dim_trabajos` (
   `nombre_empresa` varchar(100) NOT NULL,
   `cargo` varchar(100) NOT NULL,
   `descripcion` varchar(500) NOT NULL,
+  `url` varchar(300) NOT NULL,
+  `fecha` date NOT NULL,
   `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `fecha_actualizacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1295,10 +1299,10 @@ CREATE TABLE `dim_trabajos` (
 -- Volcado de datos para la tabla `dim_trabajos`
 --
 
-INSERT INTO `dim_trabajos` (`id`, `codigo`, `nombre_empresa`, `cargo`, `descripcion`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(10, '1', 'Intelix', 'Programador web', 'descripcion', '2018-11-28 21:02:54', '2018-11-28 21:02:54'),
-(11, '2', 'Promotora Tantalo', 'Programador web', 'descripcion', '2018-11-28 21:02:54', '2018-11-28 21:02:54'),
-(12, '3', 'Sofos', 'Programador web', 'descripcion', '2018-11-28 21:02:54', '2018-11-28 21:02:54');
+INSERT INTO `dim_trabajos` (`id`, `codigo`, `nombre_empresa`, `cargo`, `descripcion`, `url`, `fecha`, `fecha_creacion`, `fecha_actualizacion`) VALUES
+(10, '1', 'Intelix', 'Programador web', 'descripcion', 'url', '2018-09-22', '2018-11-28 21:02:54', '2018-12-03 20:53:00'),
+(11, '2', 'Promotora Tantalo', 'Programador web', 'descripcion', 'url', '2018-09-22', '2018-11-28 21:02:54', '2018-12-03 20:53:00'),
+(12, '3', 'Sofos', 'Programador web', 'descripcion', 'url', '2018-09-22', '2018-11-28 21:02:54', '2018-12-03 20:53:00');
 
 -- --------------------------------------------------------
 
@@ -1645,7 +1649,7 @@ CREATE TABLE `fact_egresado_trabajos` (
 --
 
 INSERT INTO `fact_egresado_trabajos` (`id`, `id_egresado`, `id_trabajo`, `cantidad`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(4, 36, 12, 1, '2018-11-29 00:20:15', '2018-11-29 00:44:18'),
+(4, 34, 12, 1, '2018-11-29 00:20:15', '2018-12-03 20:02:26'),
 (5, 36, 10, 1, '2018-11-29 00:20:15', '2018-11-29 00:20:15'),
 (6, 36, 11, 1, '2018-11-29 00:20:15', '2018-11-29 00:20:15');
 
@@ -1990,6 +1994,8 @@ CREATE TABLE `history_action` (
   `username` varchar(100) NOT NULL,
   `action` varchar(100) NOT NULL,
   `module` varchar(100) NOT NULL,
+  `ip` varchar(50) NOT NULL,
+  `status` tinyint(1) NOT NULL,
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -1997,205 +2003,12 @@ CREATE TABLE `history_action` (
 -- Volcado de datos para la tabla `history_action`
 --
 
-INSERT INTO `history_action` (`id`, `username`, `action`, `module`, `date`) VALUES
-(20, 'wgiovanni', 'Ingreso al sistema', 'Usuarios', '2018-11-07 19:40:40'),
-(21, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-07 20:09:19'),
-(22, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-07 20:13:22'),
-(23, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-07 20:21:55'),
-(24, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-07 20:26:32'),
-(25, 'wgiovanni', 'Eliminó un usuario', 'Usuarios', '2018-11-07 20:26:46'),
-(26, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-07 20:27:50'),
-(27, 'wgiovanni', 'Eliminó un usuario', 'Usuarios', '2018-11-07 20:32:21'),
-(28, 'wgiovanni', 'Modificó un parámetro del sistema', 'Integración', '2018-11-07 20:56:42'),
-(29, 'wgiovanni', 'Modificó un parámetro del sistema', 'Integración', '2018-11-07 20:56:59'),
-(30, 'wgiovanni', 'Ingreso al sistema', 'Usuarios', '2018-11-07 21:12:38'),
-(31, 'prueba', 'Ingreso al sistema', 'Usuarios', '2018-11-08 13:12:03'),
-(32, 'wgiovanni', 'Ingreso al sistema', 'Usuarios', '2018-11-08 13:13:02'),
-(33, 'wgiovanni', 'Ingreso al sistema', 'Usuarios', '2018-11-08 13:15:40'),
-(34, 'prueba', 'Ingreso al sistema', 'Usuarios', '2018-11-08 14:27:02'),
-(35, 'wgiovanni', 'Ingreso al sistema', 'Usuarios', '2018-11-08 14:27:13'),
-(36, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-08 14:27:30'),
-(37, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-08 14:43:25'),
-(38, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-08 14:44:15'),
-(39, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-10 15:36:13'),
-(40, 'Facyt', 'Ingreso al sistema', 'Usuarios', '2018-11-10 15:36:31'),
-(41, 'Facyt', 'Ingreso al sistema', 'Usuarios', '2018-11-10 16:27:46'),
-(42, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 16:48:38'),
-(43, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 16:52:44'),
-(44, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 17:29:17'),
-(45, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 17:56:56'),
-(46, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 18:12:56'),
-(47, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 18:28:08'),
-(48, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 18:47:38'),
-(49, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 18:51:34'),
-(50, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 18:57:05'),
-(51, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 19:04:29'),
-(52, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 19:07:56'),
-(53, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 19:11:00'),
-(54, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 19:13:26'),
-(55, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 19:13:58'),
-(56, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 19:15:04'),
-(57, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 19:15:48'),
-(58, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 19:19:13'),
-(59, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 19:21:01'),
-(60, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 19:25:34'),
-(61, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 19:43:31'),
-(62, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 19:44:10'),
-(63, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 19:44:30'),
-(64, 'prueba', 'Ingreso al sistema', 'Usuarios', '2018-11-10 20:38:46'),
-(65, 'Facyt', 'Ingreso al sistema', 'Usuarios', '2018-11-10 20:51:05'),
-(66, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 20:51:18'),
-(67, 'prueba', 'Ingreso al sistema', 'Usuarios', '2018-11-10 20:55:12'),
-(68, 'Facyt', 'Ingreso al sistema', 'Usuarios', '2018-11-10 20:55:34'),
-(69, 'Facyt', 'Carga de archivo', 'Docentes', '2018-11-10 20:55:45'),
-(70, 'prueba', 'Ingreso al sistema', 'Usuarios', '2018-11-10 20:56:10'),
-(71, 'wgiovanni', 'Ingreso al sistema', 'Usuarios', '2018-11-11 13:15:53'),
-(72, 'Faces', 'Ingreso al sistema', 'Usuarios', '2018-11-11 13:17:20'),
-(73, 'wgiovanni', 'Ingreso al sistema', 'Usuarios', '2018-11-11 13:29:48'),
-(74, 'Facyt', 'Ingreso al sistema', 'Usuarios', '2018-11-11 14:19:51'),
-(75, 'wgiovanni', 'Ingreso al sistema', 'Usuarios', '2018-11-11 14:29:25'),
-(76, 'wgiovanni', 'Modificó un usuario', 'Usuarios', '2018-11-11 14:30:05'),
-(77, 'wgiovanni', 'Modificó un usuario', 'Usuarios', '2018-11-11 14:30:58'),
-(78, 'wgiovanni', 'Modificó un usuario', 'Usuarios', '2018-11-11 14:34:33'),
-(79, 'wgiovanni', 'Modificó un usuario', 'Usuarios', '2018-11-11 14:34:47'),
-(80, 'wgiovanni', 'Modificó un usuario', 'Usuarios', '2018-11-11 14:34:57'),
-(81, 'wgiovanni', 'Modificó un usuario', 'Usuarios', '2018-11-11 14:35:08'),
-(82, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-11 14:36:16'),
-(83, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-11 14:37:21'),
-(84, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-11 14:38:26'),
-(85, 'wgiovanni', 'Modificó un usuario', 'Usuarios', '2018-11-11 14:38:49'),
-(86, 'wgiovanni', 'Modificó un usuario', 'Usuarios', '2018-11-11 14:39:19'),
-(87, 'wgiovanni', 'Modificó un usuario', 'Usuarios', '2018-11-11 14:39:40'),
-(88, 'wgiovanni', 'Modificó un usuario', 'Usuarios', '2018-11-11 14:40:13'),
-(89, 'wgiovanni', 'Modificó un usuario', 'Usuarios', '2018-11-11 14:41:07'),
-(90, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-11 14:44:11'),
-(91, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-11 14:46:15'),
-(92, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-11 14:47:02'),
-(93, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-11 14:48:00'),
-(94, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-11 14:48:48'),
-(95, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-11 14:49:31'),
-(96, 'wgiovanni', 'Agregó un usuario', 'Usuarios', '2018-11-11 14:50:59'),
-(97, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-11 14:54:54'),
-(98, 'Facyt_estudiante', 'Ingreso al sistema', 'Usuarios', '2018-11-11 15:07:28'),
-(99, 'facyt_docente', 'Ingreso al sistema', 'Usuarios', '2018-11-11 15:08:34'),
-(100, 'Facyt_docente', 'Carga de archivo', 'Docentes', '2018-11-11 15:09:28'),
-(101, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-11 15:35:52'),
-(102, 'Admin', 'Modificó un usuario', 'Usuarios', '2018-11-11 15:36:46'),
-(103, 'Admin', 'Modificó un usuario', 'Usuarios', '2018-11-11 15:37:03'),
-(104, 'Admin', 'Modificó un usuario', 'Usuarios', '2018-11-11 15:37:16'),
-(105, 'Admin', 'Modificó un usuario', 'Usuarios', '2018-11-11 15:37:28'),
-(106, 'Admin', 'Modificó un usuario', 'Usuarios', '2018-11-11 15:37:41'),
-(107, 'Admin', 'Modificó un usuario', 'Usuarios', '2018-11-11 15:37:54'),
-(108, 'Admin', 'Modificó un usuario', 'Usuarios', '2018-11-11 15:38:08'),
-(109, 'Admin', 'Modificó un usuario', 'Usuarios', '2018-11-11 15:39:56'),
-(110, 'Admin', 'Modificó un usuario', 'Usuarios', '2018-11-11 15:40:07'),
-(111, 'Admin', 'Modificó un usuario', 'Usuarios', '2018-11-11 15:40:16'),
-(112, 'Admin', 'Modificó un usuario', 'Usuarios', '2018-11-11 15:40:25'),
-(113, 'Admin', 'Modificó un usuario', 'Usuarios', '2018-11-11 15:40:34'),
-(114, 'Admin', 'Modificó un usuario', 'Usuarios', '2018-11-11 15:40:57'),
-(115, 'Admin', 'Modificó un usuario', 'Usuarios', '2018-11-11 15:41:10'),
-(116, 'FACYT', 'Ingreso al sistema', 'Usuarios', '2018-11-11 15:41:57'),
-(117, 'FACYT', 'Carga de archivo', 'Estudiantes', '2018-11-11 15:59:17'),
-(118, 'vicerrector', 'Ingreso al sistema', 'Usuarios', '2018-11-11 16:01:43'),
-(119, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-12 15:58:39'),
-(120, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-12 17:01:44'),
-(121, 'FACE', 'Ingreso al sistema', 'Usuarios', '2018-11-12 17:10:35'),
-(122, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-12 17:12:44'),
-(123, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-12 17:16:59'),
-(124, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-12 17:17:57'),
-(125, 'FACE', 'Ingreso al sistema', 'Usuarios', '2018-11-12 17:35:55'),
-(126, 'FACE', 'Ingreso al sistema', 'Usuarios', '2018-11-12 17:37:16'),
-(127, 'FACE', 'Ingreso al sistema', 'Usuarios', '2018-11-12 17:46:25'),
-(128, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-12 17:46:49'),
-(129, 'Faces_docente', 'Ingreso al sistema', 'Usuarios', '2018-11-12 17:52:20'),
-(130, 'Faces_docente', 'Ingreso al sistema', 'Usuarios', '2018-11-12 17:55:43'),
-(131, 'FACE', 'Ingreso al sistema', 'Usuarios', '2018-11-12 17:57:00'),
-(132, 'FACE', 'Ingreso al sistema', 'Usuarios', '2018-11-12 17:57:19'),
-(133, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-12 17:59:36'),
-(134, 'FACE', 'Ingreso al sistema', 'Usuarios', '2018-11-12 18:01:44'),
-(135, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-12 18:05:33'),
-(136, 'vicerrector', 'Ingreso al sistema', 'Usuarios', '2018-11-12 18:06:26'),
-(137, 'vicerrector', 'Ingreso al sistema', 'Usuarios', '2018-11-12 18:08:04'),
-(138, 'vicerrector', 'Ingreso al sistema', 'Usuarios', '2018-11-13 01:17:51'),
-(139, 'vicerrector', 'Ingreso al sistema', 'Usuarios', '2018-11-13 01:29:43'),
-(140, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-13 12:34:41'),
-(141, 'vicerrector', 'Ingreso al sistema', 'Usuarios', '2018-11-13 12:36:02'),
-(142, 'vicerrector', 'Ingreso al sistema', 'Usuarios', '2018-11-13 12:44:25'),
-(143, 'vicerrector', 'Ingreso al sistema', 'Usuarios', '2018-11-14 13:05:34'),
-(144, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-14 20:27:37'),
-(145, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-14 21:09:45'),
-(146, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-15 13:00:21'),
-(147, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-15 13:06:03'),
-(148, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-15 21:41:46'),
-(149, 'Admin', 'Agregó un usuario', 'Usuarios', '2018-11-15 21:48:20'),
-(150, 'Admin', 'Eliminó un usuario', 'Usuarios', '2018-11-15 21:48:25'),
-(151, 'Admin', 'Agregó un usuario', 'Usuarios', '2018-11-15 21:48:47'),
-(152, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-15 21:52:00'),
-(153, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-15 21:54:46'),
-(154, 'Admin', 'Modificó un parámetro del sistema', 'Integración', '2018-11-15 22:00:35'),
-(155, 'Admin', 'Modificó un parámetro del sistema', 'Integración', '2018-11-15 22:00:42'),
-(156, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-15 22:07:58'),
-(157, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-15 22:20:55'),
-(158, 'Admin', 'Modificó un usuario', 'Usuarios', '2018-11-15 22:22:27'),
-(159, 'Admin', 'Eliminó un usuario', 'Usuarios', '2018-11-15 22:23:59'),
-(160, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-15 23:06:44'),
-(161, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-16 12:07:12'),
-(162, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-16 12:12:49'),
-(163, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-16 12:14:16'),
-(164, 'vicerrector', 'Ingreso al sistema', 'Usuarios', '2018-11-16 12:14:48'),
-(165, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-16 13:07:57'),
-(166, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-16 15:26:39'),
-(167, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-16 17:48:20'),
-(168, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-18 22:14:54'),
-(169, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-19 12:46:23'),
-(170, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-19 13:32:50'),
-(171, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-19 14:14:46'),
-(172, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-20 13:39:05'),
-(173, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-20 13:47:20'),
-(174, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-22 12:55:55'),
-(175, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-22 15:02:26'),
-(176, 'FACE', 'Ingreso al sistema', 'Usuarios', '2018-11-22 20:00:48'),
-(177, 'vicerrector', 'Ingreso al sistema', 'Usuarios', '2018-11-22 20:02:33'),
-(178, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-23 00:58:01'),
-(179, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-23 16:07:11'),
-(180, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-23 16:50:53'),
-(181, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-23 17:48:52'),
-(182, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-23 19:42:57'),
-(183, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-23 20:04:27'),
-(184, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-23 20:13:02'),
-(185, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-23 20:34:54'),
-(186, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-23 20:43:49'),
-(187, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-23 20:44:00'),
-(188, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-23 20:45:46'),
-(189, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-23 23:19:25'),
-(190, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-25 16:17:47'),
-(191, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-25 20:32:30'),
-(192, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-25 21:18:21'),
-(193, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-25 21:58:30'),
-(194, 'Admin', 'Modificó un parámetro del sistema', 'Integración', '2018-11-25 22:07:02'),
-(195, 'Admin', 'Modificó un parámetro del sistema', 'Integración', '2018-11-25 22:07:17'),
-(196, 'Admin', 'Modificó un parámetro del sistema', 'Integración', '2018-11-25 22:07:31'),
-(197, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-25 23:04:49'),
-(198, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-25 23:17:18'),
-(199, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-25 23:17:44'),
-(200, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-26 05:37:57'),
-(201, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-27 15:06:02'),
-(202, 'Admin', 'Carga de archivo', 'Docentes', '2018-11-27 15:18:52'),
-(203, 'vicerrector', 'Ingreso al sistema', 'Usuarios', '2018-11-27 15:42:31'),
-(204, 'vicerrector', 'Carga de archivo', 'Estudiantes', '2018-11-27 15:42:51'),
-(205, 'vicerrector', 'Carga de archivo', 'Estudiantes', '2018-11-27 15:43:02'),
-(206, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-27 16:28:55'),
-(207, 'vicerrector', 'Ingreso al sistema', 'Usuarios', '2018-11-27 23:58:15'),
-(208, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-28 00:15:31'),
-(209, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-28 00:26:47'),
-(210, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-28 01:21:26'),
-(211, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-28 01:39:48'),
-(212, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-28 01:41:43'),
-(213, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-28 03:10:48'),
-(214, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-28 10:27:40'),
-(215, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-28 11:59:46'),
-(216, 'vicerrector', 'Ingreso al sistema', 'Usuarios', '2018-11-28 13:01:04'),
-(217, 'Admin', 'Ingreso al sistema', 'Usuarios', '2018-11-28 13:45:04');
+INSERT INTO `history_action` (`id`, `username`, `action`, `module`, `ip`, `status`, `date`) VALUES
+(280, 'Admin', 'Ingreso al sistema', 'Usuarios', '127.0.0.1', 0, '2018-12-03 18:36:46'),
+(281, 'Admin', 'Ingreso al sistema', 'Usuarios', '127.0.0.1', 0, '2018-12-03 18:47:44'),
+(282, 'Admin', 'Ingreso al sistema', 'Usuarios', '127.0.0.1', 0, '2018-12-03 18:48:13'),
+(283, 'Admin', 'Agregó un usuario', 'Usuarios', '127.0.0.1', 0, '2018-12-03 19:38:26'),
+(284, 'Admin', 'Eliminó un usuario', 'Usuarios', '127.0.0.1', 0, '2018-12-03 19:46:19');
 
 -- --------------------------------------------------------
 
@@ -2218,11 +2031,11 @@ CREATE TABLE `parametro_sistema` (
 --
 
 INSERT INTO `parametro_sistema` (`id`, `codigo`, `nombre`, `descripcion`, `definicion`, `fecha_creacion`, `fecha_actualizacion`) VALUES
-(1, 'CARGA_INICIAL_ACTUALIZACION', 'CARGA_INICIAL_ACTUALIZACION', 'Parametro que toma valores boleanos para la carga inicial (1) y la actualizacion (0)', '0', '2018-10-18 20:35:32', '2018-11-29 00:47:37'),
+(1, 'CARGA_INICIAL_ACTUALIZACION', 'CARGA_INICIAL_ACTUALIZACION', 'Parametro que toma valores boleanos para la carga inicial (1) y la actualizacion (0)', '0', '2018-10-18 20:35:32', '2018-12-03 20:53:00'),
 (2, 'RUTA_CARGA_ESTUDIANTES', 'RUTA_CARGA_ESTUDIANTES', 'Endpoint o ruta para la carga inicial o actualización del modulo de estudiantes', 'http://localhost:8082/estudiantes', '2018-10-18 20:38:51', '2018-11-27 15:49:30'),
 (3, 'RUTA_CARGA_DOCENTES', 'RUTA_CARGA_DOCENTES', 'Endpoint o ruta para la carga inicial o actualización del modulo de docentes', 'http://127.0.0.1:8083/docentes', '2018-10-18 20:40:26', '2018-11-27 17:58:09'),
 (4, 'RUTA_CARGA_EGRESADOS', 'RUTA_CARGA_EGRESADOS', 'Endpoint o ruta para la carga inicial o actualización del modulo de egresados', 'http://127.0.0.1:8082/api/v1/egresados', '2018-10-18 21:31:21', '2018-11-25 22:07:31'),
-(5, 'FECHA_ACTUALIZACION', 'FECHA_ACTUALIZACION', 'Parámetro de fecha que se utilizara para poder llevar el control de la fecha de actualización en cada ejecución del proceso ETL  ', '2018-11-28 20:47:37', '2018-10-28 17:44:52', '2018-11-29 00:47:37');
+(5, 'FECHA_ACTUALIZACION', 'FECHA_ACTUALIZACION', 'Parámetro de fecha que se utilizara para poder llevar el control de la fecha de actualización en cada ejecución del proceso ETL  ', '2018-12-03 16:53:00', '2018-10-28 17:44:52', '2018-12-03 20:53:00');
 
 -- --------------------------------------------------------
 
@@ -2283,31 +2096,34 @@ CREATE TABLE `user` (
   `email` varchar(100) NOT NULL,
   `phone` varchar(50) NOT NULL,
   `address` varchar(300) NOT NULL,
-  `password` varchar(100) NOT NULL
+  `password` varchar(100) NOT NULL,
+  `removed` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Volcado de datos para la tabla `user`
 --
 
-INSERT INTO `user` (`id`, `first_name`, `last_name`, `username`, `email`, `phone`, `address`, `password`) VALUES
-(42, 'Admin', 'Admin', 'Admin', 'Admin@gmail.com', '04122345768', 'direccion administrador', '123456'),
-(44, 'vicerrector', 'vicerrector', 'vicerrector', 'vicerrector@gmail.com', '04122345768', 'direccion', '123456'),
-(54, 'Ingeneria', 'Ingeneria', 'INGENIERIA', 'Ingeneria@gmail.com', '04122345768', 'direccion', '123456'),
-(55, 'aja', 'aja', 'aja', 'aja@gmail.com', '04122345768', 'direccion', '123456'),
-(56, 'Face', 'face', 'FACE', 'Face_estudiante@gmail.com', '04122345768', 'direccion', '123456'),
-(57, 'Facyt', 'Facyt', 'FACYT', 'Facyt_estudiante@gmail.com', '04122345768', 'direccion', '123'),
-(58, 'Faces', 'Faces', 'FACES', 'Faces@gmail.com', '04122345768', 'direccion', '123456'),
-(59, 'Fcs', 'Fcs', 'FCS', 'Fcs@gmail.com', '04122345768', 'direccion', '123456'),
-(60, 'odontologia', 'odontologia', 'ODONTOLOGIA', 'odontologia_estudiante@gmail.com', '04122345768', 'direccion', '123456'),
-(61, 'derecho_estudiante', 'derecho_estudiante', 'FCJP', 'Fcjp_estudiante@gmail.com', '04122345768', 'direccion', '12345'),
-(62, 'Facyt', 'Facyt', 'Facyt_docente', 'Facyt@gmail.com', '04122345768', 'direccion', '123'),
-(63, 'Face', 'Face', 'Face_docente', 'Face_docente@hotmail.com', '04122345768', 'direccion', '123'),
-(64, 'Fcjp', 'Fcjp', 'Fcjp_docente', 'Fcjp_docente@gmail.com', '04122345768', 'direccion', '123'),
-(65, 'Odontologia', 'Odontologia', 'Odontologia_docente', 'Odontologia_docente@gmail.com', '04122345768', 'direccion', '123'),
-(66, 'Fcs', 'Fcs', 'Fcs_docente', 'Fcs_docente@gmail.com', '04122345768', 'direccion', '123'),
-(67, 'Faces', 'Faces', 'Faces_docente', 'Faces_docente@gmail.com', '04122345768', 'direccion', '123'),
-(68, 'Ingeneria', 'Ingeneria', 'Ingeneria_docente', 'Ingeneria_docente@gmail.com', '04122345768', 'direccion', '123');
+INSERT INTO `user` (`id`, `first_name`, `last_name`, `username`, `email`, `phone`, `address`, `password`, `removed`) VALUES
+(42, 'Admin', 'Admin', 'Admin', 'Admin@gmail.com', '04122345768', 'direccion administrador', '123456', 0),
+(44, 'vicerrector', 'vicerrector', 'vicerrector', 'vicerrector@gmail.com', '04122345768', 'direccion', '123456', 0),
+(54, 'Ingeneria', 'Ingeneria', 'INGENIERIA', 'Ingeneria@gmail.com', '04122345768', 'direccion', '123456', 0),
+(55, 'aja', 'aja', 'aja', 'aja@gmail.com', '04122345768', 'direccion', '123456', 0),
+(56, 'Face', 'face', 'FACE', 'Face_estudiante@gmail.com', '04122345768', 'direccion', '123456', 0),
+(57, 'Facyt', 'Facyt', 'FACYT', 'juanhernandezluis0@gmail.com', '04122345768', 'direccion', '123', 0),
+(58, 'Faces', 'Faces', 'FACES', 'Faces@gmail.com', '04122345768', 'direccion', '123456', 0),
+(59, 'Fcs', 'Fcs', 'FCS', 'Fcs@gmail.com', '04122345768', 'direccion', '123456', 0),
+(60, 'odontologia', 'odontologia', 'ODONTOLOGIA', 'odontologia_estudiante@gmail.com', '04122345768', 'direccion', '123456', 0),
+(61, 'derecho_estudiante', 'derecho_estudiante', 'FCJP', 'juanjsanchez51@gmail.com', '04122345768', 'direccion', '12345', 0),
+(62, 'Facyt', 'Facyt', 'Facyt_docente', 'Facyt@gmail.com', '04122345768', 'direccion', '123', 0),
+(63, 'Face', 'Face', 'Face_docente', 'Face_docente@hotmail.com', '04122345768', 'direccion', '123', 0),
+(64, 'Fcjp', 'Fcjp', 'Fcjp_docente', 'Fcjp_docente@gmail.com', '04122345768', 'direccion', '123', 0),
+(65, 'Odontologia', 'Odontologia', 'Odontologia_docente', 'Odontologia_docente@gmail.com', '04122345768', 'direccion', '123', 0),
+(66, 'Fcs', 'Fcs', 'Fcs_docente', 'Fcs_docente@gmail.com', '04122345768', 'direccion', '123', 0),
+(67, 'Faces', 'Faces', 'Faces_docente', 'Faces_docente@gmail.com', '04122345768', 'direccion', '123', 0),
+(68, 'Ingeneria', 'Ingeneria', 'Ingeneria_docente', 'Ingeneria_docente@gmail.com', '04122345768', 'direccion', '123', 0),
+(69, 'verificador', 'verificador', 'verificador', 'verificador@gmail.com', '73635353', 'fhfgfgh', '123456', 0),
+(70, 'drgdrgd', 'fgfdhdfhdfh', 'dgdfg', 'hfhfg@mdnd.com', '223454', 'ertgthg', '1234', 1);
 
 -- --------------------------------------------------------
 
@@ -2338,11 +2154,13 @@ INSERT INTO `user_role` (`id`, `id_user`, `id_role`) VALUES
 (56, 68, 9),
 (64, 54, 7),
 (65, 56, 7),
-(66, 57, 7),
 (67, 58, 7),
 (68, 59, 7),
 (69, 60, 7),
-(70, 61, 7);
+(71, 57, 7),
+(72, 61, 7),
+(74, 69, 8),
+(75, 70, 5);
 
 --
 -- Índices para tablas volcadas
@@ -2836,7 +2654,7 @@ ALTER TABLE `dim_publicacion`
 -- AUTO_INCREMENT de la tabla `dim_status`
 --
 ALTER TABLE `dim_status`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=133;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=135;
 
 --
 -- AUTO_INCREMENT de la tabla `dim_tiempo`
@@ -2914,19 +2732,19 @@ ALTER TABLE `fact_docente_titulo`
 -- AUTO_INCREMENT de la tabla `fact_egresado_certificacion`
 --
 ALTER TABLE `fact_egresado_certificacion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_egresado_cursos`
 --
 ALTER TABLE `fact_egresado_cursos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_egresado_educacion`
 --
 ALTER TABLE `fact_egresado_educacion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_egresado_estudiosuc`
@@ -2938,7 +2756,7 @@ ALTER TABLE `fact_egresado_estudiosuc`
 -- AUTO_INCREMENT de la tabla `fact_egresado_patentes`
 --
 ALTER TABLE `fact_egresado_patentes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_egresado_trabajos`
@@ -2950,7 +2768,7 @@ ALTER TABLE `fact_egresado_trabajos`
 -- AUTO_INCREMENT de la tabla `fact_egresado_voluntariado`
 --
 ALTER TABLE `fact_egresado_voluntariado`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `fact_estudiante_facultad`
@@ -2962,7 +2780,7 @@ ALTER TABLE `fact_estudiante_facultad`
 -- AUTO_INCREMENT de la tabla `history_action`
 --
 ALTER TABLE `history_action`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=218;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=285;
 
 --
 -- AUTO_INCREMENT de la tabla `parametro_sistema`
@@ -2986,13 +2804,13 @@ ALTER TABLE `role`
 -- AUTO_INCREMENT de la tabla `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
 
 --
 -- AUTO_INCREMENT de la tabla `user_role`
 --
 ALTER TABLE `user_role`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
 -- Restricciones para tablas volcadas

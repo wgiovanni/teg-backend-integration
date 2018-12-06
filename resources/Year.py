@@ -19,15 +19,3 @@ class Year(BD, Resource):
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
         return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }
-
-class Faculty(BD, Resource):
-    representations = {'application/json': make_response}
-    parser = reqparse.RequestParser()
-    def get(self):
-        try:
-            result = self.queryAll("SELECT id, codigo, nombre FROM dim_facultad ORDER BY nombre ASC")
-
-        except Exception as e:
-            abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
-
-        return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }

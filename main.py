@@ -28,7 +28,9 @@ from resources.GraduateCertification import GraduateCertification
 from resources.GraduateEducation import GraduateEducation
 from resources.GraduateStudiosUc import GraduateFaculty, GraduatePerYear, GraduateFacultyYear
 from resources.GraduateVolunteering import GraduateVolunteering
-from resources.Full import Year, Faculty
+from resources.Year import Year
+from resources.Faculty import FacultyReport, Faculty, FacultyId
+from resources.Profession import Profession, ProfessionId
 # metodos
 from etl import etl_process
 
@@ -65,7 +67,11 @@ def extraction():
 api.add_resource(SystemParameterList, '/parametroSistema')
 api.add_resource(SystemParameter, '/parametroSistema/<systemParameter_id>')
 api.add_resource(Year, '/year')
-api.add_resource(Faculty, '/faculty')
+api.add_resource(FacultyReport, '/faculty')
+api.add_resource(Faculty, '/facultad')
+api.add_resource(FacultyId, '/facultad/<faculty_id>')
+api.add_resource(Profession, '/carrera')
+api.add_resource(ProfessionId, '/carrera/<profession_id>')
 
 # cantidad de estudiantes totales
 api.add_resource(Student, '/estudiantes-total')

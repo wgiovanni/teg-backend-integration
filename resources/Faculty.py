@@ -6,13 +6,14 @@ from flask import make_response
 from pymysql import DatabaseError
 from common.BD import BD
 import datetime
+import requests
 from flask import request
 
 class FacultyReport(BD, Resource):
     representations = {'application/json': make_response}
     def get(self):
         try:
-            result = self.queryAll("SELECT id, codigo, nombre FROM dim_facultad ORDER BY nombre ASC")
+            result = self.queryAll("SELECT id, codigo, nombre FROM dim_facultad WHERE status = 1 ORDER BY nombre ASC")
 
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
@@ -33,11 +34,14 @@ class Faculty(BD, Resource):
         try:
             faculty = request.get_json(force=True)
             print(faculty)
-
+            faculty['status'] = 1
             # verificar que se haya guardado en los modulos
-            self.insert('dim_facultad', faculty)
-            self.commit()
-            result = self.queryOne("SELECT id, codigo, nombre FROM dim_facultad ORDER BY ID DESC LIMIT 1")
+            students = requests.post("http://localhost:8082/api/v1/facultad", data= json.dumps(faculty))
+            if(students.status_code == requests.codes.ok):
+                print("si funciono")
+                self.insert('dim_facultad', faculty)
+                self.commit()
+                result = self.queryOne("SELECT id, codigo, nombre FROM dim_facultad ORDER BY ID DESC LIMIT 1")
 
             # ip = ''
             # if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
@@ -121,12 +125,19 @@ class FacultyId(BD, Resource):
             # jsonData = request.get_data(cache=False, as_text=False, parse_form_data=False)
             # jsonData = json.loads(jsonData)
             print(faculty_id)
-            result = self.queryOne("SELECT id, codigo, nombre FROM dim_facultad WHERE ID = %s", [faculty_id])
-            if result is None:
+            faculty = self.queryOne("SELECT * FROM dim_facultad WHERE ID = %s", [faculty_id])
+            if faculty is None:
                 abort(404, message="Resource {} doesn't exists".format(faculty_id))
             else:
-                
-                self.remove("DELETE FROM dim_facultad WHERE ID = %s", [faculty_id])
+                faculty = {
+                    'nombre': faculty['codigo'],
+                    'status': 0
+                }
+                print("hola")
+                students = requests.post("http://localhost:8082/api/v1/facultad", data= json.dumps(faculty))
+                if(students.status_code == requests.codes.ok):
+                    print("si funciono")
+                    self.remove("DELETE FROM dim_facultad WHERE ID = %s", [faculty_id])
                 # datos de auditoria
                 # ip = ''
                 # if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
@@ -149,4 +160,4 @@ class FacultyId(BD, Resource):
         except Exception as e:
             abort(404, message="Resource {} doesn't exists".format(faculty_id))
 
-        return json.dumps(result), 204, { 'Access-Control-Allow-Origin': '*' }
+        return json.dumps(faculty), 204, { 'Access-Control-Allow-Origin': '*' }

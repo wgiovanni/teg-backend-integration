@@ -6,6 +6,7 @@ from flask import make_response
 from pymysql import DatabaseError
 from common.BD import BD
 import datetime
+import requests
 from flask import request
 
 class Profession(BD, Resource):
@@ -17,6 +18,7 @@ class Profession(BD, Resource):
             FROM dim_carrera AS C
             INNER JOIN dim_facultad AS F
             ON (C.id_facultad = F.id)
+            WHERE C.status = 1 
             ORDER BY C.nombre ASC"""))
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
@@ -27,11 +29,21 @@ class Profession(BD, Resource):
         try:
             profession = request.get_json(force=True)
             print(profession)
+            faculty = self.queryOne("SELECT * FROM dim_facultad WHERE id = %s", [profession['id_facultad']])
+            profession1 = {
+                'nombre': profession['codigo'],
+                'pregrado_postgrado': profession['pregrado_postgrado'],
+                'tipo_semestre_anno': profession['semestre_anho'],
+                'facultad': faculty['codigo'],
+                'status': 1
+            }
 
-            # verificar que se haya guardado en los modulos
-            self.insert('dim_carrera', profession)
-            self.commit()
-            result = self.queryOne("SELECT id, codigo, nombre, semestre_anho, id_facultad, pregrado_postgrado FROM dim_carrera ORDER BY ID DESC LIMIT 1")
+            students = requests.post("http://localhost:8082/api/v1/carrera", data= json.dumps(profession1))
+            if(students.status_code == requests.codes.ok):
+                print("si funciono")
+                self.insert('dim_carrera', profession)
+                self.commit()
+                result = self.queryOne("SELECT id, codigo, nombre, semestre_anho, id_facultad, pregrado_postgrado FROM dim_carrera ORDER BY ID DESC LIMIT 1")
 
             # ip = ''
             # if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
@@ -113,13 +125,22 @@ class ProfessionId(BD, Resource):
     def delete(self, profession_id):
         try:
             result = self.queryOne(dedent("""\
-            SELECT id, codigo, nombre, semestre_anho, id_facultad, pregrado_postgrado 
-            FROM dim_carrera WHERE ID = %s"""), [profession_id])
+            SELECT id, codigo, nombre, id_facultad, pregrado_postgrado, semestre_anho FROM dim_carrera WHERE ID = %s"""), [profession_id])
             if result is None:
                 abort(404, message="Resource {} doesn't exists".format(profession_id))
             else:
-                
-                self.remove("DELETE FROM dim_carrera WHERE ID = %s", [profession_id])
+                faculty = self.queryOne("SELECT * FROM dim_facultad WHERE id = %s", [result['id_facultad']])
+                profession1 = {
+                    'nombre': result['codigo'],
+                    'pregrado_postgrado': result['pregrado_postgrado'],
+                    'tipo_semestre_anno': result['semestre_anho'],
+                    'facultad': faculty['codigo'],
+                    'status': 0
+                }
+                students = requests.post("http://localhost:8082/api/v1/carrera", data= json.dumps(profession1))
+                if(students.status_code == requests.codes.ok):
+                    print("si funciono")
+                    self.remove("DELETE FROM dim_carrera WHERE ID = %s", [profession_id])
                 # datos de auditoria
                 # ip = ''
                 # if request.environ.get('HTTP_X_FORWARDED_FOR') is None:

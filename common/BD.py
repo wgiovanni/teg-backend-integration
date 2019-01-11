@@ -134,7 +134,6 @@ class BD:
         cursor.close()
 
     def remove(self, sql: str, params: list):
-        print("Entro")
         self.connect()
         cursor = self.conn.cursor()
         cursor.execute(sql, params)
@@ -142,7 +141,6 @@ class BD:
 
 
     def commit(self):
-        print("Entro")
         self.conn.commit()
 
     def rollback():

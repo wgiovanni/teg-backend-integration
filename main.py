@@ -9,7 +9,7 @@ import mysql.connector
 import simplejson as json
 
 # Resources
-from resources.SystemParameter import SystemParameterList, SystemParameter
+from resources.SystemParameter import SystemParameterList, SystemParameter, SystemParameterUpdateDate
 from resources.Student import Student, StudentMaleFaculty, StudentFemaleFaculty, StudentSexFaculty, StudentUndergraduateSex
 from resources.Student import StudentEthnicGroupFaculty, StudentDisabilityFaculty, StudentInternacionalFaculty, StudentNacionalFaculty 
 from resources.Student import StudentNationalityFaculty, StudentProfessionFaculty, StudentProfessionConstantsFaculty, StudentInternacional 
@@ -66,6 +66,7 @@ def extraction():
 # route para parametros del sistema
 api.add_resource(SystemParameterList, '/parametroSistema')
 api.add_resource(SystemParameter, '/parametroSistema/<systemParameter_id>')
+api.add_resource(SystemParameterUpdateDate, '/fecha')
 api.add_resource(Year, '/year')
 api.add_resource(FacultyReport, '/faculty')
 api.add_resource(Faculty, '/facultad')

@@ -6,7 +6,7 @@
                 {
                     "name":"egresado",
                     "label":"Egresado",
-                    "attributes": ["id", "cedula", "primer_nombre", "segundo_nombre","primer_apellido", "segundo_apellido","correo", "telefono"],
+                    "attributes": ["id", "codigo","cedula", "nombre","apellido","correo", "telefono"],
                     "label_attribute": "cedula"
                 }
             ]
@@ -43,23 +43,12 @@
                 "label_attribute": "nombre"
               }
             ]
-        },
-        {
-            "name":"dim_carrera",
-            "levels": [
-                {
-                "name": "carrera",
-                "label":"Carrera",
-                "attributes": ["id", "codigo", "nombre"],
-                "label_attribute": "nombre"
-                }
-            ]
         }
     ],
     "cubes": [
         {
             "name": "fact_egresado_estudiosuc",
-            "dimensions": ["dim_egresado", "dim_estudiosuc", "dim_tiempo", "dim_facultad", "dim_carrera"],
+            "dimensions": ["dim_egresado", "dim_estudiosuc", "dim_tiempo", "dim_facultad"],
             "measures": [
                 {"name": "cantidad", "label": "Cantidad"}
             ],
@@ -86,21 +75,16 @@
                 {
                     "master": "fact_egresado_estudiosuc.id_facultad",
                     "detail": "dim_facultad.id"
-                },
-                {
-                    "master": "fact_egresado_estudiosuc.id_carrera",
-                    "detail": "dim_carrera.id"
                 }
             ],
             "mappings": {
               "dim_egresado.id": "dim_egresado.id",
-              "dim_egresado.primer_nombre": "dim_egresado.primer_nombre",
-              "dim_egresado.segundo_nombre": "dim_egresado.segundo_nombre",
-              "dim_egresado.primer_apellido": "dim_egresado.primer_apellido",
-              "dim_egresado.segundo_apellido": "dim_egresado.segundo_apellido",
+              "dim_egresado.nombre": "dim_egresado.nombre",
+              "dim_egresado.apellido": "dim_egresado.apellido",
               "dim_egresado.correo": "dim_egresado.correo",
               "dim_egresado.telefono": "dim_egresado.telefono",
               "dim_egresado.cedula": "dim_egresado.cedula",
+              "dim_egresado.codigo": "dim_egresado.codigo",
               "dim_estudiosuc.id": "dim_estudiosuc.id",
               "dim_estudiosuc.codigo": "dim_estudiosuc.codigo",
               "dim_estudiosuc.anho_grado": "dim_estudiosuc.anho_grado",
@@ -109,10 +93,7 @@
               "dim_tiempo.codigo": "dim_tiempo.codigo",
               "dim_facultad.id": "dim_facultad.id",
               "dim_facultad.codigo": "dim_facultad.codigo",
-              "dim_facultad.nombre": "dim_facultad.nombre",
-              "dim_carrera.id": "dim_carrera.id",
-              "dim_carrera.codigo": "dim_carrera.codigo",
-              "dim_carrera.nombre": "dim_carrera.nombre"
+              "dim_facultad.nombre": "dim_facultad.nombre"
             }
         }
     ]

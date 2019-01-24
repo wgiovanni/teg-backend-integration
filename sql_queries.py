@@ -258,16 +258,16 @@ get_prize_code = dedent("""\
 
 # consultas para egresados
 get_graduate_code = dedent("""\
-	SELECT id FROM dim_egresado WHERE cedula = %s""")
+	SELECT id FROM dim_egresado WHERE codigo = %s""")
 
 insert_graduate = dedent("""\
 	INSERT INTO dim_egresado
-		(nombre_usuario, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, descripcion, intereses, correo, telefono, identificacion)
-	VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""")
+		(cedula, nombre, apellido, correo, telefono, codigo)
+	VALUES (%s, %s, %s, %s, %s, %s)""")
 
 update_graduate = dedent("""\
 	UPDATE dim_docente
-	SET nombre_usuario=%s, primer_nombre=%s, segundo_nombre=%s, primer_apellido=%s, segundo_apellido=%s, descripcion=%s, intereses=%s, correo=%s, telefono=%s, identificacion=%s
+	SET cedula=%s, nombre=%s, apellido=%s, correo=%s, telefono=%s, codigo=%s
 	WHERE id=%s""")
 	
 # consultas para estudios uc

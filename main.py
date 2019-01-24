@@ -7,9 +7,13 @@ from flask_cors import CORS
 from flask_restful import Api
 import mysql.connector
 import simplejson as json
+import requests
+import mysql.connector
+from db_credentials import datawarehouse_db_config
+from sql_queries import systemParameter
 
 # Resources
-from resources.SystemParameter import SystemParameterList, SystemParameter, SystemParameterUpdateDate
+from resources.SystemParameter import SystemParameterList, SystemParameter, SystemParameterUpdateDateStudens, SystemParameterUpdateDateTeachers, SystemParameterUpdateDateGraduate, SystemParameterTask
 from resources.Student import Student, StudentMaleFaculty, StudentFemaleFaculty, StudentSexFaculty, StudentUndergraduateSex
 from resources.Student import StudentEthnicGroupFaculty, StudentDisabilityFaculty, StudentInternacionalFaculty, StudentNacionalFaculty 
 from resources.Student import StudentNationalityFaculty, StudentProfessionFaculty, StudentProfessionConstantsFaculty, StudentInternacional 
@@ -31,6 +35,10 @@ from resources.GraduateVolunteering import GraduateVolunteering
 from resources.Year import Year
 from resources.Faculty import FacultyReport, Faculty, FacultyId
 from resources.Profession import Profession, ProfessionId
+from resources.MicroservicesError import MicroservicesError
+
+from constants import CONTENT_TYPE
+
 # metodos
 from etl import etl_process
 
@@ -38,14 +46,29 @@ def sensor():
 	#print(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) # Se obtiene local para la actualizacion de la data cuando se ejecute el job
 	print("Scheduler esta vivo!000000000000000000000")
 
+
 def sensor1():
 	print(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) # Se obtiene local para la actualizacion de la data cuando se ejecute el job
 	print("Scheduler esta vivo11111111111111111111111!")
 
+def taskPause():
+	target_cnx = mysql.connector.connect(**datawarehouse_db_config)
+	target_cursor = target_cnx.cursor(buffered=True)
+	target_cursor.execute("USE {}".format(datawarehouse_name))
+	target_cursor.execute(systemParameter.get_query, ["TAREA_PROGRAMADA"])
+	row = target_cursor.fetchone()
+	# print(row)
+	if (row[4] == "1"):
+		print("Activa")
+		# sched.resume()
+		etl_process()
+	else:
+		print("Inactiva")
+		# sched.pause()
 
 
-# sched = BackgroundScheduler(deamon=True)
-# sched.add_job(extraction, 'interval', minutes=60)
+
+# sched.add_job(sensor, 'interval', seconds=10, id='my_job_id')
 # sched.start()
 
 #sched.add_job(sensor, trigger='interval', seconds=10)
@@ -63,16 +86,37 @@ def extraction():
 	etl_process()
 	return "Hola mundo"
 
+# @app.route('/pause/<id>')
+# def taskPause(id):
+# 	message= ""
+# 	# print("id:"+id)
+# 	if id == "1":
+# 		sched.add_job(sensor, 'interval', seconds=5)
+# 		sched.start()
+# 		message="inicio"
+# 	elif id == "2":
+# 		sched.resume()
+# 		message ="reanudado"
+# 	else:
+# 		sched.pause()
+# 		message= "pausado"
+# 	return message
+# class pauseTask(id):
+
 # route para parametros del sistema
 api.add_resource(SystemParameterList, '/parametroSistema')
 api.add_resource(SystemParameter, '/parametroSistema/<systemParameter_id>')
-api.add_resource(SystemParameterUpdateDate, '/fecha')
+api.add_resource(SystemParameterUpdateDateStudens, '/fecha-estudiantes')
+api.add_resource(SystemParameterUpdateDateTeachers, '/fecha-docentes')
+api.add_resource(SystemParameterUpdateDateGraduate, '/fecha-egresados')
+api.add_resource(SystemParameterTask, '/taskScheduler')
 api.add_resource(Year, '/year')
 api.add_resource(FacultyReport, '/faculty')
 api.add_resource(Faculty, '/facultad')
 api.add_resource(FacultyId, '/facultad/<faculty_id>')
 api.add_resource(Profession, '/carrera')
 api.add_resource(ProfessionId, '/carrera/<profession_id>')
+api.add_resource(MicroservicesError, '/microservices')
 
 # cantidad de estudiantes totales
 api.add_resource(Student, '/estudiantes-total')
@@ -167,4 +211,8 @@ api.add_resource(GraduateFacultyYear, '/egresado-ano-facultad')
 api.add_resource(GraduateJobs, '/egresado-trabajos')
 
 if __name__ == "__main__":
-	app.run(debug=True)
+	# sched = BackgroundScheduler(daemon=True)
+	# sched.add_job(taskPause, 'interval', seconds=10)
+	# sched.start()
+	app.run(debug=True, use_reloader=False)
+	

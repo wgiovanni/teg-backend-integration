@@ -6,7 +6,7 @@
                 {
                     "name":"egresado",
                     "label":"Egresado",
-                    "attributes": ["id", "primer_nombre", "segundo_nombre","primer_apellido", "segundo_apellido", "correo", "telefono", "cedula"],
+                    "attributes": ["id", "codigo","nombre","apellido", "correo", "telefono", "cedula"],
                     "label_attribute": "cedula"
                 }
             ]
@@ -17,7 +17,7 @@
             {
               "name": "trabajos",
               "label":"Trabajos",
-              "attributes": ["id", "codigo", "nombre_empresa", "cargo", "descripcion", "url", "fecha"],
+              "attributes": ["id", "codigo", "nombre_empresa", "cargo", "descripcion", "url", "fecha", "laborando"],
               "label_attribute": "codigo"
             }
           ]
@@ -49,10 +49,9 @@
             ],
             "mappings": {
               "dim_egresado.id": "dim_egresado.id",
-              "dim_egresado.primer_nombre": "dim_egresado.primer_nombre",
-              "dim_egresado.segundo_nombre": "dim_egresado.segundo_nombre",
-              "dim_egresado.primer_apellido": "dim_egresado.primer_apellido",
-              "dim_egresado.segundo_apellido": "dim_egresado.segundo_apellido",
+              "dim_egresado.codigo": "dim_egresado.codigo",
+              "dim_egresado.nombre": "dim_egresado.nombre",
+              "dim_egresado.apellido": "dim_egresado.apellido",
               "dim_egresado.correo": "dim_egresado.correo",
               "dim_egresado.telefono": "dim_egresado.telefono",
               "dim_egresado.cedula": "dim_egresado.cedula",
@@ -62,7 +61,8 @@
               "dim_trabajos.descripcion": "dim_trabajos.descripcion",
               "dim_trabajos.codigo": "dim_trabajos.codigo",
               "dim_trabajos.fecha": "dim_trabajos.fecha",
-              "dim_trabajos.url": "dim_trabajos.url"
+              "dim_trabajos.url": "dim_trabajos.url",
+              "dim_trabajos.laborando": "dim_trabajos.laborando"
             }
         }
     ]

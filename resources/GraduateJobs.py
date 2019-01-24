@@ -30,13 +30,14 @@ class GraduateJobs(BD, Resource):
                     job = {
                         "nombre": row1['dim_trabajos.nombre_empresa'],
                         "cargo": row1['dim_trabajos.cargo'],
-                        "fecha": row1['dim_trabajos.fecha'].strftime('%Y-%m-%d')
+                        "fecha": row1['dim_trabajos.fecha'].strftime('%Y-%m-%d'),
+                        "laborando": row1['dim_trabajos.laborando']
                     }
                     listJobs.append(job)
                 item = {
                     "cedula": row['dim_egresado.cedula'],
-                    "nombre": row['dim_egresado.primer_nombre'],
-                    "apellido": row['dim_egresado.primer_apellido'],
+                    "nombre": row['dim_egresado.nombre'],
+                    "apellido": row['dim_egresado.apellido'],
                     "trabajos": listJobs
                 }
                 graduates.append(item)
@@ -49,3 +50,42 @@ class GraduateJobs(BD, Resource):
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
         return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }
+
+
+class GraduateJobs(BD, Resource):
+    representations = {'application/json': make_response}
+    parser = reqparse.RequestParser()
+    def get(self):
+        try:
+            graduates = self.queryAll(dedent("""\
+            SELECT DISTINCT (nombre_empresa), COUNT(e.id) cantidad_egresados 
+            FROM dim_egresado as e 
+            INNER JOIN fact_egresado_trabajos as et 
+            ON(e.id= et.id_egresado) 
+            INNER JOIN dim_trabajos as t 
+            ON(t.id= et.id_trabajo) 
+            WHERE t.laborando = '1' 
+            GROUP by t.nombre_empresa"""))
+
+            items = self.queryAll(dedent("""\
+            SELECT e.cedula, e.nombre, e.apellido, e.correo, e.telefono, t.nombre_empresa 
+            FROM dim_egresado as e 
+            INNER JOIN fact_egresado_trabajos as et 
+            ON(e.id= et.id_egresado) 
+            INNER JOIN dim_trabajos as t 
+            ON(t.id= et.id_trabajo) 
+            WHERE t.laborando = '1'
+            ORDER by t.nombre_empresa
+            LIMIT 20"""))
+            
+            graduates = sorted(graduates, key=lambda k: k['cantidad_egresados']) 
+            result = {
+                "egresados": graduates,
+                "items": items,
+                "recuperado": "SIGEUC"
+            }
+        except Exception as e:
+            abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
+
+        return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }
+        

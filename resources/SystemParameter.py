@@ -7,7 +7,7 @@ from common.BD import BD
 from flask import request
 import datetime
 
-from constants import DATE_UPDATE, LOAD_INITIAL_UPDATE
+from constants import DATE_UPDATE, LOAD_INITIAL_UPDATE, DATE_UPDATE_STUDENS, DATE_UPDATE_TEACHERS, DATE_UPDATE_GRADUATE
 
 class SystemParameterList(BD, Resource):
 	representations = {'application/json': make_response}
@@ -114,21 +114,16 @@ class SystemParameter(BD, Resource):
 
 		return json.dumps(result), 204, { 'Access-Control-Allow-Origin': '*' }
 
-class SystemParameterUpdateDate(BD, Resource):
+class SystemParameterUpdateDateStudens(BD, Resource):
 	representations = {'application/json': make_response}
 
 	def get(self):
 		try:
-			result = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [LOAD_INITIAL_UPDATE])
-			date = ''
-			jsonData = {}
-			if result is None:
-				jsonData = {"fecha": '0000-00-00 00:00:00'}
-			if result['definicion'] == "1":
+			date = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [DATE_UPDATE_STUDENS])
+
+			if date['definicion'] == '':
 				jsonData = {"fecha": '0000-00-00 00:00:00'}
 			else:
-				date = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [DATE_UPDATE])
-				# print(date)
 				jsonData = {"fecha": date['definicion']}
 		except DatabaseError as e:
 			self.rollback()
@@ -136,3 +131,73 @@ class SystemParameterUpdateDate(BD, Resource):
 		except Exception as e:
 			abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
 		return json.dumps(jsonData), 200, { 'Access-Control-Allow-Origin': '*' }
+
+class SystemParameterUpdateDateTeachers(BD, Resource):
+	representations = {'application/json': make_response}
+
+	def get(self):
+		try:
+			date = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [DATE_UPDATE_TEACHERS])
+
+			if date['definicion'] == '':
+				jsonData = {"fecha": '0000-00-00 00:00:00'}
+			else:
+				jsonData = {"fecha": date['definicion']}
+		except DatabaseError as e:
+			self.rollback()
+			abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
+		except Exception as e:
+			abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
+		return json.dumps(jsonData), 200, { 'Access-Control-Allow-Origin': '*' }
+
+class SystemParameterUpdateDateGraduate(BD, Resource):
+	representations = {'application/json': make_response}
+
+	def get(self):
+		try:
+			date = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [DATE_UPDATE_GRADUATE])
+
+			if date['definicion'] == '':
+				jsonData = {"fecha": '0000-00-00 00:00:00'}
+			else:
+				jsonData = {"fecha": date['definicion']}
+		except DatabaseError as e:
+			self.rollback()
+			abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
+		except Exception as e:
+			abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
+		return json.dumps(jsonData), 200, { 'Access-Control-Allow-Origin': '*' }
+
+class SystemParameterTask(BD, Resource):
+	representations = {'application/json': make_response}
+
+	def get(self):
+		try:
+			result = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", ["TAREA_PROGRAMADA"])
+		except DatabaseError as e:
+			self.rollback()
+			abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
+		except Exception as e:
+			abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
+		return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }
+	
+	def post(self):
+		try:
+			active = request.get_json(force=True)
+			# print(active)
+			result = self.queryOne("SELECT * FROM PARAMETRO_SISTEMA WHERE codigo = %s", ["TAREA_PROGRAMADA"])
+			# print(result)
+			if active['active'] == False:
+				result['definicion'] = "0"
+			else:
+				result['definicion'] = "1"
+			self.update('PARAMETRO_SISTEMA', result, {'ID': result['id']})
+			self.commit()
+			result = self.queryOne("SELECT id, codigo, nombre, descripcion, definicion FROM PARAMETRO_SISTEMA ORDER BY ID DESC LIMIT 1")
+		except DatabaseError as e:
+			self.rollback()
+			abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
+		except Exception as e:
+			abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
+
+		return json.dumps(result), 201, { 'Access-Control-Allow-Origin': '*' }

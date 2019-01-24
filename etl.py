@@ -16,7 +16,7 @@ from sql_queries import jobsQuery, volunteeringQuery, graduateJobsRelationship, 
 from sql_queries import graduateCoursesRelationship, graduateEducationRelationship, graduateVolunteeringRelationship, typeTeacherQuery, projectQuery
 from sql_queries import otherStudioQuery, titleQuery, prizeQuery, yearQuery
 from constants import LOAD_INITIAL_UPDATE, ENDPOINT_LOAD_STUDENTS, ENDPOINT_LOAD_TEACHERS, ENDPOINT_LOAD_GRADUATES, DATE_UPDATE, CONTENT_TYPE
-from constants import DIMENSION, FACT, ITEMS
+from constants import DIMENSION, FACT, ITEMS, DATE_UPDATE_STUDENS, DATE_UPDATE_TEACHERS, DATE_UPDATE_GRADUATE
 from constants import STUDENT, PROFESSION, FACULTY, STUDENT_PROFESSION_FACULTY, TEACHER, SCALE, GRADE, PUBLICATION, TEACHER_PUBLICATION, TEACHER_FACULTY, GRADUATE, STUDIOS_UC
 from constants import NACIONALITY_ATTRIBUTE, SEX_ATTRIBUTE, IDENTIFICATION_CARD, FIRST_NAME_ATRIBUTE, LAST_NAME_ATRIBUTE, BIRTH_DATE_ATTRIBUTE, PHONE_ONE_ATTRIBUTE, PHONE_TWO_ATTRIBUTE, EMAIL_ATTRIBUTE, STATE_PROVENANCE_ATTRIBUTE, WORK_AREA_ATTRIBUTE, CITE_ATTRIBUTE, USER_NAME_ATTRIBUTE
 from constants import MALE, FEMALE, NATIONAL, INTERNACIONAL, STATUS_ACTIVE, STATUS_INACTIVE, ETNIA_FALSE, ETNIA_TRUE, LIST_SCALE
@@ -45,7 +45,6 @@ def etl_process():
 			print("Actualizacion")
 			print(systemParameterDate[4])
 			dataList = requestCargaInitial(target_cnx)
-			
 			for data in dataList:
 				#print(data)
 				keyList= data.keys()
@@ -98,7 +97,7 @@ def etl_process():
 		target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
 		target_cursor.execute(systemParameter.update_query, ["0", row[0]])
 		target_cnx.commit()
-		print("Se actualizo la fecha")
+		print("Se actualizo la fecha global")
 	else:
 		print("Debe llenar un registro en la Tabla 'last_update'")
 	
@@ -115,8 +114,8 @@ def requestCargaInitial(target_cnx):
 	endPointTeacher = target_cursor.fetchone()
 	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_GRADUATES])
 	endPointGraduated = target_cursor.fetchone()
-	#pathList.append(endPointStudent[4])
-	#pathList.append(endPointTeacher[4])
+	pathList.append(endPointStudent[4])
+	pathList.append(endPointTeacher[4])
 	pathList.append(endPointGraduated[4])
 	print(pathList)
 	result = []
@@ -125,11 +124,55 @@ def requestCargaInitial(target_cnx):
 			r = requests.get(path, headers=headers)
 			if r.status_code == requests.codes.ok:
 				result.append(json.loads(r.text))
-		except Exception as e:
-			print("Path no encontrado " + path)
-			continue
-		except r.raise_for_status() as e:
-			abort(404, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
+		except requests.exceptions.HTTPError as errh:
+			# print ("Http Error:",errh)
+			message = str(errc)
+			message = message.split('] ')
+			message = message[-1].split("'")
+			message = message[0]
+			entity = {
+				"message": str(message),
+				"endpoint": path,
+				"type": "Error Http"
+			}
+			insertError(target_cursor, "log_errors_microservices", entity)
+		except requests.exceptions.ConnectionError as errc:
+			# print ("Error Connecting:",errc)
+			message = str(errc)
+			message = message.split('] ')
+			message = message[-1].split("'")
+			message = message[0]
+			entity = {
+				"message": str(message),
+				"endpoint": path,
+				"type": "Error de conexión"
+			}
+			insertError(target_cursor, "log_errors_microservices", entity)
+		except requests.exceptions.Timeout as errt:
+			# print ("Timeout Error:",errt)
+			message = str(errc)
+			message = message.split('] ')
+			message = message[-1].split("'")
+			message = message[0]
+			entity = {
+				"message": str(message),
+				"endpoint": path,
+				"type": "Error, se acabó el tiempo"
+			}
+			insertError(target_cursor, "log_errors_microservices", entity)
+		except requests.exceptions.RequestException as err:
+			# print ("OOps: Something Else",err)
+			message = str(errc)
+			message = message.split('] ')
+			message = message[-1].split("'")
+			message = message[0]
+			entity = {
+				"message": str(message),
+				"endpoint": path,
+				"type": "Otro error" 
+			}
+			insertError(target_cursor, "log_errors_microservices", entity)
+
 		continue		
 
 	return result
@@ -155,11 +198,39 @@ def requestUpdate(target_cnx, lastUpdate):
 			r = requests.get(path, headers=headers)
 			if r.status_code == requests.codes.ok:
 				result.append(json.loads(r.text))
-		except Exception as e:
-			print("Path no encontrado " + path)
-			continue
-		except r.raise_for_status() as e:
-			abort(404, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
+		except requests.exceptions.HTTPError as errh:
+			# print ("Http Error:",errh)
+			message = errh
+			entity = {
+				"message": str(message),
+				"endpoint": path
+			}
+			insertError(target_cursor, "log_errors_microservices", entity)
+		except requests.exceptions.ConnectionError as errc:
+			# print ("Error Connecting:",errc)
+			message = errc
+			entity = {
+				"message": str(message),
+				"endpoint": path
+			}
+			insertError(target_cursor, "log_errors_microservices", entity)
+		except requests.exceptions.Timeout as errt:
+			# print ("Timeout Error:",errt)
+			message = errt
+			entity = {
+				"message": str(message),
+				"endpoint": path
+			}
+			insertError(target_cursor, "log_errors_microservices", entity)
+		except requests.exceptions.RequestException as err:
+			# print ("OOps: Something Else",err)
+			message = err
+			entity = {
+				"message": str(message),
+				"endpoint": path
+			}
+			insertError(target_cursor, "log_errors_microservices", entity)
+
 		continue
 
 	return result
@@ -274,18 +345,45 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 				try:
 					student.append(idStudentExist[0])
 					target_cursor.execute(studentQuery.update_query, student)
+					# actualizar fecha
+					target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_STUDENS])
+					systemParameterDate = target_cursor.fetchone()
+					dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+					target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
 					target_cnx.commit()
 				except mysql.connector.Error as e:
 					print("error")
 					target_cnx.rollback()
+					message = str(e)
+					entity = {
+						"message": str(message),
+						"endpoint": '',
+						"type": "Error de base de datos"
+					}
+					insertError(target_cursor, "log_errors_microservices", entity)
 			else:
 				# insertar estudiante
 				try:
 					target_cursor.execute(studentQuery.load_query, student)
+
+					# actualizar fecha
+					target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_STUDENS])
+					systemParameterDate = target_cursor.fetchone()
+					dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+					target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
 					target_cnx.commit()
 				except mysql.connector.Error as e:
 					print("error")
 					target_cnx.rollback()
+					message = str(e)
+					entity = {
+						"message": str(message),
+						"endpoint": '',
+						"type": "Error de base de datos"
+					}
+					insertError(target_cursor, "log_errors_microservices", entity)
 
 			target_cursor.execute(studentRelationship.get_query_code,[item[IDENTIFICATION_CARD]])
 			idFact = target_cursor.fetchone()
@@ -296,10 +394,24 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 					UPDATE fact_estudiante_facultad
 					SET id_estudiante=%s, id_genero=%s, id_nacionalidad=%s, id_status=%s, id_discapacidad=%s, id_etnia=%s, id_tipo_estudiante=%s, id_tiempo=%s, id_facultad=%s, id_carrera=%s
 					WHERE id = %s"""), [idStudentExist[0], idSex[0], idNationality[0], idStatus[0], idDisability[0], idEthnicGroup[0], idTypeStudent[0], idYear[0], idFaculty[0], idProfession[0], idFact[0]])
+					# actualizar fecha
+					target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_STUDENS])
+					systemParameterDate = target_cursor.fetchone()
+					dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+					target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
 					print("Actualizado")
+
 				except mysql.connector.Error as e:
 					print("error")
 					target_cnx.rollback()
+					message = str(e)
+					entity = {
+						"message": str(message),
+						"endpoint": '',
+						"type": "Error de base de datos"
+					}
+					insertError(target_cursor, "log_errors_microservices", entity)
 			else:
 				# insercion
 				print("INSERCION")
@@ -310,10 +422,23 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 					INSERT INTO FACT_ESTUDIANTE_FACULTAD 
 						(id_estudiante, id_genero, id_nacionalidad, id_status, id_discapacidad, id_etnia, id_tipo_estudiante, id_tiempo, id_facultad, id_carrera)
 					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""), [idStudent[0], idSex[0], idNationality[0], idStatus[0], idDisability[0], idEthnicGroup[0], idTypeStudent[0], idYear[0], idFaculty[0], idProfession[0]])
+					# actualizar fecha
+					target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_STUDENS])
+					systemParameterDate = target_cursor.fetchone()
+					dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+					target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+					
 					print("Insertado")
 				except mysql.connector.Error as e:
 					print("error")
 					target_cnx.rollback()
+					message = str(e)
+					entity = {
+						"message": str(message),
+						"endpoint": '',
+						"type": "Error de base de datos"
+					}
+					insertError(target_cursor, "log_errors_microservices", entity)
 			target_cnx.commit()
 
 	elif table == PROFESSION:
@@ -332,58 +457,32 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 				if row is not None:
 					#print("entro")
 					update(target_cursor, table, item, {"id": row[0]})
+					# actualizar fecha
+					target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_STUDENS])
+					systemParameterDate = target_cursor.fetchone()
+					dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+					target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
 				else:
 					#print("entro2")
 					#target_cursor.execute("INSERT INTO DIM_CARRERA (codigo, nombre) VALUES (%s,%s) ON ON DUPLICATE KEY UPDATE codigo=codigo, nombre=nombre", [item["nombre"], i]) 
 					insert(target_cursor, table, item)
+					# actualizar fecha
+					target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_STUDENS])
+					systemParameterDate = target_cursor.fetchone()
+					dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+					target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
 				target_cnx.commit()
 			except mysql.connector.Error as e:
 				print("Roolback")
+				message = str(e)
+				entity = {
+					"message": str(message),
+					"endpoint": '',
+					"type": "Error de base de datos"
+				}
+				insertError(target_cursor, "log_errors_microservices", entity)
 			
 		print("Insercion finalizada")
-
-	elif table == STUDENT_PROFESSION_FACULTY:
-		'''
-		print("Cargando Hechos Estudiante...")
-		items = content[ITEMS]
-		for item in items:
-			print(item)
-			professionCode = item[PROFESSION]
-			target_cursor.execute(professionQuery.get_query_code, [professionCode])
-			idProfession = target_cursor.fetchone()
-
-			facultyCode = item[FACULTY]
-			target_cursor.execute(facultyQuery.get_query_code, [facultyCode])
-			idFaculty = target_cursor.fetchone()
-			
-			studentCode = item[STUDENT]
-
-			target_cursor.execute(studentQuery.get_query_code, [studentCode])
-			idStudent = target_cursor.fetchone()
-
-			target_cursor.execute(studentRelationship.get_query_code, [studentCode])
-			idFact = target_cursor.fetchone()
-			print(idStudent[0])
-			print(idFaculty[0])
-			print(idProfession[0])
-			#print(idFact[0])
-
-			if idFact is not None:
-				try:
-					target_cursor.execute(dedent("""\
-					UPDATE fact_estudiante_facultad
-					SET id_estudiante=%s, id_facultad=%s, id_carrera=%s
-					WHERE id=%s"""), [idStudent[0], idFaculty[0], idProfession[0], idFact[0]])
-					target_cnx.commit()
-					print("Registro actualizado")
-				except mysql.connector.Error as e:
-					print("error")
-					target_cnx.rollback()
-			else:
-				print("Registro no existe")
-		#target_cnx.commit()
-		print("Insercion finalizada")
-		'''
 
 	elif table == TEACHER:
 		print("DOCENTE")
@@ -444,6 +543,12 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 				try:
 					teacher.append(idTeacherExits[0])
 					target_cursor.execute(teacherQuery.update_query, teacher)
+					# actualizar fecha
+					target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_TEACHERS])
+					systemParameterDate = target_cursor.fetchone()
+					dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+					target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
 					target_cnx.commit()
 					target_cursor.execute(teacherFacultyRelationship.get_query_code, [item[IDENTIFICATION_CARD]])
 					idFact = target_cursor.fetchone()
@@ -452,16 +557,36 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 								UPDATE fact_docente_facultad
 								SET id_docente=%s, id_genero=%s, id_nacionalidad=%s, id_escalafon=%s, id_tipo_docente=%s, id_facultad=%s
 								WHERE id=%s"""), [idTeacherExits[0], idSex[0], idNationality[0], idScale[0], idTypeTeacher[0], idFaculty[0], idFact[0]])
+							# actualizar fecha
+							target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_TEACHERS])
+							systemParameterDate = target_cursor.fetchone()
+							dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+							target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
 							target_cnx.commit()
+
 							print("Actualizado")
 					else:
 						print("No existe el registro")
 				except mysql.connector.Error as e:
 					print("Roolback")
+					message = str(e)
+					entity = {
+						"message": str(message),
+						"endpoint": '',
+						"type": "Error de base de datos"
+					}
+					insertError(target_cursor, "log_errors_microservices", entity)
 
 			else:
 				try:
 					target_cursor.execute(teacherQuery.load_query, teacher)
+					# actualizar fecha
+					target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_TEACHERS])
+					systemParameterDate = target_cursor.fetchone()
+					dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+					target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
 					target_cnx.commit()
 					target_cursor.execute(teacherQuery.get_query_code, [item[IDENTIFICATION_CARD]])
 					idTeacher = target_cursor.fetchone()
@@ -469,10 +594,24 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 					INSERT INTO FACT_DOCENTE_FACULTAD 
 						(id_docente, id_genero, id_nacionalidad, id_escalafon, id_tipo_docente, id_facultad)
 					VALUES (%s, %s, %s, %s, %s, %s)"""), [idTeacher[0], idSex[0], idNationality[0], idScale[0], idTypeTeacher[0], idFaculty[0]])
+					
+					# actualizar fecha
+					target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_TEACHERS])
+					systemParameterDate = target_cursor.fetchone()
+					dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+					target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
 					target_cnx.commit()
 					print("Insertado")
 				except mysql.connector.Error as e:
 					print("Roolback")
+					message = str(e)
+					entity = {
+						"message": str(message),
+						"endpoint": '',
+						"type": "Error de base de datos"
+					}
+					insertError(target_cursor, "log_errors_microservices", entity)
 
 		print("ACTUALIZACION DOCENTE FINALIZADA")
 
@@ -491,15 +630,34 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 			if publication is None:
 				try:
 					insert(target_cursor, "publicacion", item)
+					# actualizar fecha
+					target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_TEACHERS])
+					systemParameterDate = target_cursor.fetchone()
+					dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+					target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
 					target_cnx.commit()
 				except mysql.connector.Error as e:
 					print("Roolback")
 			else:
 				try:
 					update(target_cursor, "publicacion", item, {'id':publication[0]})
+					# actualizar fecha
+					target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_TEACHERS])
+					systemParameterDate = target_cursor.fetchone()
+					dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+					target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
 					target_cnx.commit()
 				except mysql.connector.Error as e:
 					print("Roolback")
+					message = str(e)
+					entity = {
+						"message": str(message),
+						"endpoint": '',
+						"type": "Error de base de datos"
+					}
+					insertError(target_cursor, "log_errors_microservices", entity)
 		print("Insercion finalizada")
 
 	elif table == TEACHER_PUBLICATION:
@@ -535,63 +693,76 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 					VALUES (%s, %s, %s, %s)"""), [ids[0], ids[1], idPublication[0], numberCites])
 				except mysql.connector.Error as e:
 					print("Roolback")
+					message = str(e)
+					entity = {
+						"message": str(message),
+						"endpoint": '',
+						"type": "Error de base de datos"
+					}
+					insertError(target_cursor, "log_errors_microservices", entity)
 			else: 
 				print("Error")
 			print("Insercion finalizada")
+		# actualizar fecha
+		target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_TEACHERS])
+		systemParameterDate = target_cursor.fetchone()
+		dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+		target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
 		target_cnx.commit()
 
 	elif table == "proyecto":
 		items = content[ITEMS]
-		print("INSERCION PROYECTO")
-		for item in items:
-			item = {
-				"codigo": item['codigo'],
-				"titulo": item['titulo']
-			}
-			target_cursor.execute(projectQuery.get_query_code, [item['codigo']])
-			project = target_cursor.fetchone()
-			if project is None:
-				try:
-					insert(target_cursor, "proyecto", item)
-					target_cnx.commit()
-				except mysql.connector.Error as e:
-					print("Roolback")
-			else:
-				try:
-					update(target_cursor, "proyecto", item, {'id': project[0]})
-					target_cnx.commit()
-				except mysql.connector.Error as e:
-					print("Roolback")
-		print("Insercion finalizada")
+		# print("INSERCION PROYECTO")
+		# for item in items:
+		# 	item = {
+		# 		"codigo": item['codigo'],
+		# 		"titulo": item['titulo']
+		# 	}
+		# 	target_cursor.execute(projectQuery.get_query_code, [item['codigo']])
+		# 	project = target_cursor.fetchone()
+		# 	if project is None:
+		# 		try:
+		# 			insert(target_cursor, "proyecto", item)
+		# 			target_cnx.commit()
+		# 		except mysql.connector.Error as e:
+		# 			print("Roolback")
+		# 	else:
+		# 		try:
+		# 			update(target_cursor, "proyecto", item, {'id': project[0]})
+		# 			target_cnx.commit()
+		# 		except mysql.connector.Error as e:
+		# 			print("Roolback")
+		# print("Insercion finalizada")
 
 	elif table == "docente-proyecto":
 		items = content[ITEMS]
-		if items != []:
-			target_cursor.execute("DELETE FROM fact_docente_proyecto")
-			target_cnx.commit()
-		for item in items:
-			teacherCode = item['docente']
-			projectCode = item['proyecto']
-			target_cursor.execute(teacherQuery.get_query_code, [teacherCode])
-			idTeacher = target_cursor.fetchone()
+		# if items != []:
+		# 	target_cursor.execute("DELETE FROM fact_docente_proyecto")
+		# 	target_cnx.commit()
+		# for item in items:
+		# 	teacherCode = item['docente']
+		# 	projectCode = item['proyecto']
+		# 	target_cursor.execute(teacherQuery.get_query_code, [teacherCode])
+		# 	idTeacher = target_cursor.fetchone()
 
-			target_cursor.execute(dedent("""\
-			SELECT id FROM dim_proyecto
-			WHERE codigo = %s"""), [projectCode])
-			idProyect = target_cursor.fetchone()
+		# 	target_cursor.execute(dedent("""\
+		# 	SELECT id FROM dim_proyecto
+		# 	WHERE codigo = %s"""), [projectCode])
+		# 	idProyect = target_cursor.fetchone()
 
-			if idTeacher[0] is not None and idProyect[0] is not None:
-				try:
-					target_cursor.execute(dedent("""\
-					INSERT INTO fact_docente_proyecto
-					(id_docente, id_proyecto)
-					VALUES (%s, %s)"""), [idTeacher[0], idProyect[0]])
-				except mysql.connector.Error as e:
-					print("Roolback")
-			else: 
-				print("Error")
-			print("Insercion finalizada")
-		target_cnx.commit()
+		# 	if idTeacher[0] is not None and idProyect[0] is not None:
+		# 		try:
+		# 			target_cursor.execute(dedent("""\
+		# 			INSERT INTO fact_docente_proyecto
+		# 			(id_docente, id_proyecto)
+		# 			VALUES (%s, %s)"""), [idTeacher[0], idProyect[0]])
+		# 		except mysql.connector.Error as e:
+		# 			print("Roolback")
+		# 	else: 
+		# 		print("Error")
+		# 	print("Insercion finalizada")
+		# target_cnx.commit()
 		
 
 	elif table == "otroestudio":
@@ -655,15 +826,41 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 			if title is None:
 				try:
 					insert(target_cursor, "titulo", item)
+					# actualizar fecha
+					target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_TEACHERS])
+					systemParameterDate = target_cursor.fetchone()
+					dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+					target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
 					target_cnx.commit()
 				except mysql.connector.Error as e:
 					print("Roolback")
+					message = str(e)
+					entity = {
+						"message": str(message),
+						"endpoint": '',
+						"type": "Error de base de datos"
+					}
+					insertError(target_cursor, "log_errors_microservices", entity)
 			else:
 				try:
 					update(target_cursor, "titulo", item, {'id': title[0]})
+					# actualizar fecha
+					target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_TEACHERS])
+					systemParameterDate = target_cursor.fetchone()
+					dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+					target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
 					target_cnx.commit()
 				except mysql.connector.Error as e:
 					print("Roolback")
+					message = str(e)
+					entity = {
+						"message": str(message),
+						"endpoint": '',
+						"type": "Error de base de datos"
+					}
+					insertError(target_cursor, "log_errors_microservices", entity)
 		print("Insercion finalizada")
 
 	elif table == "docente-titulo":
@@ -702,87 +899,128 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 					VALUES (%s, %s, %s)"""), [idTeacher[0], idTitle[0], idLevel[0]])
 				except mysql.connector.Error as e:
 					print("Roolback")
+					message = str(e)
+					entity = {
+						"message": str(message),
+						"endpoint": '',
+						"type": "Error de base de datos"
+					}
+					insertError(target_cursor, "log_errors_microservices", entity)
 			else:
 				print("Error")
 			print("Insercion finalizada")
+		# actualizar fecha
+		target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_TEACHERS])
+		systemParameterDate = target_cursor.fetchone()
+		dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+		target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
 		target_cnx.commit()
 
 	elif table == "premio":
 		items = content[ITEMS]
-		print("INSERCION PREMIO")
-		for item in items:
-			target_cursor.execute(prizeQuery.get_query_code, [item['codigo']])
-			prize = target_cursor.fetchone()
-			if prize is None:
-				try:
-					insert(target_cursor, "premio", item)
-				except mysql.connector.Error as e:
-					print("Roolback")
-			else:
-				try:
-					update(target_cursor, "premio", item, {'id': prize[0]})
-				except mysql.connector.Error as e:
-					print("Roolback")
-		target_cnx.commit()
-		print("Insercion finalizada")
+		# print("INSERCION PREMIO")
+		# for item in items:
+		# 	target_cursor.execute(prizeQuery.get_query_code, [item['codigo']])
+		# 	prize = target_cursor.fetchone()
+		# 	if prize is None:
+		# 		try:
+		# 			insert(target_cursor, "premio", item)
+		# 		except mysql.connector.Error as e:
+		# 			print("Roolback")
+		# 	else:
+		# 		try:
+		# 			update(target_cursor, "premio", item, {'id': prize[0]})
+		# 		except mysql.connector.Error as e:
+		# 			print("Roolback")
+		# target_cnx.commit()
+		# print("Insercion finalizada")
 
 	elif table == "docente-premio":
 		items = content[ITEMS]
-		if items != []:
-			target_cursor.execute("DELETE FROM fact_docente_premio")
-			target_cnx.commit()
-		for item in items:
-			teacherCode = item['docente']
-			target_cursor.execute(teacherQuery.get_query_code, [teacherCode])
-			idTeacher = target_cursor.fetchone()
+		# if items != []:
+		# 	target_cursor.execute("DELETE FROM fact_docente_premio")
+		# 	target_cnx.commit()
+		# for item in items:
+		# 	teacherCode = item['docente']
+		# 	target_cursor.execute(teacherQuery.get_query_code, [teacherCode])
+		# 	idTeacher = target_cursor.fetchone()
 
-			target_cursor.execute(dedent("""\
-			SELECT id FROM dim_premio
-			WHERE codigo = %s"""), [item['premio']])
-			idPrize = target_cursor.fetchone()
+		# 	target_cursor.execute(dedent("""\
+		# 	SELECT id FROM dim_premio
+		# 	WHERE codigo = %s"""), [item['premio']])
+		# 	idPrize = target_cursor.fetchone()
 
-			if idTeacher[0] is not None and idPrize[0] is not None:
-				try:
-					target_cursor.execute(dedent("""\
-					INSERT INTO fact_docente_premio
-					(id_docente, id_premio)
-					VALUES (%s, %s)"""), [idTeacher[0], idPrize[0]])
-				except mysql.connector.Error as e:
-					print("Roolback")
-			else:
-				print("Error")
-			print("Insercion finalizada")
-		target_cnx.commit()
+		# 	if idTeacher[0] is not None and idPrize[0] is not None:
+		# 		try:
+		# 			target_cursor.execute(dedent("""\
+		# 			INSERT INTO fact_docente_premio
+		# 			(id_docente, id_premio)
+		# 			VALUES (%s, %s)"""), [idTeacher[0], idPrize[0]])
+		# 		except mysql.connector.Error as e:
+		# 			print("Roolback")
+		# 	else:
+		# 		print("Error")
+		# 	print("Insercion finalizada")
+		# target_cnx.commit()
 
 	elif table == GRADUATE:
 		print("Entro")
 		items = content[ITEMS]
 		for item in items:
 			if validateJson(item):
-				graduateCode = item['identificacion']
+				graduateCode = item['codigo']
 				target_cursor.execute(graduateQuery.get_query_code, [graduateCode])
 				idGraduate = target_cursor.fetchone()
+				print("codigo")
+				print(idGraduate)
 				item = {
 					"cedula": item['identificacion'],
-					"primer_nombre": item['primernombre'], 
-					"segundo_nombre": item['segundonombre'], 
-					"primer_apellido": item['primerapellido'],
-					"segundo_apellido": item['segundoapellido'],
+					"nombre": item['primernombre'], 
+					"apellido": item['primerapellido'],
 					"correo": item['email'],
-					"telefono": item['telefono']				
+					"telefono": item['telefono'],
+					"codigo": item['codigo']				
 				}
 				if idGraduate is None:
+					print("insertar")
 					try:
 						insert(target_cursor, table, item)
+						# actualizar fecha
+						target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_GRADUATE])
+						systemParameterDate = target_cursor.fetchone()
+						dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+						target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
 						target_cnx.commit()
 					except mysql.connector.Error as e:
 						print("Roolback")
+						message = str(e)
+						entity = {
+							"message": str(message),
+							"endpoint": '',
+							"type": "Error de base de datos"
+						}
+						insertError(target_cursor, "log_errors_microservices", entity)
 				else:
+					print("actualizar")
 					try: 
 						update(target_cursor, table, item, {"id": idGraduate[0]})
+						# actualizar fecha
+						target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_GRADUATE])
+						systemParameterDate = target_cursor.fetchone()
+						dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+						target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
 						target_cnx.commit()
 					except mysql.connector.Error as e:
 						print("Roolback")
+						message = str(e)
+						entity = {
+							"message": str(message),
+							"endpoint": '',
+							"type": "Error de base de datos"
+						}
+						insertError(target_cursor, "log_errors_microservices", entity)
 			else: 
 				print("Objeto con valores nulos o vacios")
 	
@@ -792,6 +1030,8 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 		for item in items:
 			print(item)
 			if validateJson(item):
+				facultyCode = item['facultad']
+				graduateCode = item['egresado']
 				item = {
 					"titulo": item['titulo'],
 					"anho_grado": item['anhogrado'],
@@ -804,82 +1044,178 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 					print("INSERTADO")
 					try:
 						insert(target_cursor, table, item)
+						# actualizar fecha
+						target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_GRADUATE])
+						systemParameterDate = target_cursor.fetchone()
+						dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+						target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
 						target_cnx.commit()
 					except mysql.connector.Error as e:
 						print("Roolback")
+						message = str(e)
+						entity = {
+							"message": str(message),
+							"endpoint": '',
+							"type": "Error de base de datos"
+						}
+						insertError(target_cursor, "log_errors_microservices", entity)
 				else:
 					print("ACTUALIZADO")
 					try: 
 						update(target_cursor, table, item, {"id": studiosUc[0]})
+						# actualizar fecha
+						target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_GRADUATE])
+						systemParameterDate = target_cursor.fetchone()
+						dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+						target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
 						target_cnx.commit()
 					except mysql.connector.Error as e:
 						print("Roolback")
+						message = str(e)
+						entity = {
+							"message": str(message),
+							"endpoint": '',
+							"type": "Error de base de datos"
+						}
+						insertError(target_cursor, "log_errors_microservices", entity)
+				
+				target_cursor.execute(facultyQuery.get_query_code, [facultyCode])
+				idFaculty = target_cursor.fetchone()
+
+				target_cursor.execute(graduateQuery.get_query_code, [graduateCode])
+				idGraduate = target_cursor.fetchone()
+
+				studiosUcCode = item['codigo']
+				target_cursor.execute(studiosUcQuery.get_query_code, [studiosUcCode])
+				idStudiosUc = target_cursor.fetchone()
+				idYear = None
+				
+				if idStudiosUc is not None:
+					anhoCode = idStudiosUc[1].strftime('%Y-%m-%d').split("-")
+					target_cursor.execute(yearQuery.get_query_code, [anhoCode[0]])
+					idYear = target_cursor.fetchone()
+
+				target_cursor.execute(graduateStudiosUcRelationship.get_query_code, [studiosUcCode])
+				idFact = target_cursor.fetchone()
+
+				if idStudiosUc is not None and idFaculty is not None and idYear is not None and idGraduate is not None:
+					if idFact is not None:
+						print("ACTUALIZADO")
+						try:
+							target_cursor.execute(dedent("""\
+							UPDATE fact_egresado_estudiosuc
+							SET id_egresado=%s, id_estudiosuc=%s, id_facultad=%s, id_tiempo=%s 
+							WHERE id=%s;"""), [idGraduate[0], idStudiosUc[0], idFaculty[0], idYear[0], idFact[0]])
+							# actualizar fecha
+							target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_GRADUATE])
+							systemParameterDate = target_cursor.fetchone()
+							dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+							target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
+							target_cnx.commit()
+							print("Registro actualizado")
+						except mysql.connector.Error as e:
+							print("Roolback {}".format(e))
+							message = str(e)
+							entity = {
+								"message": str(message),
+								"endpoint": '',
+								"type": "Error de base de datos"
+							}
+							insertError(target_cursor, "log_errors_microservices", entity)
+					else:
+						print("INSERTADO")
+						try:
+							target_cursor.execute(dedent("""\
+							INSERT INTO fact_egresado_estudiosuc 
+							(id_egresado, id_estudiosuc, id_facultad, id_tiempo)
+							VALUES (%s, %s, %s, %s)"""), [idGraduate[0], idStudiosUc[0], idFaculty[0], idYear[0]])
+
+							# actualizar fecha
+							target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_GRADUATE])
+							systemParameterDate = target_cursor.fetchone()
+							dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+							target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
+							target_cnx.commit()
+							print("Registro insertado")
+						except mysql.connector.Error as e:
+							print("Roolback {}".format(e))
+							message = str(e)
+							entity = {
+								"message": str(message),
+								"endpoint": '',
+								"type": "Error de base de datos"
+							}
+							insertError(target_cursor, "log_errors_microservices", entity)
 			else:
 				print("Objeto con valores nulos o vacios")
 	
 	elif table == "egresado-estudiosuc":
 		print("EGRESADO ESTUDIOSUC")
-		items = content[ITEMS]
-		for item in items:
-			print(item)
-			if validateJson(item):
-				target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
-				idGraduate = target_cursor.fetchone()
+		# items = content[ITEMS]
+		# for item in items:
+		# 	print(item)
+		# 	if validateJson(item):
+		# 		target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
+		# 		idGraduate = target_cursor.fetchone()
 
-				studiosUcList = item["estudiosuc"]
+		# 		studiosUcList = item["estudiosuc"]
 
-				if studiosUcList is not None and idGraduate is not None:
-					for i in studiosUcList:
-						if validateJson(i):
-							studiosUcCode = i['codigo']
-							facultyCode = i['facultad']
-							professionCode = i['carrera']
+		# 		if studiosUcList is not None and idGraduate is not None:
+		# 			for i in studiosUcList:
+		# 				if validateJson(i):
+		# 					studiosUcCode = i['codigo']
+		# 					facultyCode = i['facultad']
+		# 					professionCode = i['carrera']
 
-							target_cursor.execute(studiosUcQuery.get_query_code, [studiosUcCode])
-							idStudiosUc = target_cursor.fetchone()
-							idYear = None
-							if idStudiosUc is not None:
-								anhoCode = idStudiosUc[1].strftime('%Y-%m-%d').split("-")
-								target_cursor.execute(yearQuery.get_query_code, [anhoCode[0]])
-								idYear = target_cursor.fetchone()
+		# 					target_cursor.execute(studiosUcQuery.get_query_code, [studiosUcCode])
+		# 					idStudiosUc = target_cursor.fetchone()
+		# 					idYear = None
+		# 					if idStudiosUc is not None:
+		# 						anhoCode = idStudiosUc[1].strftime('%Y-%m-%d').split("-")
+		# 						target_cursor.execute(yearQuery.get_query_code, [anhoCode[0]])
+		# 						idYear = target_cursor.fetchone()
 
-							target_cursor.execute(facultyQuery.get_query_code, [facultyCode])
-							idFaculty = target_cursor.fetchone()
+		# 					target_cursor.execute(facultyQuery.get_query_code, [facultyCode])
+		# 					idFaculty = target_cursor.fetchone()
 
-							target_cursor.execute(professionQuery.get_query_code, [professionCode])
-							idProfession = target_cursor.fetchone()
+		# 					target_cursor.execute(professionQuery.get_query_code, [professionCode])
+		# 					idProfession = target_cursor.fetchone()
 
-							target_cursor.execute(graduateStudiosUcRelationship.get_query_code, [studiosUcCode])
-							idFact = target_cursor.fetchone()
+		# 					target_cursor.execute(graduateStudiosUcRelationship.get_query_code, [studiosUcCode])
+		# 					idFact = target_cursor.fetchone()
 
-							if idStudiosUc is not None and idFaculty is not None and idProfession is not None and idYear is not None and idGraduate is not None:
-								if idFact is not None:
-									print("ACTUALIZADO")
-									try:
-										target_cursor.execute(dedent("""\
-										UPDATE fact_egresado_estudiosuc
-										SET id_egresado=%s, id_estudiosuc=%s, id_facultad=%s, id_carrera=%s, id_tiempo=%s 
-										WHERE id=%s;"""), [idGraduate[0], idStudiosUc[0], idFaculty[0], idProfession[0], idYear[0], idFact[0]])
-										target_cnx.commit()
-										print("Registro actualizado")
-									except mysql.connector.Error as e:
-										print("Roolback {}".format(e))
-								else:
-									print("INSERTADO")
-									try:
-										target_cursor.execute(dedent("""\
-										INSERT INTO fact_egresado_estudiosuc 
-										(id_egresado, id_estudiosuc, id_facultad, id_carrera, id_tiempo)
-										VALUES (%s, %s, %s, %s, %s)"""), [idGraduate[0], idStudiosUc[0], idFaculty[0], idProfession[0], idYear[0]])
-										target_cnx.commit()
-										print("Registro insertado")
-									except mysql.connector.Error as e:
-										print("Roolback {}".format(e))
-						else:
-							print("Objeto con valores nulos o vacios")
-			else:
-				print("Objeto con valores nulos o vacios")
-		print("Actualizacion finalizada")
+		# 					if idStudiosUc is not None and idFaculty is not None and idProfession is not None and idYear is not None and idGraduate is not None:
+		# 						if idFact is not None:
+		# 							print("ACTUALIZADO")
+		# 							try:
+		# 								target_cursor.execute(dedent("""\
+		# 								UPDATE fact_egresado_estudiosuc
+		# 								SET id_egresado=%s, id_estudiosuc=%s, id_facultad=%s, id_carrera=%s, id_tiempo=%s 
+		# 								WHERE id=%s;"""), [idGraduate[0], idStudiosUc[0], idFaculty[0], idProfession[0], idYear[0], idFact[0]])
+		# 								target_cnx.commit()
+		# 								print("Registro actualizado")
+		# 							except mysql.connector.Error as e:
+		# 								print("Roolback {}".format(e))
+		# 						else:
+		# 							print("INSERTADO")
+		# 							try:
+		# 								target_cursor.execute(dedent("""\
+		# 								INSERT INTO fact_egresado_estudiosuc 
+		# 								(id_egresado, id_estudiosuc, id_facultad, id_carrera, id_tiempo)
+		# 								VALUES (%s, %s, %s, %s, %s)"""), [idGraduate[0], idStudiosUc[0], idFaculty[0], idProfession[0], idYear[0]])
+		# 								target_cnx.commit()
+		# 								print("Registro insertado")
+		# 							except mysql.connector.Error as e:
+		# 								print("Roolback {}".format(e))
+		# 				else:
+		# 					print("Objeto con valores nulos o vacios")
+		# 	else:
+		# 		print("Objeto con valores nulos o vacios")
+		# print("Actualizacion finalizada")
 	
 	elif table == "trabajos":
 		print("Trabajos\n\n")
@@ -887,13 +1223,16 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 		for item in items:
 			print(item)
 			if validateJson(item):
+				graduateCode = item['egresado']
+				jobCode = item['codigo']
 				item = {
 					"nombre_empresa": item['nombreempresa'],
 					"cargo": item['cargo'],
 					"descripcion": item['descripcion'],
 					"codigo": item['codigo'],
 					"url": item['url'],
-					"fecha": item['fecha']
+					"fecha": item['fecha'],
+					"laborando": item['laborando']
 				}
 				target_cursor.execute(jobsQuery.get_query_code, [item['codigo']])
 				job = target_cursor.fetchone()
@@ -901,6 +1240,13 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 					print("INSERTADO")
 					try:
 						insert(target_cursor, table, item)
+
+						# actualizar fecha
+						target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_GRADUATE])
+						systemParameterDate = target_cursor.fetchone()
+						dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+						target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
 						target_cnx.commit()
 					except mysql.connector.Error as e:
 						print("Roolback")
@@ -908,62 +1254,137 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 					print("ACTUALIZADO")
 					try: 
 						update(target_cursor, table, item, {"id": job[0]})
+
+						# actualizar fecha
+						target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_GRADUATE])
+						systemParameterDate = target_cursor.fetchone()
+						dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+						target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
 						target_cnx.commit()
 					except mysql.connector.Error as e:
 						print("Roolback")
+						message = str(e)
+						entity = {
+							"message": str(message),
+							"endpoint": '',
+							"type": "Error de base de datos"
+						}
+						insertError(target_cursor, "log_errors_microservices", entity)
+
+				target_cursor.execute(jobsQuery.get_query_code, [jobCode])
+				idJob = target_cursor.fetchone() 
+
+				target_cursor.execute(graduateQuery.get_query_code, [graduateCode])
+				idGraduate = target_cursor.fetchone()
+
+				target_cursor.execute(graduateJobsRelationship.get_query_code, [jobCode])
+				idFact = target_cursor.fetchone()
+
+				if idJob is not None and idGraduate is not None:
+					if idFact is not None:
+						print("ACTUALIZADO")
+						try:
+							target_cursor.execute(dedent("""\
+							UPDATE fact_egresado_trabajos
+							SET id_egresado=%s, id_trabajo=%s 
+							WHERE id=%s;"""), [idGraduate[0], idJob[0], idFact[0]])
+
+							# actualizar fecha
+							target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_GRADUATE])
+							systemParameterDate = target_cursor.fetchone()
+							dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+							target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
+							target_cnx.commit()
+							print("Registro actualizado")
+						except mysql.connector.Error as e:
+							print("Roolback {}".format(e))
+							message = str(e)
+							entity = {
+								"message": str(message),
+								"endpoint": '',
+								"type": "Error de base de datos"
+							}
+							insertError(target_cursor, "log_errors_microservices", entity)
+					else:
+						print("INSERTADO")
+						try:
+							target_cursor.execute(dedent("""\
+							INSERT INTO fact_egresado_trabajos 
+							(id_egresado, id_trabajo)
+							VALUES (%s, %s)"""), [idGraduate[0], idJob[0]])
+
+							# actualizar fecha
+							target_cursor.execute(systemParameter.get_query, [DATE_UPDATE_GRADUATE])
+							systemParameterDate = target_cursor.fetchone()
+							dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+							target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+
+							target_cnx.commit()
+							print("Registro insertado")
+						except mysql.connector.Error as e:
+							print("Roolback {}".format(e))
+							message = str(e)
+							entity = {
+								"message": str(message),
+								"endpoint": '',
+								"type": "Error de base de datos"
+							}
+							insertError(target_cursor, "log_errors_microservices", entity)
 			else:
 				print("Objeto con valores nulos o vacios")
 
 	elif table == "egresado-trabajos":
 		print("EGRESADO TRABAJOS")
-		items = content[ITEMS]
-		for item in items:
-			print(item)
-			if validateJson(item):
-				target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
-				idGraduate = target_cursor.fetchone()
-				print(item['egresado'])
-				jobsList = item["trabajos"]
+		# items = content[ITEMS]
+		# for item in items:
+		# 	print(item)
+		# 	if validateJson(item):
+		# 		target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
+		# 		idGraduate = target_cursor.fetchone()
+		# 		print(item['egresado'])
+		# 		jobsList = item["trabajos"]
 
-				if jobsList is not None and idGraduate is not None:
-					for i in jobsList:
-						if validateJson(i):
-							jobCode = i['codigo']
-							print(jobCode)
-							target_cursor.execute(jobsQuery.get_query_code, [jobCode])
-							idJob = target_cursor.fetchone()
+		# 		if jobsList is not None and idGraduate is not None:
+		# 			for i in jobsList:
+		# 				if validateJson(i):
+		# 					jobCode = i['codigo']
+		# 					print(jobCode)
+		# 					target_cursor.execute(jobsQuery.get_query_code, [jobCode])
+		# 					idJob = target_cursor.fetchone()
 
-							target_cursor.execute(graduateJobsRelationship.get_query_code, [jobCode])
-							idFact = target_cursor.fetchone()
+		# 					target_cursor.execute(graduateJobsRelationship.get_query_code, [jobCode])
+		# 					idFact = target_cursor.fetchone()
 
-							if idJob is not None and idGraduate is not None:
-								if idFact is not None:
-									print("ACTUALIZADO")
-									try:
-										target_cursor.execute(dedent("""\
-										UPDATE fact_egresado_trabajos
-										SET id_egresado=%s, id_trabajo=%s 
-										WHERE id=%s;"""), [idGraduate[0], idJob[0], idFact[0]])
-										target_cnx.commit()
-										print("Registro actualizado")
-									except mysql.connector.Error as e:
-										print("Roolback {}".format(e))
-								else:
-									print("INSERTADO")
-									try:
-										target_cursor.execute(dedent("""\
-										INSERT INTO fact_egresado_trabajos 
-										(id_egresado, id_trabajo)
-										VALUES (%s, %s)"""), [idGraduate[0], idJob[0]])
-										target_cnx.commit()
-										print("Registro insertado")
-									except mysql.connector.Error as e:
-										print("Roolback {}".format(e))
-						else:
-							print("Objeto con valores nulos o vacios")
-			else:
-				print("Objeto con valores nulos o vacios")
-		print("Actualizacion finalizada")
+		# 					if idJob is not None and idGraduate is not None:
+		# 						if idFact is not None:
+		# 							print("ACTUALIZADO")
+		# 							try:
+		# 								target_cursor.execute(dedent("""\
+		# 								UPDATE fact_egresado_trabajos
+		# 								SET id_egresado=%s, id_trabajo=%s 
+		# 								WHERE id=%s;"""), [idGraduate[0], idJob[0], idFact[0]])
+		# 								target_cnx.commit()
+		# 								print("Registro actualizado")
+		# 							except mysql.connector.Error as e:
+		# 								print("Roolback {}".format(e))
+		# 						else:
+		# 							print("INSERTADO")
+		# 							try:
+		# 								target_cursor.execute(dedent("""\
+		# 								INSERT INTO fact_egresado_trabajos 
+		# 								(id_egresado, id_trabajo)
+		# 								VALUES (%s, %s)"""), [idGraduate[0], idJob[0]])
+		# 								target_cnx.commit()
+		# 								print("Registro insertado")
+		# 							except mysql.connector.Error as e:
+		# 								print("Roolback {}".format(e))
+		# 				else:
+		# 					print("Objeto con valores nulos o vacios")
+		# 	else:
+		# 		print("Objeto con valores nulos o vacios")
+		# print("Actualizacion finalizada")
 
 	target_cursor.close()
 
@@ -1119,4 +1540,27 @@ def validateJson(items: dict):
 			validate = False
 	
 	return validate
+
+def insertError(cursor, table: str, datos: dict=None, columns=None, values: list=None):
+	if datos is not None:
+		columns = []
+		values = []
+		for col, val in datos.items():
+			columns.append(col)
+			values.append(val)
+
+	if isinstance(columns, str):
+		columns = "("+columns+")"
+	elif isinstance(columns, list):
+		columns = "("+", ".join(columns)+")"
+
+
+	if isinstance(values[0], (list, tuple)):
+		marks = "(%s" + (",%s" * (len(values[0]) - 1)) + ")"
+		sql = f"insert into {table} {columns} values {marks}", values
+		cursor.execute(sql, values)
+	else:
+		marks = "(%s" + (",%s" * (len(values) - 1)) + ")"
+		sql = f"insert into {table} {columns} values {marks}"
+		cursor.execute(sql, values)	
 

@@ -8,12 +8,13 @@ from common.BD import BD
 import datetime
 import requests
 from flask import request
+from constants import LOG_ACTIVITY_MICROSERVICES
 
 class MicroservicesError(BD, Resource):
     representations = {'application/json': make_response}
     def get(self):
         try:
-            result = self.queryAll("SELECT * FROM log_errors_microservices WHERE status = 0 ORDER BY date DESC")
+            result = self.queryAll("SELECT * FROM LOG_ACTIVITY_MICROSERVICES WHERE status = 0 ORDER BY date DESC")
             for r in result:
                 r['date'] = r['date'].strftime('%Y-%m-%d %H:%M:%S')
         except Exception as e:
@@ -25,7 +26,7 @@ class MicroservicesError(BD, Resource):
         try:
             print("Entro")
             #self.remove("DELETE FROM HISTORY_ACTION",[])
-            self.remove("UPDATE log_errors_microservices SET status = %s",[True])
+            self.remove("UPDATE LOG_ACTIVITY_MICROSERVICES SET status = %s",[True])
             self.commit()
             print("Salio")
         except DatabaseError as e:

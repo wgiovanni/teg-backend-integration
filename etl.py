@@ -16,7 +16,7 @@ from sql_queries import jobsQuery, volunteeringQuery, graduateJobsRelationship, 
 from sql_queries import graduateCoursesRelationship, graduateEducationRelationship, graduateVolunteeringRelationship, typeTeacherQuery, projectQuery
 from sql_queries import otherStudioQuery, titleQuery, prizeQuery, yearQuery
 from constants import LOAD_INITIAL_UPDATE, ENDPOINT_LOAD_STUDENTS, ENDPOINT_LOAD_TEACHERS, ENDPOINT_LOAD_GRADUATES, DATE_UPDATE, CONTENT_TYPE
-from constants import DIMENSION, FACT, ITEMS, DATE_UPDATE_STUDENS, DATE_UPDATE_TEACHERS, DATE_UPDATE_GRADUATE
+from constants import DIMENSION, FACT, ITEMS, DATE_UPDATE_STUDENS, DATE_UPDATE_TEACHERS, DATE_UPDATE_GRADUATE, LOG_ACTIVITY_MICROSERVICES
 from constants import STUDENT, PROFESSION, FACULTY, STUDENT_PROFESSION_FACULTY, TEACHER, SCALE, GRADE, PUBLICATION, TEACHER_PUBLICATION, TEACHER_FACULTY, GRADUATE, STUDIOS_UC
 from constants import NACIONALITY_ATTRIBUTE, SEX_ATTRIBUTE, IDENTIFICATION_CARD, FIRST_NAME_ATRIBUTE, LAST_NAME_ATRIBUTE, BIRTH_DATE_ATTRIBUTE, PHONE_ONE_ATTRIBUTE, PHONE_TWO_ATTRIBUTE, EMAIL_ATTRIBUTE, STATE_PROVENANCE_ATTRIBUTE, WORK_AREA_ATTRIBUTE, CITE_ATTRIBUTE, USER_NAME_ATTRIBUTE
 from constants import MALE, FEMALE, NATIONAL, INTERNACIONAL, STATUS_ACTIVE, STATUS_INACTIVE, ETNIA_FALSE, ETNIA_TRUE, LIST_SCALE
@@ -24,9 +24,8 @@ from constants import DISABILITY_FALSE, DISABILITY_TRUE, UNDERGRADUATE, POSTGRAD
 # variables
 from variables import datawarehouse_name
 
-
-def etl_process():
-	print("ETL \n")
+def etl_process_students():
+	print("ETL estudiantes\n")
 	target_cnx = mysql.connector.connect(**datawarehouse_db_config)
 	target_cursor = target_cnx.cursor(buffered=True)
 	target_cursor.execute("USE {}".format(datawarehouse_name))
@@ -35,7 +34,6 @@ def etl_process():
 	target_cursor.execute(systemParameter.get_query, [DATE_UPDATE])
 	systemParameterDate = target_cursor.fetchone()
 	dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-	print(row)
 	dimension = DIMENSION
 	hechos = FACT
 	table = ''
@@ -44,55 +42,31 @@ def etl_process():
 			#actualizacion
 			print("Actualizacion")
 			print(systemParameterDate[4])
-			dataList = requestCargaInitial(target_cnx)
-			for data in dataList:
-				#print(data)
-				keyList= data.keys()
-				keyList = sorted(keyList)
-				for key in keyList:
-					#print("KEY:{}".format(key))
-					if dimension in key:
-						#print("Dimension")
-						#picar string
-						table = key[len(dimension):]
-					elif hechos in key:
-						#print("Hechos")
-						#picar string
-						table = key[len(hechos):]
-					content = data[key]
-					#print("\n\n")
-					#print(table)
-					#print(content)
-					distributionCargaInitialUpdate(target_cnx, table, content)
+			data = requestCargaInitialStudents(target_cnx)
+			keyList= data.keys()
+			keyList = sorted(keyList)
+			for key in keyList:
+				if dimension in key:
+					table = key[len(dimension):]
+				elif hechos in key:
+					table = key[len(hechos):]
+				content = data[key]
+				distributionCargaInitialUpdateStudens(target_cnx, table, content)
 		else:
 			print("Carga Inicial")
 			# insercion de tablas estaticas
 			insertTableStatic(target_cnx)
-			dataList = requestCargaInitial(target_cnx)
-			#print(dataList)
-			#print("\n\n")
-			for data in dataList:
-				#print(data)
-				#print("\n")
-				# ordenamiento: ESTO ES RELEVANTE
-				keyList= data.keys()
-				keyList = sorted(keyList)
-				#insercion
-				for key in keyList:
-					#print("KEY:{}".format(key))
-					if dimension in key:
-						#print("Dimension")
-						#picar string
-						table = key[len(dimension):]
-					elif hechos in key:
-						#print("Hechos")
-						#picar string
-						table = key[len(hechos):]
-					content = data[key]
-					#print("\n\n")
-					#print(table)
-					#print(content)
-					distributionCargaInitialUpdate(target_cnx, table, content)
+			data = requestCargaInitialStudents(target_cnx)
+			keyList= data.keys()
+			keyList = sorted(keyList)
+			#insercion
+			for key in keyList:
+				if dimension in key:
+					table = key[len(dimension):]
+				elif hechos in key:
+					table = key[len(hechos):]
+				content = data[key]
+				distributionCargaInitialUpdateStudens(target_cnx, table, content)
 		
 		target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
 		target_cursor.execute(systemParameter.update_query, ["0", row[0]])
@@ -100,144 +74,286 @@ def etl_process():
 		print("Se actualizo la fecha global")
 	else:
 		print("Debe llenar un registro en la Tabla 'last_update'")
-	
-	target_cursor.close()
 
-def requestCargaInitial(target_cnx):
+def etl_process_teachers():
+	print("ETL docentes\n")
+	target_cnx = mysql.connector.connect(**datawarehouse_db_config)
+	target_cursor = target_cnx.cursor(buffered=True)
+	target_cursor.execute("USE {}".format(datawarehouse_name))
+	target_cursor.execute(systemParameter.get_query, [LOAD_INITIAL_UPDATE])
+	row = target_cursor.fetchone()
+	target_cursor.execute(systemParameter.get_query, [DATE_UPDATE])
+	systemParameterDate = target_cursor.fetchone()
+	dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+	dimension = DIMENSION
+	hechos = FACT
+	table = ''
+	if row is not None:
+		if row[4] == "0":
+			#actualizacion
+			print("Actualizacion")
+			data = requestCargaInitialTeachers(target_cnx)
+			keyList= data.keys()
+			keyList = sorted(keyList)
+			for key in keyList:
+				if dimension in key:
+					table = key[len(dimension):]
+				elif hechos in key:
+					table = key[len(hechos):]
+				content = data[key]
+				distributionCargaInitialUpdateTeachers(target_cnx, table, content)
+		else:
+			print("Carga Inicial")
+			# insercion de tablas estaticas
+			insertTableStatic(target_cnx)
+			data = requestCargaInitialTeachers(target_cnx)
+			keyList= data.keys()
+			keyList = sorted(keyList)
+			#insercion
+			for key in keyList:
+				if dimension in key:
+					table = key[len(dimension):]
+				elif hechos in key:
+					table = key[len(hechos):]
+				content = data[key]
+				distributionCargaInitialUpdateTeachers(target_cnx, table, content)
+		
+		target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+		target_cursor.execute(systemParameter.update_query, ["0", row[0]])
+		target_cnx.commit()
+		print("Se actualizo la fecha global")
+	else:
+		print("Debe llenar un registro en la Tabla 'last_update'")
+
+
+def etl_process_graduates():
+	print("ETL egresados\n")
+	target_cnx = mysql.connector.connect(**datawarehouse_db_config)
+	target_cursor = target_cnx.cursor(buffered=True)
+	target_cursor.execute("USE {}".format(datawarehouse_name))
+	target_cursor.execute(systemParameter.get_query, [LOAD_INITIAL_UPDATE])
+	row = target_cursor.fetchone()
+	target_cursor.execute(systemParameter.get_query, [DATE_UPDATE])
+	systemParameterDate = target_cursor.fetchone()
+	dateUpdate = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+	dimension = DIMENSION
+	hechos = FACT
+	table = ''
+	if row is not None:
+		if row[4] == "0":
+			#actualizacion
+			print("Actualizacion")
+			data = requestCargaInitialGraduate(target_cnx)
+			keyList= data.keys()
+			keyList = sorted(keyList)
+			for key in keyList:
+				if dimension in key:
+					table = key[len(dimension):]
+				elif hechos in key:
+					table = key[len(hechos):]
+				content = data[key]
+				distributionCargaInitialUpdateGraduate(target_cnx, table, content)
+		else:
+			print("Carga Inicial")
+			# insercion de tablas estaticas
+			insertTableStatic(target_cnx)
+			data = requestCargaInitialGraduate(target_cnx)
+			keyList= data.keys()
+			keyList = sorted(keyList)
+			#insercion
+			for key in keyList:
+				if dimension in key:
+					table = key[len(dimension):]
+				elif hechos in key:
+					table = key[len(hechos):]
+				content = data[key]
+				distributionCargaInitialUpdateGraduate(target_cnx, table, content)
+		
+		target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
+		target_cursor.execute(systemParameter.update_query, ["0", row[0]])
+		target_cnx.commit()
+		print("Se actualizo la fecha global")
+	else:
+		print("Debe llenar un registro en la Tabla 'last_update'")
+
+
+def requestCargaInitialStudents(target_cnx):
 	
 	headers = CONTENT_TYPE
-	pathList = []
 	target_cursor = target_cnx.cursor()
 	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_STUDENTS])
 	endPointStudent = target_cursor.fetchone()
-	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_TEACHERS])
-	endPointTeacher = target_cursor.fetchone()
-	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_GRADUATES])
-	endPointGraduated = target_cursor.fetchone()
-	pathList.append(endPointStudent[4])
-	pathList.append(endPointTeacher[4])
-	pathList.append(endPointGraduated[4])
-	print(pathList)
-	result = []
-	for path in pathList:
-		try:
-			r = requests.get(path, headers=headers)
-			if r.status_code == requests.codes.ok:
-				result.append(json.loads(r.text))
-		except requests.exceptions.HTTPError as errh:
-			# print ("Http Error:",errh)
-			message = str(errc)
-			message = message.split('] ')
-			message = message[-1].split("'")
-			message = message[0]
-			entity = {
-				"message": str(message),
-				"endpoint": path,
-				"type": "Error Http"
-			}
-			insertError(target_cursor, "log_errors_microservices", entity)
-		except requests.exceptions.ConnectionError as errc:
-			# print ("Error Connecting:",errc)
-			message = str(errc)
-			message = message.split('] ')
-			message = message[-1].split("'")
-			message = message[0]
-			entity = {
-				"message": str(message),
-				"endpoint": path,
-				"type": "Error de conexión"
-			}
-			insertError(target_cursor, "log_errors_microservices", entity)
-		except requests.exceptions.Timeout as errt:
-			# print ("Timeout Error:",errt)
-			message = str(errc)
-			message = message.split('] ')
-			message = message[-1].split("'")
-			message = message[0]
-			entity = {
-				"message": str(message),
-				"endpoint": path,
-				"type": "Error, se acabó el tiempo"
-			}
-			insertError(target_cursor, "log_errors_microservices", entity)
-		except requests.exceptions.RequestException as err:
-			# print ("OOps: Something Else",err)
-			message = str(errc)
-			message = message.split('] ')
-			message = message[-1].split("'")
-			message = message[0]
-			entity = {
-				"message": str(message),
-				"endpoint": path,
-				"type": "Otro error" 
-			}
-			insertError(target_cursor, "log_errors_microservices", entity)
-
-		continue		
+	path = endPointStudent[4]
+	result = {}
+	try:
+		r = requests.get(path, headers=headers)
+		if r.status_code == requests.codes.ok:
+			result = json.loads(r.text)
+		buildMessageSuccessRequest(target_cursor, "Conexión satisfactoria con api de estudiantes", '', path, '')
+	except requests.exceptions.HTTPError as errh:
+		# print ("Http Error:",errh)
+		buildMessageErrorRequest(target_cursor, "Solicitud para la api de estudiantes", errh, path, "Error Http")
+	except requests.exceptions.ConnectionError as errc:
+		# print ("Error Connecting:",errc)
+		buildMessageErrorRequest(target_cursor, "Solicitud para la api de estudiantes", errc, path, "Error de conexión")
+	except requests.exceptions.Timeout as errt:
+		# print ("Timeout Error:",errt)
+		buildMessageErrorRequest(target_cursor, "Solicitud para la api de estudiantes", errt, path, "Error, se acabó el tiempo")
+	except requests.exceptions.RequestException as err:
+		# print ("OOps: Something Else",err)
+		buildMessageErrorRequest(target_cursor, "Solicitud para la api de estudiantes", err, path, "Otro error")
 
 	return result
 	
-
-def requestUpdate(target_cnx, lastUpdate):
+def requestCargaInitialTeachers(target_cnx):
+	
 	headers = CONTENT_TYPE
-	pathList = []
 	target_cursor = target_cnx.cursor()
-	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_STUDENTS])
-	endPointStudent = target_cursor.fetchone()
 	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_TEACHERS])
 	endPointTeacher = target_cursor.fetchone()
-	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_GRADUATES])
-	endPointGraduated = target_cursor.fetchone()
-	#pathList.append(endPointStudent[4]+"/{}".format(lastUpdate))
-	#pathList.append(endPointTeacher[4]+"/{}".format(lastUpdate))
-	#pathList.append(endPointGraduated[4]+"{}".format(lastUpdate)) 
-	print(pathList)
-	result = []
-	for path in pathList:
-		try:
-			r = requests.get(path, headers=headers)
-			if r.status_code == requests.codes.ok:
-				result.append(json.loads(r.text))
-		except requests.exceptions.HTTPError as errh:
-			# print ("Http Error:",errh)
-			message = errh
-			entity = {
-				"message": str(message),
-				"endpoint": path
-			}
-			insertError(target_cursor, "log_errors_microservices", entity)
-		except requests.exceptions.ConnectionError as errc:
-			# print ("Error Connecting:",errc)
-			message = errc
-			entity = {
-				"message": str(message),
-				"endpoint": path
-			}
-			insertError(target_cursor, "log_errors_microservices", entity)
-		except requests.exceptions.Timeout as errt:
-			# print ("Timeout Error:",errt)
-			message = errt
-			entity = {
-				"message": str(message),
-				"endpoint": path
-			}
-			insertError(target_cursor, "log_errors_microservices", entity)
-		except requests.exceptions.RequestException as err:
-			# print ("OOps: Something Else",err)
-			message = err
-			entity = {
-				"message": str(message),
-				"endpoint": path
-			}
-			insertError(target_cursor, "log_errors_microservices", entity)
-
-		continue
+	path = endPointTeacher[4]
+	result = {}
+	try:
+		r = requests.get(path, headers=headers)
+		if r.status_code == requests.codes.ok:
+			result = json.loads(r.text)
+		buildMessageSuccessRequest(target_cursor, "Conexión satisfactoria con api de docentes", '', path, '')
+	except requests.exceptions.HTTPError as errh:
+		# print ("Http Error:",errh)
+		buildMessageErrorRequest(target_cursor, "Solicitud para la api de docentes", errh, path, "Error Http")
+	except requests.exceptions.ConnectionError as errc:
+		# print ("Error Connecting:",errc)
+		buildMessageErrorRequest(target_cursor, "Solicitud para la api de docentes", errc, path, "Error de conexión")
+	except requests.exceptions.Timeout as errt:
+		# print ("Timeout Error:",errt)
+		buildMessageErrorRequest(target_cursor, "Solicitud para la api de docentes", errt, path, "Error, se acabó el tiempo")
+	except requests.exceptions.RequestException as err:
+		# print ("OOps: Something Else",err)
+		buildMessageErrorRequest(target_cursor, "Solicitud para la api de docentes", err, path, "Otro error")
 
 	return result
 
+def requestCargaInitialGraduate(target_cnx):
+	
+	headers = CONTENT_TYPE
+	target_cursor = target_cnx.cursor()
+	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_GRADUATES])
+	endPointGraduated = target_cursor.fetchone()
+	path = endPointGraduated[4]
+	result = {}
+	try:
+		r = requests.get(path, headers=headers)
+		if r.status_code == requests.codes.ok:
+			result = json.loads(r.text)
+		buildMessageSuccessRequest(target_cursor, "Conexión satisfactoria con api de egresados", '', path, '')
+	except requests.exceptions.HTTPError as errh:
+		# print ("Http Error:",errh)
+		buildMessageErrorRequest(target_cursor, "Solicitud para la api de egresados", errh, path, "Error Http")
+	except requests.exceptions.ConnectionError as errc:
+		# print ("Error Connecting:",errc)
+		buildMessageErrorRequest(target_cursor,"Solicitud para la api de egresados", errc, path, "Error de conexión")
+	except requests.exceptions.Timeout as errt:
+		# print ("Timeout Error:",errt)
+		buildMessageErrorRequest(target_cursor,"Solicitud para la api de egresados", errt, path, "Error, se acabó el tiempo")
+	except requests.exceptions.RequestException as err:
+		# print ("OOps: Something Else",err)
+		buildMessageErrorRequest(target_cursor, "Solicitud para la api de egresados", err, path, "Otro error")
 
+	return result
 
-def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
+def buildMessageErrorRequest(target_cursor, activity: str, message: str, path: str, typeError: str):
+	message = splitError(str(message))
+	entity = {
+		"activity": str(activity),
+		"message": str(message),
+		"endpoint": path,
+		"type": str(typeError) 
+	}
+	insertError(target_cursor, LOG_ACTIVITY_MICROSERVICES, entity)	
+
+def buildMessageSuccessRequest(target_cursor, activity: str, message: str, path: str, typeError: str):
+	entity = {
+		"activity": str(activity),
+		"message": str(message),
+		"endpoint": path,
+		"type": str(typeError) 
+	}
+	insertError(target_cursor, LOG_ACTIVITY_MICROSERVICES, entity)
+
+def buildMessageErrorETL(target_cursor, activity: str, message: str, path: str, typeError: str):
+	entity = {
+		"activity": str(activity),
+		"message": str(message),
+		"endpoint": path,
+		"type": str(typeError) 
+	}
+	insertError(target_cursor, LOG_ACTIVITY_MICROSERVICES, entity)
+
+def splitError(message: str):
+	message = message.split('] ')
+	message = message[-1].split("'")
+	message = message[0]
+	return message
+
+# def requestUpdate(target_cnx, lastUpdate):
+# 	headers = CONTENT_TYPE
+# 	pathList = []
+# 	target_cursor = target_cnx.cursor()
+# 	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_STUDENTS])
+# 	endPointStudent = target_cursor.fetchone()
+# 	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_TEACHERS])
+# 	endPointTeacher = target_cursor.fetchone()
+# 	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_GRADUATES])
+# 	endPointGraduated = target_cursor.fetchone()
+# 	#pathList.append(endPointStudent[4]+"/{}".format(lastUpdate))
+# 	#pathList.append(endPointTeacher[4]+"/{}".format(lastUpdate))
+# 	#pathList.append(endPointGraduated[4]+"{}".format(lastUpdate)) 
+# 	print(pathList)
+# 	result = []
+# 	for path in pathList:
+# 		try:
+# 			r = requests.get(path, headers=headers)
+# 			if r.status_code == requests.codes.ok:
+# 				result.append(json.loads(r.text))
+# 		except requests.exceptions.HTTPError as errh:
+# 			# print ("Http Error:",errh)
+# 			message = errh
+# 			entity = {
+# 				"message": str(message),
+# 				"endpoint": path
+# 			}
+# 			insertError(target_cursor, "LOG_ACTIVITY_MICROSERVICES", entity)
+# 		except requests.exceptions.ConnectionError as errc:
+# 			# print ("Error Connecting:",errc)
+# 			message = errc
+# 			entity = {
+# 				"message": str(message),
+# 				"endpoint": path
+# 			}
+# 			insertError(target_cursor, "LOG_ACTIVITY_MICROSERVICES", entity)
+# 		except requests.exceptions.Timeout as errt:
+# 			# print ("Timeout Error:",errt)
+# 			message = errt
+# 			entity = {
+# 				"message": str(message),
+# 				"endpoint": path
+# 			}
+# 			insertError(target_cursor, "LOG_ACTIVITY_MICROSERVICES", entity)
+# 		except requests.exceptions.RequestException as err:
+# 			# print ("OOps: Something Else",err)
+# 			message = err
+# 			entity = {
+# 				"message": str(message),
+# 				"endpoint": path
+# 			}
+# 			insertError(target_cursor, "LOG_ACTIVITY_MICROSERVICES", entity)
+
+# 		continue
+
+# 	return result
+
+def distributionCargaInitialUpdateStudens(target_cnx, table: str, content: dict):
+	
 	target_cursor = target_cnx.cursor(buffered=True)
 
 	if table == STUDENT:
@@ -257,7 +373,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 				nationalityCode = INTERNACIONAL
 			target_cursor.execute(nationalityQuery.get_query_code, [nationalityCode])
 			idNationality = target_cursor.fetchone()
-			print("nacionalidad: {}".format(idNationality))
+			# print("nacionalidad: {}".format(idNationality))
 
 			# sexo
 			sexCode = item[SEX_ATTRIBUTE]
@@ -267,7 +383,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 				sexCode = MALE
 			target_cursor.execute(sexQuery.get_query_code, [sexCode])
 			idSex = target_cursor.fetchone()
-			print("sexo: {}".format(idSex))
+			# print("sexo: {}".format(idSex))
 
 			# status
 			statusCode = item['estatus']
@@ -277,7 +393,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 				statusCode = STATUS_INACTIVE
 			target_cursor.execute(statusQuery.get_query_code, [statusCode])
 			idStatus = target_cursor.fetchone()
-			print("status: {}".format(idStatus))
+			# print("status: {}".format(idStatus))
 
 			# discapacidad
 			disabilityCode = item['discapacidad']
@@ -285,10 +401,10 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 				disabilityCode = DISABILITY_FALSE
 			else:
 				disabilityCode = DISABILITY_TRUE
-			print(disabilityCode)
+			# print(disabilityCode)
 			target_cursor.execute(disabilityQuery.get_query_code, [disabilityCode])
 			idDisability = target_cursor.fetchone()
-			print("discapacidad: {}".format(idDisability[0]))
+			# print("discapacidad: {}".format(idDisability[0]))
 
 			# etnia
 			ethnicGroupCode = item['etnia']
@@ -298,7 +414,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 				ethnicGroupCode = ETNIA_TRUE
 			target_cursor.execute(ethnicGroupQuery.get_query_code, [ethnicGroupCode])
 			idEthnicGroup = target_cursor.fetchone()
-			print("etnia: {}".format(idEthnicGroup))
+			# print("etnia: {}".format(idEthnicGroup))
 
 			# tipo de estudiante
 			typeStudentCode = item['tipo_estudio']
@@ -308,13 +424,13 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 				typeStudentCode = POSTGRADUATE
 			target_cursor.execute(typeStudentQuery.get_query_code, [typeStudentCode])
 			idTypeStudent = target_cursor.fetchone()
-			print("tipo: {}".format(idTypeStudent))
+			# print("tipo: {}".format(idTypeStudent))
 
 			# año
 			yearCode = item['anno_entrada']
 			target_cursor.execute(yearQuery.get_query_code, [yearCode])
 			idYear = target_cursor.fetchone()
-			print("ano: {}".format(idYear))
+			# print("ano: {}".format(idYear))
 
 			# carrera
 			professionCode = item[PROFESSION]
@@ -355,13 +471,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 				except mysql.connector.Error as e:
 					print("error")
 					target_cnx.rollback()
-					message = str(e)
-					entity = {
-						"message": str(message),
-						"endpoint": '',
-						"type": "Error de base de datos"
-					}
-					insertError(target_cursor, "log_errors_microservices", entity)
+					buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_estudiante', 'Error de base de datos')
 			else:
 				# insertar estudiante
 				try:
@@ -377,13 +487,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 				except mysql.connector.Error as e:
 					print("error")
 					target_cnx.rollback()
-					message = str(e)
-					entity = {
-						"message": str(message),
-						"endpoint": '',
-						"type": "Error de base de datos"
-					}
-					insertError(target_cursor, "log_errors_microservices", entity)
+					buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla dim_estudiante', 'Error de base de datos')
 
 			target_cursor.execute(studentRelationship.get_query_code,[item[IDENTIFICATION_CARD]])
 			idFact = target_cursor.fetchone()
@@ -405,13 +509,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 				except mysql.connector.Error as e:
 					print("error")
 					target_cnx.rollback()
-					message = str(e)
-					entity = {
-						"message": str(message),
-						"endpoint": '',
-						"type": "Error de base de datos"
-					}
-					insertError(target_cursor, "log_errors_microservices", entity)
+					buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla fact_estudiante_facultad', 'Error de base de datos')
 			else:
 				# insercion
 				print("INSERCION")
@@ -432,16 +530,14 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 				except mysql.connector.Error as e:
 					print("error")
 					target_cnx.rollback()
-					message = str(e)
-					entity = {
-						"message": str(message),
-						"endpoint": '',
-						"type": "Error de base de datos"
-					}
-					insertError(target_cursor, "log_errors_microservices", entity)
+					buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla fact_estudiante_facultad', 'Error de base de datos')
 			target_cnx.commit()
+	
+	target_cursor.close()
 
-	elif table == PROFESSION:
+def distributionCargaInitialUpdateTeachers(target_cnx, table: str, content: dict):
+	target_cursor = target_cnx.cursor(buffered=True)
+	if table == PROFESSION:
 		print("Cargando carrera...")
 		items = content[ITEMS]
 		for item in items:
@@ -474,13 +570,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 				target_cnx.commit()
 			except mysql.connector.Error as e:
 				print("Roolback")
-				message = str(e)
-				entity = {
-					"message": str(message),
-					"endpoint": '',
-					"type": "Error de base de datos"
-				}
-				insertError(target_cursor, "log_errors_microservices", entity)
+				buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla dim_carrera', 'Error de base de datos')
 			
 		print("Insercion finalizada")
 
@@ -570,13 +660,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 						print("No existe el registro")
 				except mysql.connector.Error as e:
 					print("Roolback")
-					message = str(e)
-					entity = {
-						"message": str(message),
-						"endpoint": '',
-						"type": "Error de base de datos"
-					}
-					insertError(target_cursor, "log_errors_microservices", entity)
+					buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_docentes', 'Error de base de datos')
 
 			else:
 				try:
@@ -605,13 +689,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 					print("Insertado")
 				except mysql.connector.Error as e:
 					print("Roolback")
-					message = str(e)
-					entity = {
-						"message": str(message),
-						"endpoint": '',
-						"type": "Error de base de datos"
-					}
-					insertError(target_cursor, "log_errors_microservices", entity)
+					buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla dim_docentes', 'Error de base de datos')
 
 		print("ACTUALIZACION DOCENTE FINALIZADA")
 
@@ -639,6 +717,8 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 					target_cnx.commit()
 				except mysql.connector.Error as e:
 					print("Roolback")
+					buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla dim_publicacion', 'Error de base de datos')
+					
 			else:
 				try:
 					update(target_cursor, "publicacion", item, {'id':publication[0]})
@@ -651,13 +731,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 					target_cnx.commit()
 				except mysql.connector.Error as e:
 					print("Roolback")
-					message = str(e)
-					entity = {
-						"message": str(message),
-						"endpoint": '',
-						"type": "Error de base de datos"
-					}
-					insertError(target_cursor, "log_errors_microservices", entity)
+					buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_publicacion', 'Error de base de datos')
 		print("Insercion finalizada")
 
 	elif table == TEACHER_PUBLICATION:
@@ -693,13 +767,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 					VALUES (%s, %s, %s, %s)"""), [ids[0], ids[1], idPublication[0], numberCites])
 				except mysql.connector.Error as e:
 					print("Roolback")
-					message = str(e)
-					entity = {
-						"message": str(message),
-						"endpoint": '',
-						"type": "Error de base de datos"
-					}
-					insertError(target_cursor, "log_errors_microservices", entity)
+					buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla fact_docente_publicacion', 'Error de base de datos')
 			else: 
 				print("Error")
 			print("Insercion finalizada")
@@ -710,109 +778,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 		target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
 
 		target_cnx.commit()
-
-	elif table == "proyecto":
-		items = content[ITEMS]
-		# print("INSERCION PROYECTO")
-		# for item in items:
-		# 	item = {
-		# 		"codigo": item['codigo'],
-		# 		"titulo": item['titulo']
-		# 	}
-		# 	target_cursor.execute(projectQuery.get_query_code, [item['codigo']])
-		# 	project = target_cursor.fetchone()
-		# 	if project is None:
-		# 		try:
-		# 			insert(target_cursor, "proyecto", item)
-		# 			target_cnx.commit()
-		# 		except mysql.connector.Error as e:
-		# 			print("Roolback")
-		# 	else:
-		# 		try:
-		# 			update(target_cursor, "proyecto", item, {'id': project[0]})
-		# 			target_cnx.commit()
-		# 		except mysql.connector.Error as e:
-		# 			print("Roolback")
-		# print("Insercion finalizada")
-
-	elif table == "docente-proyecto":
-		items = content[ITEMS]
-		# if items != []:
-		# 	target_cursor.execute("DELETE FROM fact_docente_proyecto")
-		# 	target_cnx.commit()
-		# for item in items:
-		# 	teacherCode = item['docente']
-		# 	projectCode = item['proyecto']
-		# 	target_cursor.execute(teacherQuery.get_query_code, [teacherCode])
-		# 	idTeacher = target_cursor.fetchone()
-
-		# 	target_cursor.execute(dedent("""\
-		# 	SELECT id FROM dim_proyecto
-		# 	WHERE codigo = %s"""), [projectCode])
-		# 	idProyect = target_cursor.fetchone()
-
-		# 	if idTeacher[0] is not None and idProyect[0] is not None:
-		# 		try:
-		# 			target_cursor.execute(dedent("""\
-		# 			INSERT INTO fact_docente_proyecto
-		# 			(id_docente, id_proyecto)
-		# 			VALUES (%s, %s)"""), [idTeacher[0], idProyect[0]])
-		# 		except mysql.connector.Error as e:
-		# 			print("Roolback")
-		# 	else: 
-		# 		print("Error")
-		# 	print("Insercion finalizada")
-		# target_cnx.commit()
-		
-
-	elif table == "otroestudio":
-		items = content[ITEMS]
-		print("INSERCION OTRO ESTUDIO")
-		'''
-		for item in items:
-			item = {
-				"codigo": item['codigo'],
-				"nombre_titulo": item['nomtitulo']
-			}
-			target_cursor.execute(otherStudioQuery.get_query_code, [item['codigo']])
-			project = target_cursor.fetchone()
-			if project is None:
-				insert(target_cursor, "otroestudio", item)
-				target_cnx.commit()
-			else:
-				print("Ya existe {}".format(item['codigo']))
-		print("Insercion finalizada")
-		'''
-
-	elif table == "docente-otro-estudio":
-		items = content[ITEMS]
-		'''
-		if items != []:
-			target_cursor.execute("DELETE FROM fact_docente_otroestudio")
-			target_cnx.commit()
-		for item in items:
-			teacherCode = item['docente']
-			otherStudioCode = item['codigo']
-			target_cursor.execute(dedent("""\
-			SELECT id 
-			FROM dim_docente
-			WHERE cedula = %s"""), [teacherCode])
-			idTeacher = target_cursor.fetchone()
-
-			target_cursor.execute(dedent("""\
-			SELECT id FROM dim_otroestudio
-			WHERE codigo = %s"""), [otherStudioCode])
-			idOtherStudio = target_cursor.fetchone()
-
-			if idTeacher[0] is not None and idOtherStudio[0] is not None:
-				target_cursor.execute(dedent("""\
-				INSERT INTO fact_docente_otroestudio
-				(id_docente, id_otroestudio)
-				VALUES (%s, %s)"""), [idTeacher[0], idOtherStudio[0]])
-			else:
-				print("Error")
-			print("Insercion finalizada")
-		'''
+	
 	elif table == "titulo":
 		items = content[ITEMS]
 		print("INSERCION TITULO")
@@ -835,13 +801,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 					target_cnx.commit()
 				except mysql.connector.Error as e:
 					print("Roolback")
-					message = str(e)
-					entity = {
-						"message": str(message),
-						"endpoint": '',
-						"type": "Error de base de datos"
-					}
-					insertError(target_cursor, "log_errors_microservices", entity)
+					buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla dim_titulo', 'Error de base de datos')
 			else:
 				try:
 					update(target_cursor, "titulo", item, {'id': title[0]})
@@ -854,13 +814,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 					target_cnx.commit()
 				except mysql.connector.Error as e:
 					print("Roolback")
-					message = str(e)
-					entity = {
-						"message": str(message),
-						"endpoint": '',
-						"type": "Error de base de datos"
-					}
-					insertError(target_cursor, "log_errors_microservices", entity)
+					buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_titulo', 'Error de base de datos')
 		print("Insercion finalizada")
 
 	elif table == "docente-titulo":
@@ -899,13 +853,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 					VALUES (%s, %s, %s)"""), [idTeacher[0], idTitle[0], idLevel[0]])
 				except mysql.connector.Error as e:
 					print("Roolback")
-					message = str(e)
-					entity = {
-						"message": str(message),
-						"endpoint": '',
-						"type": "Error de base de datos"
-					}
-					insertError(target_cursor, "log_errors_microservices", entity)
+					buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla fact_docente_titulo', 'Error de base de datos')
 			else:
 				print("Error")
 			print("Insercion finalizada")
@@ -916,63 +864,20 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 		target_cursor.execute(systemParameter.update_query, [dateUpdate, systemParameterDate[0]])
 		target_cnx.commit()
 
-	elif table == "premio":
-		items = content[ITEMS]
-		# print("INSERCION PREMIO")
-		# for item in items:
-		# 	target_cursor.execute(prizeQuery.get_query_code, [item['codigo']])
-		# 	prize = target_cursor.fetchone()
-		# 	if prize is None:
-		# 		try:
-		# 			insert(target_cursor, "premio", item)
-		# 		except mysql.connector.Error as e:
-		# 			print("Roolback")
-		# 	else:
-		# 		try:
-		# 			update(target_cursor, "premio", item, {'id': prize[0]})
-		# 		except mysql.connector.Error as e:
-		# 			print("Roolback")
-		# target_cnx.commit()
-		# print("Insercion finalizada")
+	target_cursor.close()
 
-	elif table == "docente-premio":
-		items = content[ITEMS]
-		# if items != []:
-		# 	target_cursor.execute("DELETE FROM fact_docente_premio")
-		# 	target_cnx.commit()
-		# for item in items:
-		# 	teacherCode = item['docente']
-		# 	target_cursor.execute(teacherQuery.get_query_code, [teacherCode])
-		# 	idTeacher = target_cursor.fetchone()
-
-		# 	target_cursor.execute(dedent("""\
-		# 	SELECT id FROM dim_premio
-		# 	WHERE codigo = %s"""), [item['premio']])
-		# 	idPrize = target_cursor.fetchone()
-
-		# 	if idTeacher[0] is not None and idPrize[0] is not None:
-		# 		try:
-		# 			target_cursor.execute(dedent("""\
-		# 			INSERT INTO fact_docente_premio
-		# 			(id_docente, id_premio)
-		# 			VALUES (%s, %s)"""), [idTeacher[0], idPrize[0]])
-		# 		except mysql.connector.Error as e:
-		# 			print("Roolback")
-		# 	else:
-		# 		print("Error")
-		# 	print("Insercion finalizada")
-		# target_cnx.commit()
-
-	elif table == GRADUATE:
-		print("Entro")
+def distributionCargaInitialUpdateGraduate(target_cnx, table: str, content: dict):
+	target_cursor = target_cnx.cursor(buffered=True)
+	if table == GRADUATE:
+		# print("Entro")
 		items = content[ITEMS]
 		for item in items:
 			if validateJson(item):
 				graduateCode = item['codigo']
 				target_cursor.execute(graduateQuery.get_query_code, [graduateCode])
 				idGraduate = target_cursor.fetchone()
-				print("codigo")
-				print(idGraduate)
+				# print("codigo")
+				# print(idGraduate)
 				item = {
 					"cedula": item['identificacion'],
 					"nombre": item['primernombre'], 
@@ -994,13 +899,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 						target_cnx.commit()
 					except mysql.connector.Error as e:
 						print("Roolback")
-						message = str(e)
-						entity = {
-							"message": str(message),
-							"endpoint": '',
-							"type": "Error de base de datos"
-						}
-						insertError(target_cursor, "log_errors_microservices", entity)
+						buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla dim_egresado', 'Error de base de datos')
 				else:
 					print("actualizar")
 					try: 
@@ -1014,13 +913,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 						target_cnx.commit()
 					except mysql.connector.Error as e:
 						print("Roolback")
-						message = str(e)
-						entity = {
-							"message": str(message),
-							"endpoint": '',
-							"type": "Error de base de datos"
-						}
-						insertError(target_cursor, "log_errors_microservices", entity)
+						buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_egresado', 'Error de base de datos')
 			else: 
 				print("Objeto con valores nulos o vacios")
 	
@@ -1053,13 +946,8 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 						target_cnx.commit()
 					except mysql.connector.Error as e:
 						print("Roolback")
-						message = str(e)
-						entity = {
-							"message": str(message),
-							"endpoint": '',
-							"type": "Error de base de datos"
-						}
-						insertError(target_cursor, "log_errors_microservices", entity)
+						buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla dim_estudiosuc', 'Error de base de datos')
+						
 				else:
 					print("ACTUALIZADO")
 					try: 
@@ -1073,13 +961,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 						target_cnx.commit()
 					except mysql.connector.Error as e:
 						print("Roolback")
-						message = str(e)
-						entity = {
-							"message": str(message),
-							"endpoint": '',
-							"type": "Error de base de datos"
-						}
-						insertError(target_cursor, "log_errors_microservices", entity)
+						buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_estudiosuc', 'Error de base de datos')
 				
 				target_cursor.execute(facultyQuery.get_query_code, [facultyCode])
 				idFaculty = target_cursor.fetchone()
@@ -1118,13 +1000,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 							print("Registro actualizado")
 						except mysql.connector.Error as e:
 							print("Roolback {}".format(e))
-							message = str(e)
-							entity = {
-								"message": str(message),
-								"endpoint": '',
-								"type": "Error de base de datos"
-							}
-							insertError(target_cursor, "log_errors_microservices", entity)
+							buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla fact_egresado_estudiosuc', 'Error de base de datos')
 					else:
 						print("INSERTADO")
 						try:
@@ -1143,80 +1019,10 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 							print("Registro insertado")
 						except mysql.connector.Error as e:
 							print("Roolback {}".format(e))
-							message = str(e)
-							entity = {
-								"message": str(message),
-								"endpoint": '',
-								"type": "Error de base de datos"
-							}
-							insertError(target_cursor, "log_errors_microservices", entity)
+							buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla fact_egresado_estudiosuc', 'Error de base de datos')
 			else:
 				print("Objeto con valores nulos o vacios")
-	
-	elif table == "egresado-estudiosuc":
-		print("EGRESADO ESTUDIOSUC")
-		# items = content[ITEMS]
-		# for item in items:
-		# 	print(item)
-		# 	if validateJson(item):
-		# 		target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
-		# 		idGraduate = target_cursor.fetchone()
 
-		# 		studiosUcList = item["estudiosuc"]
-
-		# 		if studiosUcList is not None and idGraduate is not None:
-		# 			for i in studiosUcList:
-		# 				if validateJson(i):
-		# 					studiosUcCode = i['codigo']
-		# 					facultyCode = i['facultad']
-		# 					professionCode = i['carrera']
-
-		# 					target_cursor.execute(studiosUcQuery.get_query_code, [studiosUcCode])
-		# 					idStudiosUc = target_cursor.fetchone()
-		# 					idYear = None
-		# 					if idStudiosUc is not None:
-		# 						anhoCode = idStudiosUc[1].strftime('%Y-%m-%d').split("-")
-		# 						target_cursor.execute(yearQuery.get_query_code, [anhoCode[0]])
-		# 						idYear = target_cursor.fetchone()
-
-		# 					target_cursor.execute(facultyQuery.get_query_code, [facultyCode])
-		# 					idFaculty = target_cursor.fetchone()
-
-		# 					target_cursor.execute(professionQuery.get_query_code, [professionCode])
-		# 					idProfession = target_cursor.fetchone()
-
-		# 					target_cursor.execute(graduateStudiosUcRelationship.get_query_code, [studiosUcCode])
-		# 					idFact = target_cursor.fetchone()
-
-		# 					if idStudiosUc is not None and idFaculty is not None and idProfession is not None and idYear is not None and idGraduate is not None:
-		# 						if idFact is not None:
-		# 							print("ACTUALIZADO")
-		# 							try:
-		# 								target_cursor.execute(dedent("""\
-		# 								UPDATE fact_egresado_estudiosuc
-		# 								SET id_egresado=%s, id_estudiosuc=%s, id_facultad=%s, id_carrera=%s, id_tiempo=%s 
-		# 								WHERE id=%s;"""), [idGraduate[0], idStudiosUc[0], idFaculty[0], idProfession[0], idYear[0], idFact[0]])
-		# 								target_cnx.commit()
-		# 								print("Registro actualizado")
-		# 							except mysql.connector.Error as e:
-		# 								print("Roolback {}".format(e))
-		# 						else:
-		# 							print("INSERTADO")
-		# 							try:
-		# 								target_cursor.execute(dedent("""\
-		# 								INSERT INTO fact_egresado_estudiosuc 
-		# 								(id_egresado, id_estudiosuc, id_facultad, id_carrera, id_tiempo)
-		# 								VALUES (%s, %s, %s, %s, %s)"""), [idGraduate[0], idStudiosUc[0], idFaculty[0], idProfession[0], idYear[0]])
-		# 								target_cnx.commit()
-		# 								print("Registro insertado")
-		# 							except mysql.connector.Error as e:
-		# 								print("Roolback {}".format(e))
-		# 				else:
-		# 					print("Objeto con valores nulos o vacios")
-		# 	else:
-		# 		print("Objeto con valores nulos o vacios")
-		# print("Actualizacion finalizada")
-	
 	elif table == "trabajos":
 		print("Trabajos\n\n")
 		items = content[ITEMS]
@@ -1250,6 +1056,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 						target_cnx.commit()
 					except mysql.connector.Error as e:
 						print("Roolback")
+						buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla dim_trabajos', 'Error de base de datos')
 				else:
 					print("ACTUALIZADO")
 					try: 
@@ -1264,13 +1071,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 						target_cnx.commit()
 					except mysql.connector.Error as e:
 						print("Roolback")
-						message = str(e)
-						entity = {
-							"message": str(message),
-							"endpoint": '',
-							"type": "Error de base de datos"
-						}
-						insertError(target_cursor, "log_errors_microservices", entity)
+						buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_trabajos', 'Error de base de datos')
 
 				target_cursor.execute(jobsQuery.get_query_code, [jobCode])
 				idJob = target_cursor.fetchone() 
@@ -1300,13 +1101,7 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 							print("Registro actualizado")
 						except mysql.connector.Error as e:
 							print("Roolback {}".format(e))
-							message = str(e)
-							entity = {
-								"message": str(message),
-								"endpoint": '',
-								"type": "Error de base de datos"
-							}
-							insertError(target_cursor, "log_errors_microservices", entity)
+							buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla fact_egresado_trabajos', 'Error de base de datos')
 					else:
 						print("INSERTADO")
 						try:
@@ -1325,69 +1120,11 @@ def distributionCargaInitialUpdate(target_cnx, table: str, content: dict):
 							print("Registro insertado")
 						except mysql.connector.Error as e:
 							print("Roolback {}".format(e))
-							message = str(e)
-							entity = {
-								"message": str(message),
-								"endpoint": '',
-								"type": "Error de base de datos"
-							}
-							insertError(target_cursor, "log_errors_microservices", entity)
+							buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla fact_egresado_trabajos', 'Error de base de datos')
 			else:
 				print("Objeto con valores nulos o vacios")
-
-	elif table == "egresado-trabajos":
-		print("EGRESADO TRABAJOS")
-		# items = content[ITEMS]
-		# for item in items:
-		# 	print(item)
-		# 	if validateJson(item):
-		# 		target_cursor.execute(graduateQuery.get_query_code, [item['egresado']])
-		# 		idGraduate = target_cursor.fetchone()
-		# 		print(item['egresado'])
-		# 		jobsList = item["trabajos"]
-
-		# 		if jobsList is not None and idGraduate is not None:
-		# 			for i in jobsList:
-		# 				if validateJson(i):
-		# 					jobCode = i['codigo']
-		# 					print(jobCode)
-		# 					target_cursor.execute(jobsQuery.get_query_code, [jobCode])
-		# 					idJob = target_cursor.fetchone()
-
-		# 					target_cursor.execute(graduateJobsRelationship.get_query_code, [jobCode])
-		# 					idFact = target_cursor.fetchone()
-
-		# 					if idJob is not None and idGraduate is not None:
-		# 						if idFact is not None:
-		# 							print("ACTUALIZADO")
-		# 							try:
-		# 								target_cursor.execute(dedent("""\
-		# 								UPDATE fact_egresado_trabajos
-		# 								SET id_egresado=%s, id_trabajo=%s 
-		# 								WHERE id=%s;"""), [idGraduate[0], idJob[0], idFact[0]])
-		# 								target_cnx.commit()
-		# 								print("Registro actualizado")
-		# 							except mysql.connector.Error as e:
-		# 								print("Roolback {}".format(e))
-		# 						else:
-		# 							print("INSERTADO")
-		# 							try:
-		# 								target_cursor.execute(dedent("""\
-		# 								INSERT INTO fact_egresado_trabajos 
-		# 								(id_egresado, id_trabajo)
-		# 								VALUES (%s, %s)"""), [idGraduate[0], idJob[0]])
-		# 								target_cnx.commit()
-		# 								print("Registro insertado")
-		# 							except mysql.connector.Error as e:
-		# 								print("Roolback {}".format(e))
-		# 				else:
-		# 					print("Objeto con valores nulos o vacios")
-		# 	else:
-		# 		print("Objeto con valores nulos o vacios")
-		# print("Actualizacion finalizada")
-
+	
 	target_cursor.close()
-
 
 def insertTableStatic(target_cnx):
 	

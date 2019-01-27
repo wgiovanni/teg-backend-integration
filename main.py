@@ -13,7 +13,8 @@ from db_credentials import datawarehouse_db_config
 from sql_queries import systemParameter
 
 # Resources
-from resources.SystemParameter import SystemParameterList, SystemParameter, SystemParameterUpdateDateStudens, SystemParameterUpdateDateTeachers, SystemParameterUpdateDateGraduate, SystemParameterTask
+from resources.SystemParameter import SystemParameterList, SystemParameter, SystemParameterTaskStudents, SystemParameterUpdateDateStudens, SystemParameterUpdateDateTeachers 
+from resources.SystemParameter import SystemParameterUpdateDateGraduate, SystemParameterTaskTeachers, SystemParameterTaskGraduates, SystemParameterTaskAll 
 from resources.Student import Student, StudentMaleFaculty, StudentFemaleFaculty, StudentSexFaculty, StudentUndergraduateSex
 from resources.Student import StudentEthnicGroupFaculty, StudentDisabilityFaculty, StudentInternacionalFaculty, StudentNacionalFaculty 
 from resources.Student import StudentNationalityFaculty, StudentProfessionFaculty, StudentProfessionConstantsFaculty, StudentInternacional 
@@ -37,34 +38,71 @@ from resources.Faculty import FacultyReport, Faculty, FacultyId
 from resources.Profession import Profession, ProfessionId
 from resources.MicroservicesError import MicroservicesError
 
-from constants import CONTENT_TYPE
+from constants import CONTENT_TYPE, SCHEDULED_TASK_GRADUATES, SCHEDULED_TASK_TEACHERS, SCHEDULED_TASK_STUDENTS
 
 # metodos
-from etl import etl_process
+from etl import etl_process_students, etl_process_teachers, etl_process_graduates
 
-def sensor():
-	#print(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) # Se obtiene local para la actualizacion de la data cuando se ejecute el job
-	print("Scheduler esta vivo!000000000000000000000")
-
-
-def sensor1():
-	print(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) # Se obtiene local para la actualizacion de la data cuando se ejecute el job
-	print("Scheduler esta vivo11111111111111111111111!")
-
-def taskPause():
+def taskGraduates():
 	target_cnx = mysql.connector.connect(**datawarehouse_db_config)
 	target_cursor = target_cnx.cursor(buffered=True)
 	target_cursor.execute("USE {}".format(datawarehouse_name))
-	target_cursor.execute(systemParameter.get_query, ["TAREA_PROGRAMADA"])
+	target_cursor.execute(systemParameter.get_query, [SCHEDULED_TASK_GRADUATES])
 	row = target_cursor.fetchone()
 	# print(row)
-	if (row[4] == "1"):
-		print("Activa")
-		# sched.resume()
-		etl_process()
-	else:
-		print("Inactiva")
-		# sched.pause()
+	if row is not None:
+		if (row[4] == "1"):
+			print("Activa sensor")
+			etl_process_graduates()
+		else:
+			print("Inactiva sensor")
+
+
+# def sensor1():
+# 	# print(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) # Se obtiene local para la actualizacion de la data cuando se ejecute el job
+# 	# print("Scheduler esta vivo11111111111111111111111!")
+# 	target_cnx = mysql.connector.connect(**datawarehouse_db_config)
+# 	target_cursor = target_cnx.cursor(buffered=True)
+# 	target_cursor.execute("USE {}".format(datawarehouse_name))
+# 	target_cursor.execute(systemParameter.get_query, ["TAREA_PROGRAMADA"])
+# 	row = target_cursor.fetchone()
+# 	# print(row)
+# 	if (row[4] == "1"):
+# 		print("Activa Sensor 1")
+# 		# print("Sensor 1")
+# 		# sched.resume()
+# 		# etl_process()
+# 	else:
+# 		print("Inactiva Sensor 1")
+# 		# print("Scheduler esta vivo!000000000000000000000")
+
+def taskTeachers():
+	target_cnx = mysql.connector.connect(**datawarehouse_db_config)
+	target_cursor = target_cnx.cursor(buffered=True)
+	target_cursor.execute("USE {}".format(datawarehouse_name))
+	target_cursor.execute(systemParameter.get_query, [SCHEDULED_TASK_TEACHERS])
+	row = target_cursor.fetchone()
+	# print(row)
+	if row is not None:
+		if (row[4] == "1"):
+			print("Activa Sensor 2")
+			etl_process_teachers()
+		else:
+			print("Inactiva Sensor 2")
+
+def taskStudents():
+	target_cnx = mysql.connector.connect(**datawarehouse_db_config)
+	target_cursor = target_cnx.cursor(buffered=True)
+	target_cursor.execute("USE {}".format(datawarehouse_name))
+	target_cursor.execute(systemParameter.get_query, [SCHEDULED_TASK_STUDENTS])
+	row = target_cursor.fetchone()
+	# print(row)
+	if row is not None:
+		if (row[4] == "1"):
+			print("Activa")
+			etl_process_students()
+		else:
+			print("Inactiva")
 
 
 
@@ -109,7 +147,10 @@ api.add_resource(SystemParameter, '/parametroSistema/<systemParameter_id>')
 api.add_resource(SystemParameterUpdateDateStudens, '/fecha-estudiantes')
 api.add_resource(SystemParameterUpdateDateTeachers, '/fecha-docentes')
 api.add_resource(SystemParameterUpdateDateGraduate, '/fecha-egresados')
-api.add_resource(SystemParameterTask, '/taskScheduler')
+api.add_resource(SystemParameterTaskStudents, '/taskSchedulerStudents')
+api.add_resource(SystemParameterTaskTeachers, '/taskSchedulerTeachers')
+api.add_resource(SystemParameterTaskGraduates, '/taskSchedulerGraduates')
+api.add_resource(SystemParameterTaskAll, '/taskSchedulerAll')
 api.add_resource(Year, '/year')
 api.add_resource(FacultyReport, '/faculty')
 api.add_resource(Faculty, '/facultad')
@@ -211,8 +252,18 @@ api.add_resource(GraduateFacultyYear, '/egresado-ano-facultad')
 api.add_resource(GraduateJobs, '/egresado-trabajos')
 
 if __name__ == "__main__":
-	# sched = BackgroundScheduler(daemon=True)
-	# sched.add_job(taskPause, 'interval', seconds=10)
-	# sched.start()
+	sched = BackgroundScheduler(daemon=True)
+	sched.add_job(taskStudents, 'interval', seconds=30)
+
+	sched1 = BackgroundScheduler(daemon=True)
+	sched1.add_job(taskTeachers, 'interval', seconds=60)
+
+	sched2 = BackgroundScheduler(daemon=True)
+	sched2.add_job(taskGraduates, 'interval', seconds=90)
+
+	sched.start()
+	sched1.start()
+	sched2.start()
+
 	app.run(debug=True, use_reloader=False)
 	

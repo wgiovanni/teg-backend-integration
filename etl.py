@@ -189,7 +189,7 @@ def requestCargaInitialStudents(target_cnx):
 		r = requests.get(path, headers=headers)
 		if r.status_code == requests.codes.ok:
 			result = json.loads(r.text)
-		buildMessageSuccessRequest(target_cursor, "Conexión satisfactoria con api de estudiantes", '', path, '')
+		buildMessageLog(target_cursor, "Conexión satisfactoria con api de estudiantes", '', path, '')
 	except requests.exceptions.HTTPError as errh:
 		# print ("Http Error:",errh)
 		buildMessageErrorRequest(target_cursor, "Solicitud para la api de estudiantes", errh, path, "Error Http")
@@ -217,7 +217,7 @@ def requestCargaInitialTeachers(target_cnx):
 		r = requests.get(path, headers=headers)
 		if r.status_code == requests.codes.ok:
 			result = json.loads(r.text)
-		buildMessageSuccessRequest(target_cursor, "Conexión satisfactoria con api de docentes", '', path, '')
+		buildMessageLog(target_cursor, "Conexión satisfactoria con api de docentes", '', path, '')
 	except requests.exceptions.HTTPError as errh:
 		# print ("Http Error:",errh)
 		buildMessageErrorRequest(target_cursor, "Solicitud para la api de docentes", errh, path, "Error Http")
@@ -245,7 +245,7 @@ def requestCargaInitialGraduate(target_cnx):
 		r = requests.get(path, headers=headers)
 		if r.status_code == requests.codes.ok:
 			result = json.loads(r.text)
-		buildMessageSuccessRequest(target_cursor, "Conexión satisfactoria con api de egresados", '', path, '')
+		buildMessageLog(target_cursor, "Conexión satisfactoria con api de egresados", '', path, '')
 	except requests.exceptions.HTTPError as errh:
 		# print ("Http Error:",errh)
 		buildMessageErrorRequest(target_cursor, "Solicitud para la api de egresados", errh, path, "Error Http")
@@ -271,7 +271,7 @@ def buildMessageErrorRequest(target_cursor, activity: str, message: str, path: s
 	}
 	insertError(target_cursor, LOG_ACTIVITY_MICROSERVICES, entity)	
 
-def buildMessageSuccessRequest(target_cursor, activity: str, message: str, path: str, typeError: str):
+def buildMessageLog(target_cursor, activity: str, message: str, path: str, typeError: str):
 	entity = {
 		"activity": str(activity),
 		"message": str(message),
@@ -280,14 +280,14 @@ def buildMessageSuccessRequest(target_cursor, activity: str, message: str, path:
 	}
 	insertError(target_cursor, LOG_ACTIVITY_MICROSERVICES, entity)
 
-def buildMessageErrorETL(target_cursor, activity: str, message: str, path: str, typeError: str):
-	entity = {
-		"activity": str(activity),
-		"message": str(message),
-		"endpoint": path,
-		"type": str(typeError) 
-	}
-	insertError(target_cursor, LOG_ACTIVITY_MICROSERVICES, entity)
+# def buildMessageLog(target_cursor, activity: str, message: str, path: str, typeError: str):
+# 	entity = {
+# 		"activity": str(activity),
+# 		"message": str(message),
+# 		"endpoint": path,
+# 		"type": str(typeError) 
+# 	}
+# 	insertError(target_cursor, LOG_ACTIVITY_MICROSERVICES, entity)
 
 def splitError(message: str):
 	message = message.split('] ')
@@ -295,62 +295,6 @@ def splitError(message: str):
 	message = message[0]
 	return message
 
-# def requestUpdate(target_cnx, lastUpdate):
-# 	headers = CONTENT_TYPE
-# 	pathList = []
-# 	target_cursor = target_cnx.cursor()
-# 	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_STUDENTS])
-# 	endPointStudent = target_cursor.fetchone()
-# 	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_TEACHERS])
-# 	endPointTeacher = target_cursor.fetchone()
-# 	target_cursor.execute(systemParameter.get_query, [ENDPOINT_LOAD_GRADUATES])
-# 	endPointGraduated = target_cursor.fetchone()
-# 	#pathList.append(endPointStudent[4]+"/{}".format(lastUpdate))
-# 	#pathList.append(endPointTeacher[4]+"/{}".format(lastUpdate))
-# 	#pathList.append(endPointGraduated[4]+"{}".format(lastUpdate)) 
-# 	print(pathList)
-# 	result = []
-# 	for path in pathList:
-# 		try:
-# 			r = requests.get(path, headers=headers)
-# 			if r.status_code == requests.codes.ok:
-# 				result.append(json.loads(r.text))
-# 		except requests.exceptions.HTTPError as errh:
-# 			# print ("Http Error:",errh)
-# 			message = errh
-# 			entity = {
-# 				"message": str(message),
-# 				"endpoint": path
-# 			}
-# 			insertError(target_cursor, "LOG_ACTIVITY_MICROSERVICES", entity)
-# 		except requests.exceptions.ConnectionError as errc:
-# 			# print ("Error Connecting:",errc)
-# 			message = errc
-# 			entity = {
-# 				"message": str(message),
-# 				"endpoint": path
-# 			}
-# 			insertError(target_cursor, "LOG_ACTIVITY_MICROSERVICES", entity)
-# 		except requests.exceptions.Timeout as errt:
-# 			# print ("Timeout Error:",errt)
-# 			message = errt
-# 			entity = {
-# 				"message": str(message),
-# 				"endpoint": path
-# 			}
-# 			insertError(target_cursor, "LOG_ACTIVITY_MICROSERVICES", entity)
-# 		except requests.exceptions.RequestException as err:
-# 			# print ("OOps: Something Else",err)
-# 			message = err
-# 			entity = {
-# 				"message": str(message),
-# 				"endpoint": path
-# 			}
-# 			insertError(target_cursor, "LOG_ACTIVITY_MICROSERVICES", entity)
-
-# 		continue
-
-# 	return result
 
 def distributionCargaInitialUpdateStudens(target_cnx, table: str, content: dict):
 	
@@ -471,7 +415,7 @@ def distributionCargaInitialUpdateStudens(target_cnx, table: str, content: dict)
 				except mysql.connector.Error as e:
 					print("error")
 					target_cnx.rollback()
-					buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_estudiante', 'Error de base de datos')
+					buildMessageLog(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_estudiante', 'Error de base de datos')
 			else:
 				# insertar estudiante
 				try:
@@ -487,7 +431,7 @@ def distributionCargaInitialUpdateStudens(target_cnx, table: str, content: dict)
 				except mysql.connector.Error as e:
 					print("error")
 					target_cnx.rollback()
-					buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla dim_estudiante', 'Error de base de datos')
+					buildMessageLog(target_cursor, 'Carga en base de datos', e, 'Tabla dim_estudiante', 'Error de base de datos')
 
 			target_cursor.execute(studentRelationship.get_query_code,[item[IDENTIFICATION_CARD]])
 			idFact = target_cursor.fetchone()
@@ -509,7 +453,7 @@ def distributionCargaInitialUpdateStudens(target_cnx, table: str, content: dict)
 				except mysql.connector.Error as e:
 					print("error")
 					target_cnx.rollback()
-					buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla fact_estudiante_facultad', 'Error de base de datos')
+					buildMessageLog(target_cursor, 'Actualización en base de datos', e, 'Tabla fact_estudiante_facultad', 'Error de base de datos')
 			else:
 				# insercion
 				print("INSERCION")
@@ -530,7 +474,7 @@ def distributionCargaInitialUpdateStudens(target_cnx, table: str, content: dict)
 				except mysql.connector.Error as e:
 					print("error")
 					target_cnx.rollback()
-					buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla fact_estudiante_facultad', 'Error de base de datos')
+					buildMessageLog(target_cursor, 'Carga en base de datos', e, 'Tabla fact_estudiante_facultad', 'Error de base de datos')
 			target_cnx.commit()
 	
 	target_cursor.close()
@@ -570,7 +514,7 @@ def distributionCargaInitialUpdateTeachers(target_cnx, table: str, content: dict
 				target_cnx.commit()
 			except mysql.connector.Error as e:
 				print("Roolback")
-				buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla dim_carrera', 'Error de base de datos')
+				buildMessageLog(target_cursor, 'Carga en base de datos', e, 'Tabla dim_carrera', 'Error de base de datos')
 			
 		print("Insercion finalizada")
 
@@ -660,7 +604,7 @@ def distributionCargaInitialUpdateTeachers(target_cnx, table: str, content: dict
 						print("No existe el registro")
 				except mysql.connector.Error as e:
 					print("Roolback")
-					buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_docentes', 'Error de base de datos')
+					buildMessageLog(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_docentes', 'Error de base de datos')
 
 			else:
 				try:
@@ -689,7 +633,7 @@ def distributionCargaInitialUpdateTeachers(target_cnx, table: str, content: dict
 					print("Insertado")
 				except mysql.connector.Error as e:
 					print("Roolback")
-					buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla dim_docentes', 'Error de base de datos')
+					buildMessageLog(target_cursor, 'Carga en base de datos', e, 'Tabla dim_docentes', 'Error de base de datos')
 
 		print("ACTUALIZACION DOCENTE FINALIZADA")
 
@@ -717,7 +661,7 @@ def distributionCargaInitialUpdateTeachers(target_cnx, table: str, content: dict
 					target_cnx.commit()
 				except mysql.connector.Error as e:
 					print("Roolback")
-					buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla dim_publicacion', 'Error de base de datos')
+					buildMessageLog(target_cursor, 'Carga en base de datos', e, 'Tabla dim_publicacion', 'Error de base de datos')
 					
 			else:
 				try:
@@ -731,7 +675,7 @@ def distributionCargaInitialUpdateTeachers(target_cnx, table: str, content: dict
 					target_cnx.commit()
 				except mysql.connector.Error as e:
 					print("Roolback")
-					buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_publicacion', 'Error de base de datos')
+					buildMessageLog(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_publicacion', 'Error de base de datos')
 		print("Insercion finalizada")
 
 	elif table == TEACHER_PUBLICATION:
@@ -767,7 +711,7 @@ def distributionCargaInitialUpdateTeachers(target_cnx, table: str, content: dict
 					VALUES (%s, %s, %s, %s)"""), [ids[0], ids[1], idPublication[0], numberCites])
 				except mysql.connector.Error as e:
 					print("Roolback")
-					buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla fact_docente_publicacion', 'Error de base de datos')
+					buildMessageLog(target_cursor, 'Carga en base de datos', e, 'Tabla fact_docente_publicacion', 'Error de base de datos')
 			else: 
 				print("Error")
 			print("Insercion finalizada")
@@ -801,7 +745,7 @@ def distributionCargaInitialUpdateTeachers(target_cnx, table: str, content: dict
 					target_cnx.commit()
 				except mysql.connector.Error as e:
 					print("Roolback")
-					buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla dim_titulo', 'Error de base de datos')
+					buildMessageLog(target_cursor, 'Carga en base de datos', e, 'Tabla dim_titulo', 'Error de base de datos')
 			else:
 				try:
 					update(target_cursor, "titulo", item, {'id': title[0]})
@@ -814,7 +758,7 @@ def distributionCargaInitialUpdateTeachers(target_cnx, table: str, content: dict
 					target_cnx.commit()
 				except mysql.connector.Error as e:
 					print("Roolback")
-					buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_titulo', 'Error de base de datos')
+					buildMessageLog(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_titulo', 'Error de base de datos')
 		print("Insercion finalizada")
 
 	elif table == "docente-titulo":
@@ -853,7 +797,7 @@ def distributionCargaInitialUpdateTeachers(target_cnx, table: str, content: dict
 					VALUES (%s, %s, %s)"""), [idTeacher[0], idTitle[0], idLevel[0]])
 				except mysql.connector.Error as e:
 					print("Roolback")
-					buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla fact_docente_titulo', 'Error de base de datos')
+					buildMessageLog(target_cursor, 'Carga en base de datos', e, 'Tabla fact_docente_titulo', 'Error de base de datos')
 			else:
 				print("Error")
 			print("Insercion finalizada")
@@ -899,7 +843,7 @@ def distributionCargaInitialUpdateGraduate(target_cnx, table: str, content: dict
 						target_cnx.commit()
 					except mysql.connector.Error as e:
 						print("Roolback")
-						buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla dim_egresado', 'Error de base de datos')
+						buildMessageLog(target_cursor, 'Carga en base de datos', e, 'Tabla dim_egresado', 'Error de base de datos')
 				else:
 					print("actualizar")
 					try: 
@@ -913,7 +857,7 @@ def distributionCargaInitialUpdateGraduate(target_cnx, table: str, content: dict
 						target_cnx.commit()
 					except mysql.connector.Error as e:
 						print("Roolback")
-						buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_egresado', 'Error de base de datos')
+						buildMessageLog(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_egresado', 'Error de base de datos')
 			else: 
 				print("Objeto con valores nulos o vacios")
 	
@@ -946,7 +890,7 @@ def distributionCargaInitialUpdateGraduate(target_cnx, table: str, content: dict
 						target_cnx.commit()
 					except mysql.connector.Error as e:
 						print("Roolback")
-						buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla dim_estudiosuc', 'Error de base de datos')
+						buildMessageLog(target_cursor, 'Carga en base de datos', e, 'Tabla dim_estudiosuc', 'Error de base de datos')
 						
 				else:
 					print("ACTUALIZADO")
@@ -961,7 +905,7 @@ def distributionCargaInitialUpdateGraduate(target_cnx, table: str, content: dict
 						target_cnx.commit()
 					except mysql.connector.Error as e:
 						print("Roolback")
-						buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_estudiosuc', 'Error de base de datos')
+						buildMessageLog(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_estudiosuc', 'Error de base de datos')
 				
 				target_cursor.execute(facultyQuery.get_query_code, [facultyCode])
 				idFaculty = target_cursor.fetchone()
@@ -1000,7 +944,7 @@ def distributionCargaInitialUpdateGraduate(target_cnx, table: str, content: dict
 							print("Registro actualizado")
 						except mysql.connector.Error as e:
 							print("Roolback {}".format(e))
-							buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla fact_egresado_estudiosuc', 'Error de base de datos')
+							buildMessageLog(target_cursor, 'Actualización en base de datos', e, 'Tabla fact_egresado_estudiosuc', 'Error de base de datos')
 					else:
 						print("INSERTADO")
 						try:
@@ -1019,7 +963,7 @@ def distributionCargaInitialUpdateGraduate(target_cnx, table: str, content: dict
 							print("Registro insertado")
 						except mysql.connector.Error as e:
 							print("Roolback {}".format(e))
-							buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla fact_egresado_estudiosuc', 'Error de base de datos')
+							buildMessageLog(target_cursor, 'Carga en base de datos', e, 'Tabla fact_egresado_estudiosuc', 'Error de base de datos')
 			else:
 				print("Objeto con valores nulos o vacios")
 
@@ -1056,7 +1000,7 @@ def distributionCargaInitialUpdateGraduate(target_cnx, table: str, content: dict
 						target_cnx.commit()
 					except mysql.connector.Error as e:
 						print("Roolback")
-						buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla dim_trabajos', 'Error de base de datos')
+						buildMessageLog(target_cursor, 'Carga en base de datos', e, 'Tabla dim_trabajos', 'Error de base de datos')
 				else:
 					print("ACTUALIZADO")
 					try: 
@@ -1071,7 +1015,7 @@ def distributionCargaInitialUpdateGraduate(target_cnx, table: str, content: dict
 						target_cnx.commit()
 					except mysql.connector.Error as e:
 						print("Roolback")
-						buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_trabajos', 'Error de base de datos')
+						buildMessageLog(target_cursor, 'Actualización en base de datos', e, 'Tabla dim_trabajos', 'Error de base de datos')
 
 				target_cursor.execute(jobsQuery.get_query_code, [jobCode])
 				idJob = target_cursor.fetchone() 
@@ -1101,7 +1045,7 @@ def distributionCargaInitialUpdateGraduate(target_cnx, table: str, content: dict
 							print("Registro actualizado")
 						except mysql.connector.Error as e:
 							print("Roolback {}".format(e))
-							buildMessageErrorETL(target_cursor, 'Actualización en base de datos', e, 'Tabla fact_egresado_trabajos', 'Error de base de datos')
+							buildMessageLog(target_cursor, 'Actualización en base de datos', e, 'Tabla fact_egresado_trabajos', 'Error de base de datos')
 					else:
 						print("INSERTADO")
 						try:
@@ -1120,7 +1064,7 @@ def distributionCargaInitialUpdateGraduate(target_cnx, table: str, content: dict
 							print("Registro insertado")
 						except mysql.connector.Error as e:
 							print("Roolback {}".format(e))
-							buildMessageErrorETL(target_cursor, 'Carga en base de datos', e, 'Tabla fact_egresado_trabajos', 'Error de base de datos')
+							buildMessageLog(target_cursor, 'Carga en base de datos', e, 'Tabla fact_egresado_trabajos', 'Error de base de datos')
 			else:
 				print("Objeto con valores nulos o vacios")
 	

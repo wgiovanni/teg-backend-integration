@@ -159,6 +159,7 @@ api.add_resource(Profession, '/carrera')
 api.add_resource(ProfessionId, '/carrera/<profession_id>')
 api.add_resource(MicroservicesError, '/microservices')
 
+#ESTUDIANTES
 # cantidad de estudiantes totales
 api.add_resource(Student, '/estudiantes-total')
 # cantidad de estudiantes por facultad
@@ -195,7 +196,7 @@ api.add_resource(StudentPerYear, '/estudiantes-ano')
 api.add_resource(StudentYearFaculty, '/estudiantes-ano-facultad')
 
 
-# docentes
+# DOCENTES
 # Número de personal académico empleado en relación al número de alumnos matriculados.
 api.add_resource(TeacherStudent, '/profesor-estudiante-proporcion')
 # total de docentes empleado
@@ -224,7 +225,6 @@ api.add_resource(TeacherNacionalityFaculty, '/profesores-nacionalidad-facultad')
 api.add_resource(TeacherScale, '/profesores-escalafon-proporcion')
 # proporcion de profesores con doctorado/ total de profesores
 api.add_resource(TeacherTitle, '/profesor-doctorado-proporcion')
-
 # premios
 api.add_resource(TeacherPrize, '/profesores-premios')
 # proyectos
@@ -242,6 +242,8 @@ api.add_resource(GraduateCourses, '/egresado-cursos')
 api.add_resource(GraduateCertification, '/egresado-certificacion')
 api.add_resource(GraduateEducation, '/egresado-educacion')
 
+
+#EGRESADO
 # cantidad de egresados por facultad
 api.add_resource(GraduateFaculty, '/egresado-facultad')
 # cantidad de egresados por año
@@ -253,13 +255,13 @@ api.add_resource(GraduateJobs, '/egresado-trabajos')
 
 if __name__ == "__main__":
 	sched = BackgroundScheduler(daemon=True)
-	sched.add_job(taskStudents, 'interval', seconds=30)
+	sched.add_job(taskStudents, 'interval', seconds=200)
 
 	sched1 = BackgroundScheduler(daemon=True)
-	sched1.add_job(taskTeachers, 'interval', seconds=60)
+	sched1.add_job(taskTeachers, 'interval', seconds=250)
 
 	sched2 = BackgroundScheduler(daemon=True)
-	sched2.add_job(taskGraduates, 'interval', seconds=90)
+	sched2.add_job(taskGraduates, 'interval', seconds=300)
 
 	sched.start()
 	sched1.start()

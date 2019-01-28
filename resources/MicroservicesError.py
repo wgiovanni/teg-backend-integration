@@ -8,15 +8,27 @@ from common.BD import BD
 import datetime
 import requests
 from flask import request
-from constants import LOG_ACTIVITY_MICROSERVICES
+from constants import LOG_ACTIVITY_MICROSERVICES, SCHEDULED_TASK_STUDENTS, SCHEDULED_TASK_GRADUATES, SCHEDULED_TASK_TEACHERS
 
 class MicroservicesError(BD, Resource):
     representations = {'application/json': make_response}
     def get(self):
         try:
-            result = self.queryAll("SELECT * FROM LOG_ACTIVITY_MICROSERVICES WHERE status = 0 ORDER BY date DESC")
-            for r in result:
+            # sistemParamaterStudentsScheduler = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_STUDENTS])
+            # sistemParamaterTeachersScheduler = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_TEACHERS])
+            # sistemParamaterGraduatesScheduler = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_GRADUATES])
+            activityMicroservices = self.queryAll("SELECT * FROM LOG_ACTIVITY_MICROSERVICES WHERE status = 0 ORDER BY date DESC")
+            for r in activityMicroservices:
                 r['date'] = r['date'].strftime('%Y-%m-%d %H:%M:%S')
+            result = activityMicroservices
+            # result = {
+            #     'dates': [
+            #         { 'dateStudents': sistemParamaterStudentsScheduler['definicion']}, 
+            #         {'dateTeachers': sistemParamaterTeachersScheduler['definicion']}, 
+            #         {'dateGraduate': sistemParamaterGraduatesScheduler['definicion']}
+            #     ], 
+            #     'activity': activityMicroservices
+            # }
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 

@@ -93,12 +93,10 @@ class BD:
         if isinstance(values[0], (list, tuple)):
             marks = "(%s" + (",%s" * (len(values[0]) - 1)) + ")"
             sql = f"insert into {table} {columns} values {marks}", values
-            print(sql)
             cursor.execute(sql, values)
         else:
             marks = "(%s" + (",%s" * (len(values) - 1)) + ")"
             sql = f"insert into {table} {columns} values {marks}"
-            print(sql)
             cursor.execute(sql, values)	
 
         cursor.close()

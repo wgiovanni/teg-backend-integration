@@ -175,6 +175,10 @@ class SystemParameterTaskStudents(BD, Resource):
 	def get(self):
 		try:
 			result = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_STUDENTS])
+			activityMicroservices = self.queryAll("SELECT * FROM LOG_ACTIVITY_MICROSERVICES WHERE status = 0 ORDER BY date DESC")
+			for r in activityMicroservices:
+				r['date'] = r['date'].strftime('%Y-%m-%d %H:%M:%S')
+			result['activityMicroservices'] = activityMicroservices
 		except DatabaseError as e:
 			self.rollback()
 			abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
@@ -219,8 +223,14 @@ class SystemParameterTaskStudents(BD, Resource):
 			}
 			self.insert('HISTORY_ACTION', audit)
 			self.commit()
-			result = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_STUDENTS])
-			print(result)
+			definition = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_STUDENTS])
+			result = {
+				"definition": definition
+			}
+			activityMicriservices = self.queryAll("SELECT * FROM LOG_ACTIVITY_MICROSERVICES WHERE status = 0 ORDER BY date DESC")
+			for r in activityMicriservices:
+				r['date'] = r['date'].strftime('%Y-%m-%d %H:%M:%S')
+			result['activityMicroservices'] = activityMicriservices
 		except DatabaseError as e:
 			self.rollback()
 			abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
@@ -235,6 +245,10 @@ class SystemParameterTaskTeachers(BD, Resource):
 	def get(self):
 		try:
 			result = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_TEACHERS])
+			activityMicroservices = self.queryAll("SELECT * FROM LOG_ACTIVITY_MICROSERVICES WHERE status = 0 ORDER BY date DESC")
+			for r in activityMicroservices:
+				r['date'] = r['date'].strftime('%Y-%m-%d %H:%M:%S')
+			result['activityMicroservices'] = activityMicroservices
 		except DatabaseError as e:
 			self.rollback()
 			abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
@@ -279,8 +293,14 @@ class SystemParameterTaskTeachers(BD, Resource):
 			}
 			self.insert('HISTORY_ACTION', audit)
 			self.commit()
-			result = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_TEACHERS])
-			print(result)
+			definition = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_TEACHERS])
+			result = {
+				'definition': definition
+			}
+			activityMicroservices = self.queryAll("SELECT * FROM LOG_ACTIVITY_MICROSERVICES WHERE status = 0 ORDER BY date DESC")
+			for r in activityMicroservices:
+				r['date'] = r['date'].strftime('%Y-%m-%d %H:%M:%S')
+			result['activityMicroservices'] = activityMicroservices
 		except DatabaseError as e:
 			self.rollback()
 			abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
@@ -295,6 +315,10 @@ class SystemParameterTaskGraduates(BD, Resource):
 	def get(self):
 		try:
 			result = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_GRADUATES])
+			activityMicriservices = self.queryAll("SELECT * FROM LOG_ACTIVITY_MICROSERVICES WHERE status = 0 ORDER BY date DESC")
+			for r in activityMicriservices:
+				r['date'] = r['date'].strftime('%Y-%m-%d %H:%M:%S')
+			result['activityMicroservices'] = activityMicriservices
 		except DatabaseError as e:
 			self.rollback()
 			abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
@@ -339,8 +363,14 @@ class SystemParameterTaskGraduates(BD, Resource):
 			}
 			self.insert('HISTORY_ACTION', audit)
 			self.commit()
-			result = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_GRADUATES])
-			print(result)
+			definition = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_GRADUATES])
+			result = {
+				'definition': definition
+			}
+			activityMicriservices = self.queryAll("SELECT * FROM LOG_ACTIVITY_MICROSERVICES WHERE status = 0 ORDER BY date DESC")
+			for r in activityMicriservices:
+				r['date'] = r['date'].strftime('%Y-%m-%d %H:%M:%S')
+			result['activityMicroservices'] = activityMicriservices
 		except DatabaseError as e:
 			self.rollback()
 			abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
@@ -446,8 +476,13 @@ class SystemParameterTaskAll(BD, Resource):
 			self.insert('HISTORY_ACTION', audit2)
 			self.commit()
 			result = {
-				"definicion": activeTask
+				'definicion': activeTask
 			}
+			activityMicriservices = self.queryAll("SELECT * FROM LOG_ACTIVITY_MICROSERVICES WHERE status = 0 ORDER BY date DESC")
+			for r in activityMicriservices:
+				r['date'] = r['date'].strftime('%Y-%m-%d %H:%M:%S')
+			result['activityMicroservices'] = activityMicriservices
+
 		except DatabaseError as e:
 			self.rollback()
 			abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))

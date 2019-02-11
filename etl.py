@@ -41,7 +41,7 @@ def etl_process_students():
 		if row[4] == "0":
 			#actualizacion
 			print("Actualizacion")
-			print(systemParameterDate[4])
+			# print(systemParameterDate[4])
 			data = requestCargaInitialStudents(target_cnx)
 			keyList= data.keys()
 			keyList = sorted(keyList)
@@ -189,7 +189,7 @@ def requestCargaInitialStudents(target_cnx):
 		r = requests.get(path, headers=headers)
 		if r.status_code == requests.codes.ok:
 			result = json.loads(r.text)
-		buildMessageLog(target_cursor, "Conexión satisfactoria con api de estudiantes", '', path, '')
+		buildMessageLog(target_cursor, "Conexión satisfactoria con api de estudiantes", '.', path, '.')
 	except requests.exceptions.HTTPError as errh:
 		# print ("Http Error:",errh)
 		buildMessageErrorRequest(target_cursor, "Solicitud para la api de estudiantes", errh, path, "Error Http")
@@ -217,7 +217,7 @@ def requestCargaInitialTeachers(target_cnx):
 		r = requests.get(path, headers=headers)
 		if r.status_code == requests.codes.ok:
 			result = json.loads(r.text)
-		buildMessageLog(target_cursor, "Conexión satisfactoria con api de docentes", '', path, '')
+		buildMessageLog(target_cursor, "Conexión satisfactoria con api de docentes", '.', path, '.')
 	except requests.exceptions.HTTPError as errh:
 		# print ("Http Error:",errh)
 		buildMessageErrorRequest(target_cursor, "Solicitud para la api de docentes", errh, path, "Error Http")
@@ -245,7 +245,7 @@ def requestCargaInitialGraduate(target_cnx):
 		r = requests.get(path, headers=headers)
 		if r.status_code == requests.codes.ok:
 			result = json.loads(r.text)
-		buildMessageLog(target_cursor, "Conexión satisfactoria con api de egresados", '', path, '')
+		buildMessageLog(target_cursor, "Conexión satisfactoria con api de egresados", '.', path, '.')
 	except requests.exceptions.HTTPError as errh:
 		# print ("Http Error:",errh)
 		buildMessageErrorRequest(target_cursor, "Solicitud para la api de egresados", errh, path, "Error Http")
@@ -280,15 +280,6 @@ def buildMessageLog(target_cursor, activity: str, message: str, path: str, typeE
 	}
 	insertError(target_cursor, LOG_ACTIVITY_MICROSERVICES, entity)
 
-# def buildMessageLog(target_cursor, activity: str, message: str, path: str, typeError: str):
-# 	entity = {
-# 		"activity": str(activity),
-# 		"message": str(message),
-# 		"endpoint": path,
-# 		"type": str(typeError) 
-# 	}
-# 	insertError(target_cursor, LOG_ACTIVITY_MICROSERVICES, entity)
-
 def splitError(message: str):
 	message = message.split('] ')
 	message = message[-1].split("'")
@@ -302,7 +293,7 @@ def distributionCargaInitialUpdateStudens(target_cnx, table: str, content: dict)
 
 	if table == STUDENT:
 		items = content[ITEMS]
-		#print(items)
+		# print(items)
 		print("Cargando estudiantes...")
 		for item in items:
 			# aqui deberian ir las verificaciones de cada item
@@ -331,13 +322,13 @@ def distributionCargaInitialUpdateStudens(target_cnx, table: str, content: dict)
 
 			# status
 			statusCode = item['estatus']
-			if statusCode == 0:
+			if statusCode == 1:
 				statusCode = STATUS_ACTIVE
-			elif statusCode == 1:
+			elif statusCode == 0:
 				statusCode = STATUS_INACTIVE
 			target_cursor.execute(statusQuery.get_query_code, [statusCode])
 			idStatus = target_cursor.fetchone()
-			# print("status: {}".format(idStatus))
+			print("status: {}".format(idStatus))
 
 			# discapacidad
 			disabilityCode = item['discapacidad']
@@ -532,7 +523,7 @@ def distributionCargaInitialUpdateTeachers(target_cnx, table: str, content: dict
 				nationalityCode = INTERNACIONAL
 			target_cursor.execute(nationalityQuery.get_query_code, [nationalityCode])
 			idNationality = target_cursor.fetchone()
-			print("nacionalidad: {}".format(idNationality))
+			# print("nacionalidad: {}".format(idNationality))
 
 			# sexo
 			sexCode = item[SEX_ATTRIBUTE]
@@ -542,13 +533,13 @@ def distributionCargaInitialUpdateTeachers(target_cnx, table: str, content: dict
 				sexCode = MALE
 			target_cursor.execute(sexQuery.get_query_code, [sexCode])
 			idSex = target_cursor.fetchone()
-			print("sexo: {}".format(idSex))
+			# print("sexo: {}".format(idSex))
 
 			#escalafon
 			scaleCode = item[SCALE]
 			target_cursor.execute(scaleQuery.get_query_code, [scaleCode])
 			idScale = target_cursor.fetchone()
-			print("escalafon: {}".format(idScale))
+			# print("escalafon: {}".format(idScale))
 
 			#tipo de docente
 			typeTeacherCode = item['tipo']
@@ -828,7 +819,9 @@ def distributionCargaInitialUpdateGraduate(target_cnx, table: str, content: dict
 					"apellido": item['primerapellido'],
 					"correo": item['email'],
 					"telefono": item['telefono'],
-					"codigo": item['codigo']				
+					"codigo": item['codigo'],
+					"confianza": item['confianza'],
+					"validado": item['validado']				
 				}
 				if idGraduate is None:
 					print("insertar")
@@ -865,7 +858,7 @@ def distributionCargaInitialUpdateGraduate(target_cnx, table: str, content: dict
 		print("ESTUDIOSUC")
 		items = content[ITEMS]
 		for item in items:
-			print(item)
+			# print(item)
 			if validateJson(item):
 				facultyCode = item['facultad']
 				graduateCode = item['egresado']
@@ -971,7 +964,7 @@ def distributionCargaInitialUpdateGraduate(target_cnx, table: str, content: dict
 		print("Trabajos\n\n")
 		items = content[ITEMS]
 		for item in items:
-			print(item)
+			# print(item)
 			if validateJson(item):
 				graduateCode = item['egresado']
 				jobCode = item['codigo']

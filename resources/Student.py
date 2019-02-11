@@ -610,6 +610,10 @@ class StudentInternacionalFaculty(BD, Resource):
                 item = {"nacionalidad": row['dim_nacionalidad.codigo'], "facultad": row['dim_facultad.nombre'], "total": row['sumatoria']}
                 result.append(item)
 
+            response = {
+                "facultades": result, 
+                "items": items
+            }
             retreived = []
             retreived = self.queryAll(dedent("""\
             SELECT u.first_name, u.email, u.phone, u.address 
@@ -619,14 +623,14 @@ class StudentInternacionalFaculty(BD, Resource):
             INNER JOIN user as u 
             ON (ur.id_user = u.id) 
             WHERE r.name = %s"""), [ROLE_USER_STUDENT])
-            result['recuperado'] = retreived  
+            response['recuperado'] = retreived  
         except DatabaseError as e:
             self.rollback()
             abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
-        return json.dumps(result), 200, { 'Access-Control-Allow-Origin': '*' }
+        return json.dumps(response), 200, { 'Access-Control-Allow-Origin': '*' }
 
 class StudentNacionalFaculty(BD, Resource):
     representations = {'application/json': make_response}

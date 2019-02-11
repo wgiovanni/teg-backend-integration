@@ -384,3 +384,22 @@ class GraduateFacultyYear(BD, Resource):
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
         return json.dumps(response), 200, { 'Access-Control-Allow-Origin': '*' }
+
+# class GraduateFacultyYear(BD, Resource):
+#     representations = {'application/json': make_response}
+#     parser = reqparse.RequestParser()
+#     def post(self):
+#         try:
+#             parameter = request.get_json(force=True)
+#             print(parameter)
+#             parameterYear1 = parameter['desde']
+#             parameterYear2 = parameter['hasta']
+#             parameterFaculty = parameter['facultad'] 
+#             result = []
+#             SELECT e.*, f.nombre as facultad FROM `fact_egresado_estudiosuc` as fact INNER JOIN dim_egresado as e on(fact.id_egresado = e.id) INNER JOIN dim_facultad as f on(fact.id_facultad = f.id) WHERE e.confianza>= 20 and e.confianza<= 60
+            
+            
+#         except Exception as e:
+#             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
+
+#         return json.dumps(response), 200, { 'Access-Control-Allow-Origin': '*' }

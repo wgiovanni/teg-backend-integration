@@ -9,7 +9,6 @@ import mysql.connector
 import simplejson as json
 import requests
 from common.BD import BD
-import mysql.connector
 from db_credentials import datawarehouse_db_config
 from sql_queries import systemParameter
 from pymysql import DatabaseError
@@ -37,7 +36,7 @@ from resources.GraduateJobs import GraduateJobs
 from resources.GraduateCourses import GraduateCourses
 from resources.GraduateCertification import GraduateCertification
 from resources.GraduateEducation import GraduateEducation
-from resources.GraduateStudiosUc import GraduateFaculty, GraduatePerYear, GraduateFacultyYear
+from resources.GraduateStudiosUc import GraduateFaculty, GraduatePerYear, GraduateFacultyYear, GraduateTrust
 from resources.GraduateVolunteering import GraduateVolunteering
 from resources.Year import Year
 from resources.Faculty import FacultyReport, Faculty, FacultyId
@@ -136,8 +135,8 @@ class SystemParameterTaskStudents(BD, Resource):
 
 	def get(self):
 		try:
-			result = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_STUDENTS])
-			activityMicroservices = self.queryAll("SELECT * FROM LOG_ACTIVITY_MICROSERVICES WHERE status = 0 ORDER BY date DESC")
+			result = self.queryOne("SELECT definicion FROM parametro_sistema WHERE codigo = %s", [SCHEDULED_TASK_STUDENTS])
+			activityMicroservices = self.queryAll("SELECT * FROM log_activity_microservices WHERE status = 0 ORDER BY date DESC")
 			for r in activityMicroservices:
 				r['date'] = r['date'].strftime('%Y-%m-%d %H:%M:%S')
 			result['activityMicroservices'] = activityMicroservices
@@ -153,7 +152,7 @@ class SystemParameterTaskStudents(BD, Resource):
 			active = request.get_json(force=True)
 			# print(active)
 			message = ''
-			result = self.queryOne("SELECT * FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_STUDENTS])
+			result = self.queryOne("SELECT * FROM parametro_sistema WHERE codigo = %s", [SCHEDULED_TASK_STUDENTS])
 			# print(result)
 			if active['active'] == False:
 				result['definicion'] = "0"
@@ -163,7 +162,7 @@ class SystemParameterTaskStudents(BD, Resource):
 				result['definicion'] = "1"
 				message = "Activación de tarea programada para estudiantes"
 				app.apscheduler.resume_job(id='j'+str(1))
-			self.update('PARAMETRO_SISTEMA', result, {'ID': result['id']})
+			self.update('parametro_sistema', result, {'ID': result['id']})
 			self.commit()
 			entity = {
 				"activity": str(message),
@@ -171,7 +170,7 @@ class SystemParameterTaskStudents(BD, Resource):
 				"endpoint": '.',
 				"type": '.' 
 			}
-			self.insert(LOG_ACTIVITY_MICROSERVICES, entity)
+			self.insert(log_activity_microservices, entity)
 			self.commit()
 			username = active['user']
 			if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
@@ -187,11 +186,11 @@ class SystemParameterTaskStudents(BD, Resource):
 			}
 			self.insert('HISTORY_ACTION', audit)
 			self.commit()
-			definition = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_STUDENTS])
+			definition = self.queryOne("SELECT definicion FROM parametro_sistema WHERE codigo = %s", [SCHEDULED_TASK_STUDENTS])
 			result = {
 				"definition": definition
 			}
-			activityMicriservices = self.queryAll("SELECT * FROM LOG_ACTIVITY_MICROSERVICES WHERE status = 0 ORDER BY date DESC")
+			activityMicriservices = self.queryAll("SELECT * FROM log_activity_microservices WHERE status = 0 ORDER BY date DESC")
 			for r in activityMicriservices:
 				r['date'] = r['date'].strftime('%Y-%m-%d %H:%M:%S')
 			result['activityMicroservices'] = activityMicriservices
@@ -208,8 +207,8 @@ class SystemParameterTaskTeachers(BD, Resource):
 
 	def get(self):
 		try:
-			result = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_TEACHERS])
-			activityMicroservices = self.queryAll("SELECT * FROM LOG_ACTIVITY_MICROSERVICES WHERE status = 0 ORDER BY date DESC")
+			result = self.queryOne("SELECT definicion FROM parametro_sistema WHERE codigo = %s", [SCHEDULED_TASK_TEACHERS])
+			activityMicroservices = self.queryAll("SELECT * FROM log_activity_microservices WHERE status = 0 ORDER BY date DESC")
 			for r in activityMicroservices:
 				r['date'] = r['date'].strftime('%Y-%m-%d %H:%M:%S')
 			result['activityMicroservices'] = activityMicroservices
@@ -225,7 +224,7 @@ class SystemParameterTaskTeachers(BD, Resource):
 			active = request.get_json(force=True)
 			# print(active)
 			message = ''
-			result = self.queryOne("SELECT * FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_TEACHERS])
+			result = self.queryOne("SELECT * FROM parametro_sistema WHERE codigo = %s", [SCHEDULED_TASK_TEACHERS])
 			# print(result)
 			if active['active'] == False:
 				result['definicion'] = "0"
@@ -235,7 +234,7 @@ class SystemParameterTaskTeachers(BD, Resource):
 				result['definicion'] = "1"
 				message = "Activación de tarea programada para docentes"
 				app.apscheduler.resume_job(id='j'+str(2))
-			self.update('PARAMETRO_SISTEMA', result, {'ID': result['id']})
+			self.update('parametro_sistema', result, {'ID': result['id']})
 			self.commit()
 			entity = {
 				"activity": str(message),
@@ -243,7 +242,7 @@ class SystemParameterTaskTeachers(BD, Resource):
 				"endpoint": '.',
 				"type": '.' 
 			}
-			self.insert(LOG_ACTIVITY_MICROSERVICES, entity)
+			self.insert(log_activity_microservices, entity)
 			self.commit()
 			username = active['user']
 			if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
@@ -259,11 +258,11 @@ class SystemParameterTaskTeachers(BD, Resource):
 			}
 			self.insert('HISTORY_ACTION', audit)
 			self.commit()
-			definition = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_TEACHERS])
+			definition = self.queryOne("SELECT definicion FROM parametro_sistema WHERE codigo = %s", [SCHEDULED_TASK_TEACHERS])
 			result = {
 				'definition': definition
 			}
-			activityMicroservices = self.queryAll("SELECT * FROM LOG_ACTIVITY_MICROSERVICES WHERE status = 0 ORDER BY date DESC")
+			activityMicroservices = self.queryAll("SELECT * FROM log_activity_microservices WHERE status = 0 ORDER BY date DESC")
 			for r in activityMicroservices:
 				r['date'] = r['date'].strftime('%Y-%m-%d %H:%M:%S')
 			result['activityMicroservices'] = activityMicroservices
@@ -280,8 +279,8 @@ class SystemParameterTaskGraduates(BD, Resource):
 
 	def get(self):
 		try:
-			result = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_GRADUATES])
-			activityMicriservices = self.queryAll("SELECT * FROM LOG_ACTIVITY_MICROSERVICES WHERE status = 0 ORDER BY date DESC")
+			result = self.queryOne("SELECT definicion FROM parametro_sistema WHERE codigo = %s", [SCHEDULED_TASK_GRADUATES])
+			activityMicriservices = self.queryAll("SELECT * FROM log_activity_microservices WHERE status = 0 ORDER BY date DESC")
 			for r in activityMicriservices:
 				r['date'] = r['date'].strftime('%Y-%m-%d %H:%M:%S')
 			result['activityMicroservices'] = activityMicriservices
@@ -297,7 +296,7 @@ class SystemParameterTaskGraduates(BD, Resource):
 			active = request.get_json(force=True)
 			# print(active)
 			message = ''
-			result = self.queryOne("SELECT * FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_GRADUATES])
+			result = self.queryOne("SELECT * FROM parametro_sistema WHERE codigo = %s", [SCHEDULED_TASK_GRADUATES])
 			# print(result)
 			if active['active'] == False:
 				result['definicion'] = "0"
@@ -307,7 +306,7 @@ class SystemParameterTaskGraduates(BD, Resource):
 				result['definicion'] = "1"
 				message = "Activación de tarea programada para egresados"
 				app.apscheduler.resume_job(id='j'+str(3))
-			self.update('PARAMETRO_SISTEMA', result, {'ID': result['id']})
+			self.update('parametro_sistema', result, {'ID': result['id']})
 			self.commit()
 			entity = {
 				"activity": str(message),
@@ -315,7 +314,7 @@ class SystemParameterTaskGraduates(BD, Resource):
 				"endpoint": '.',
 				"type": '.' 
 			}
-			self.insert(LOG_ACTIVITY_MICROSERVICES, entity)
+			self.insert(log_activity_microservices, entity)
 			self.commit()
 			username = active['user']
 			if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
@@ -331,11 +330,11 @@ class SystemParameterTaskGraduates(BD, Resource):
 			}
 			self.insert('HISTORY_ACTION', audit)
 			self.commit()
-			definition = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_GRADUATES])
+			definition = self.queryOne("SELECT definicion FROM parametro_sistema WHERE codigo = %s", [SCHEDULED_TASK_GRADUATES])
 			result = {
 				'definition': definition
 			}
-			activityMicriservices = self.queryAll("SELECT * FROM LOG_ACTIVITY_MICROSERVICES WHERE status = 0 ORDER BY date DESC")
+			activityMicriservices = self.queryAll("SELECT * FROM log_activity_microservices WHERE status = 0 ORDER BY date DESC")
 			for r in activityMicriservices:
 				r['date'] = r['date'].strftime('%Y-%m-%d %H:%M:%S')
 			result['activityMicroservices'] = activityMicriservices
@@ -359,9 +358,9 @@ class SystemParameterTaskAll(BD, Resource):
 			messageTeachers = ''
 			messageStudents = '	' 
 			activeTask = ''
-			resultGraduates = self.queryOne("SELECT * FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_GRADUATES])
-			resultTeachers = self.queryOne("SELECT * FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_TEACHERS])
-			resultStudents = self.queryOne("SELECT * FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_STUDENTS])
+			resultGraduates = self.queryOne("SELECT * FROM parametro_sistema WHERE codigo = %s", [SCHEDULED_TASK_GRADUATES])
+			resultTeachers = self.queryOne("SELECT * FROM parametro_sistema WHERE codigo = %s", [SCHEDULED_TASK_TEACHERS])
+			resultStudents = self.queryOne("SELECT * FROM parametro_sistema WHERE codigo = %s", [SCHEDULED_TASK_STUDENTS])
 			# print(result)
 			if active['active'] == False:
 				activeTask = "0"
@@ -386,11 +385,11 @@ class SystemParameterTaskAll(BD, Resource):
 				app.apscheduler.resume_job(id='j'+str(2))
 				app.apscheduler.resume_job(id='j'+str(3))
 
-			self.update('PARAMETRO_SISTEMA', resultGraduates, {'ID': resultGraduates['id']})
+			self.update('parametro_sistema', resultGraduates, {'ID': resultGraduates['id']})
 			self.commit()
-			self.update('PARAMETRO_SISTEMA', resultTeachers, {'ID': resultTeachers['id']})
+			self.update('parametro_sistema', resultTeachers, {'ID': resultTeachers['id']})
 			self.commit()
-			self.update('PARAMETRO_SISTEMA', resultStudents, {'ID': resultStudents['id']})
+			self.update('parametro_sistema', resultStudents, {'ID': resultStudents['id']})
 			self.commit()
 			entityGraduates = {
 				"activity": str(messageGraduates),
@@ -411,11 +410,11 @@ class SystemParameterTaskAll(BD, Resource):
 				"endpoint": '.',
 				"type": '.' 
 			}
-			self.insert(LOG_ACTIVITY_MICROSERVICES, entityGraduates)
+			self.insert(log_activity_microservices, entityGraduates)
 			self.commit()
-			self.insert(LOG_ACTIVITY_MICROSERVICES, entityTeachers)
+			self.insert(log_activity_microservices, entityTeachers)
 			self.commit()
-			self.insert(LOG_ACTIVITY_MICROSERVICES, entityStudents)
+			self.insert(log_activity_microservices, entityStudents)
 			self.commit()
 			username = active['user']
 			if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
@@ -452,7 +451,7 @@ class SystemParameterTaskAll(BD, Resource):
 			result = {
 				'definicion': activeTask
 			}
-			activityMicriservices = self.queryAll("SELECT * FROM LOG_ACTIVITY_MICROSERVICES WHERE status = 0 ORDER BY date DESC")
+			activityMicriservices = self.queryAll("SELECT * FROM log_activity_microservices WHERE status = 0 ORDER BY date DESC")
 			for r in activityMicriservices:
 				r['date'] = r['date'].strftime('%Y-%m-%d %H:%M:%S')
 			result['activityMicroservices'] = activityMicriservices
@@ -582,6 +581,7 @@ api.add_resource(GraduatePerYear, '/egresado-ano')
 api.add_resource(GraduateFacultyYear, '/egresado-ano-facultad')
 # trabajos de los egresados
 api.add_resource(GraduateJobs, '/egresado-trabajos')
+api.add_resource(GraduateTrust, '/egresado-confianza')
 
 
 @app.route('/run-tasks')

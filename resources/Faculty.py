@@ -125,7 +125,7 @@ class FacultyId(BD, Resource):
             # jsonData = request.get_data(cache=False, as_text=False, parse_form_data=False)
             # jsonData = json.loads(jsonData)
             print(faculty_id)
-            faculty = self.queryOne("SELECT * FROM dim_facultad WHERE ID = %s", [faculty_id])
+            faculty = self.queryOne("SELECT * FROM dim_facultad WHERE id = %s", [faculty_id])
             if faculty is None:
                 abort(404, message="Resource {} doesn't exists".format(faculty_id))
             else:

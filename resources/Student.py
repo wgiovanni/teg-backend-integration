@@ -19,7 +19,7 @@ class Student(BD, Resource):
     def get(self):
         try:
             params = "Activo"
-            result = self.queryOne("SELECT * FROM DIM_STATUS WHERE CODIGO = %s", [params])
+            result = self.queryOne("SELECT * FROM dim_status WHERE codigo = %s", [params])
             cut = PointCut("dim_status", [result['id']])
             cell = Cell(browser.cube, cuts = [cut])
             r = browser.aggregate(cell, drilldown=['dim_status', 'dim_estudiante', 'dim_facultad'])
@@ -386,7 +386,7 @@ class StudentInternacional(BD, Resource):
     def get(self):
         try:
             params = "Extranjero"
-            result = self.queryOne("SELECT * FROM DIM_NACIONALIDAD WHERE CODIGO = %s", [params])
+            result = self.queryOne("SELECT * FROM dim_nacionalidad WHERE codigo = %s", [params])
             cut = PointCut("dim_nacionalidad", [result['id']])
             cell = Cell(browser.cube, cuts = [cut])
             r = browser.aggregate(cell, drilldown=['dim_nacionalidad'])
@@ -435,7 +435,7 @@ class StudentFaculty(BD, Resource):
                 item = {"nombre": row['dim_facultad.nombre'], "total": row['sumatoria']}
                 items.append(item)
 
-            facultades = self.queryAll("SELECT nombre FROM DIM_FACULTAD")
+            facultades = self.queryAll("SELECT nombre FROM dim_facultad")
             flag = False
             for f in facultades:
                 for r in items:
@@ -485,7 +485,7 @@ class StudentMaleFaculty(BD, Resource):
     def get(self):
         try:
             params = "Masculino"
-            result = self.queryOne("SELECT * FROM dim_genero WHERE CODIGO = %s", [params])
+            result = self.queryOne("SELECT * FROM dim_genero WHERE codigo = %s", [params])
             if result is None:
                 abort(404, message="Resource {} doesn't exists".format(params))
             cut = PointCut("dim_genero", [result['id']])
@@ -510,7 +510,7 @@ class StudentFemaleFaculty(BD, Resource):
     def get(self):
         try:
             params = "Femenino"
-            result = self.queryOne("SELECT * FROM dim_genero WHERE CODIGO = %s", [params])
+            result = self.queryOne("SELECT * FROM dim_genero WHERE codigo = %s", [params])
             if result is None:
                 abort(404, message="Resource {} doesn't exists".format(params))
             cut = PointCut("dim_genero", [result['id']])
@@ -533,7 +533,7 @@ class StudentSexFaculty(BD, Resource):
     parser = reqparse.RequestParser()
     def get(self):
         try:
-            facultades = self.queryAll("SELECT codigo FROM DIM_FACULTAD")
+            facultades = self.queryAll("SELECT codigo FROM dim_facultad")
             
             r = browser.aggregate(drilldown=["dim_genero", "dim_facultad"])
             for row in r:
@@ -599,7 +599,7 @@ class StudentInternacionalFaculty(BD, Resource):
     def get(self):
         try:
             params = "Extranjero"
-            result = self.queryOne("SELECT * FROM DIM_NACIONALIDAD WHERE CODIGO = %s", [params])
+            result = self.queryOne("SELECT * FROM dim_nacionalidad WHERE codigo = %s", [params])
             if result is None:
                 abort(404, message="Resource {} doesn't exists".format(params))
             cut = PointCut("dim_nacionalidad", [result['id']])
@@ -638,7 +638,7 @@ class StudentNacionalFaculty(BD, Resource):
     def get(self):
         try:
             params = "Venezolano"
-            result = self.queryOne("SELECT * FROM DIM_NACIONALIDAD WHERE CODIGO = %s", [params])
+            result = self.queryOne("SELECT * FROM dim_nacionalidad WHERE codigo = %s", [params])
             if result is None:
                 abort(404, message="Resource {} doesn't exists".format(params))
             cut = PointCut("dim_nacionalidad", [result['id']])
@@ -673,7 +673,7 @@ class StudentNationalityFaculty(BD, Resource):
 
     def get(self):
         try:
-            facultades = self.queryAll("SELECT codigo FROM DIM_FACULTAD")
+            facultades = self.queryAll("SELECT codigo FROM dim_facultad")
             r = browser.aggregate(drilldown=["dim_nacionalidad", "dim_facultad"])
             result = []
             item = {}
@@ -732,8 +732,8 @@ class StudentDisabilityFaculty(BD, Resource):
     def get(self):
         try:
             params = "SI POSEO DISCAPACIDAD"
-            result = self.queryOne("SELECT * FROM DIM_DISCAPACIDAD WHERE CODIGO = %s", [params])
-            facultades = self.queryAll("SELECT nombre FROM DIM_FACULTAD")
+            result = self.queryOne("SELECT * FROM dim_discapacidad WHERE codigo = %s", [params])
+            facultades = self.queryAll("SELECT nombre FROM dim_facultad")
 
             if result is None:
                 abort(404, message="Resource {} doesn't exists".format(params))
@@ -796,8 +796,8 @@ class StudentEthnicGroupFaculty(BD, Resource):
     def get(self):
         try:
             params = "SI PERTENEZCO A UN PUEBLO INDÍGENA"
-            result = self.queryOne("SELECT * FROM DIM_ETNIA WHERE CODIGO = %s", [params])
-            facultades = self.queryAll("SELECT nombre FROM DIM_FACULTAD")
+            result = self.queryOne("SELECT * FROM dim_etnia WHERE codigo = %s", [params])
+            facultades = self.queryAll("SELECT nombre FROM dim_facultad")
             
             if result is None:
                 abort(404, message="Resource {} doesn't exists".format(params))
@@ -859,7 +859,7 @@ class StudentUndergraduateSex(BD, Resource):
     def get(self):
         try:
             params = "Pregrado"
-            result = self.queryOne("SELECT * FROM DIM_TIPO_ESTUDIANTE WHERE CODIGO = %s", [params])            
+            result = self.queryOne("SELECT * FROM dim_tipo_estudiante WHERE codigo = %s", [params])            
             if result is None:
                 abort(404, message="Resource {} doesn't exists".format(params))
             
@@ -907,7 +907,7 @@ class StudentUndergraduateNacionality(BD, Resource):
     def get(self):
         try:
             params = "Pregrado"
-            result = self.queryOne("SELECT * FROM DIM_TIPO_ESTUDIANTE WHERE CODIGO = %s", [params])            
+            result = self.queryOne("SELECT * FROM dim_tipo_estudiante WHERE codigo = %s", [params])            
             if result is None:
                 abort(404, message="Resource {} doesn't exists".format(params))
             
@@ -974,7 +974,7 @@ class StudentProfessionConstantsFaculty(BD, Resource):
     def get(self, facultad_codigo):
         try:
             params = facultad_codigo
-            result = self.queryOne("SELECT * FROM DIM_FACULTAD WHERE CODIGO = %s", [params])
+            result = self.queryOne("SELECT * FROM dim_facultad WHERE codigo = %s", [params])
             if result is None:
                 abort(404, message="Resource {} doesn't exists".format(params))
             cut = PointCut("dim_facultad", [result['id']])

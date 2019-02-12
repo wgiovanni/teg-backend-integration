@@ -41,7 +41,7 @@ class TeacherWithDoctorateFaculty(BD, Resource):
             cell = Cell(browser.cube, cuts = [cut])
             r = browser.aggregate(cell, drilldown=["dim_facultad"])
 
-            facultades = self.queryAll("SELECT nombre FROM DIM_FACULTAD")
+            facultades = self.queryAll("SELECT nombre FROM dim_facultad")
 
             result = []
             for row in r:
@@ -77,7 +77,7 @@ class TeacherGradeFaculty(BD, Resource):
             cell = Cell(browser.cube, cuts = [cut])
             r = browser.aggregate(cell, drilldown=["dim_facultad", "dim_grado"])
 
-            facultades = self.queryAll("SELECT nombre FROM DIM_FACULTAD")
+            facultades = self.queryAll("SELECT nombre FROM dim_facultad")
 
             result = []
             for row in r:
@@ -176,7 +176,7 @@ class TeacherSexFaculty(BD, Resource):
     parser = reqparse.RequestParser()
     def get(self):
         try:
-            facultades = self.queryAll("SELECT codigo FROM DIM_FACULTAD")
+            facultades = self.queryAll("SELECT codigo FROM dim_facultad")
             r = browser.aggregate(drilldown=["dim_genero", "dim_facultad"])
             result = []
             item = {}
@@ -235,7 +235,7 @@ class TeacherNacionalityFaculty(BD, Resource):
 
     def get(self):
         try:
-            facultades = self.queryAll("SELECT codigo FROM DIM_FACULTAD")
+            facultades = self.queryAll("SELECT codigo FROM dim_facultad")
             
             r = browser.aggregate(drilldown=["dim_nacionalidad", "dim_facultad"])
             result = []

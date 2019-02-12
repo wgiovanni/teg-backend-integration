@@ -17,7 +17,7 @@ class MicroservicesError(BD, Resource):
             # sistemParamaterStudentsScheduler = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_STUDENTS])
             # sistemParamaterTeachersScheduler = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_TEACHERS])
             # sistemParamaterGraduatesScheduler = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [SCHEDULED_TASK_GRADUATES])
-            activityMicroservices = self.queryAll("SELECT * FROM LOG_ACTIVITY_MICROSERVICES WHERE status = 0 ORDER BY date DESC")
+            activityMicroservices = self.queryAll("SELECT * FROM {} WHERE status = 0 ORDER BY date DESC".format(LOG_ACTIVITY_MICROSERVICES))
             for r in activityMicroservices:
                 r['date'] = r['date'].strftime('%Y-%m-%d %H:%M:%S')
             result = activityMicroservices

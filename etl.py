@@ -452,7 +452,7 @@ def distributionCargaInitialUpdateStudens(target_cnx, table: str, content: dict)
 					target_cursor.execute(studentQuery.get_query_code, [item[IDENTIFICATION_CARD]])
 					idStudent = target_cursor.fetchone()
 					target_cursor.execute(dedent("""\
-					INSERT INTO FACT_ESTUDIANTE_FACULTAD 
+					INSERT INTO fact_estudiante_facultad 
 						(id_estudiante, id_genero, id_nacionalidad, id_status, id_discapacidad, id_etnia, id_tipo_estudiante, id_tiempo, id_facultad, id_carrera)
 					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""), [idStudent[0], idSex[0], idNationality[0], idStatus[0], idDisability[0], idEthnicGroup[0], idTypeStudent[0], idYear[0], idFaculty[0], idProfession[0]])
 					# actualizar fecha
@@ -610,7 +610,7 @@ def distributionCargaInitialUpdateTeachers(target_cnx, table: str, content: dict
 					target_cursor.execute(teacherQuery.get_query_code, [item[IDENTIFICATION_CARD]])
 					idTeacher = target_cursor.fetchone()
 					target_cursor.execute(dedent("""\
-					INSERT INTO FACT_DOCENTE_FACULTAD 
+					INSERT INTO fact_docente_facultad 
 						(id_docente, id_genero, id_nacionalidad, id_escalafon, id_tipo_docente, id_facultad)
 					VALUES (%s, %s, %s, %s, %s, %s)"""), [idTeacher[0], idSex[0], idNationality[0], idScale[0], idTypeTeacher[0], idFaculty[0]])
 					

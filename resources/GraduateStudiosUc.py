@@ -391,13 +391,14 @@ class GraduateTrust(BD, Resource):
     def post(self):
         try:
             parameter = request.get_json(force=True)
-            print(parameter)
             parameterTrust1 = parameter['desde']
             parameteTrust2 = parameter['hasta']
             parameterValidated = parameter['validado'] 
 
             result = []
+            response = {}
             if parameterTrust1 is not None and parameteTrust2 is not None and parameterValidated is not None:
+                # print("entro")
                 result = self.queryAll(dedent("""
                 SELECT e.confianza, COUNT(e.id) cantidad_egresados 
                 FROM `fact_egresado_estudiosuc` as fact 
@@ -405,11 +406,93 @@ class GraduateTrust(BD, Resource):
                 on(fact.id_egresado = e.id) 
                 INNER JOIN dim_facultad as f 
                 on(fact.id_facultad = f.id) 
-                WHERE e.confianza>= %s and e.confianza<= %s and validado = %s
+                WHERE e.confianza>= %s and e.confianza<= %s and e.validado = %s
                 GROUP by e.confianza"""), [parameterTrust1, parameteTrust2, parameterValidated])
+
+                result1 = self.queryAll(dedent("""
+                SELECT e.cedula, e.nombre, e.apellido, e.correo, f.codigo 
+                FROM `fact_egresado_estudiosuc` as fact 
+                INNER JOIN dim_egresado as e 
+                on(fact.id_egresado = e.id) 
+                INNER JOIN dim_facultad as f 
+                on(fact.id_facultad = f.id) 
+                WHERE e.confianza>= %s and e.confianza<= %s and e.validado = %s"""), [parameterTrust1, parameteTrust2, parameterValidated])
+                response['egresados'] = result
+                response['items'] = result1
+                
+            
+            if parameterTrust1 is None and parameteTrust2 is None and parameterValidated is not None:
+                # print("entro2")
+                result = self.queryAll(dedent("""
+                SELECT e.confianza, COUNT(e.id) cantidad_egresados 
+                FROM `fact_egresado_estudiosuc` as fact 
+                INNER JOIN dim_egresado as e 
+                on(fact.id_egresado = e.id) 
+                INNER JOIN dim_facultad as f 
+                on(fact.id_facultad = f.id) 
+                WHERE e.validado = %s
+                GROUP by e.confianza"""), [parameterValidated])
+
+                result1 = self.queryAll(dedent("""
+                SELECT e.cedula, e.nombre, e.apellido, e.correo, f.codigo 
+                FROM `fact_egresado_estudiosuc` as fact 
+                INNER JOIN dim_egresado as e 
+                on(fact.id_egresado = e.id) 
+                INNER JOIN dim_facultad as f 
+                on(fact.id_facultad = f.id) 
+                WHERE e.validado = %s"""), [parameterValidated])
+
+                response['egresados'] = result
+                response['items'] = result1
+            
+            if parameterTrust1 is not None and parameteTrust2 is not None and parameterValidated is None:
+                # print("entro3")
+                result = self.queryAll(dedent("""
+                SELECT e.confianza, COUNT(e.id) cantidad_egresados 
+                FROM `fact_egresado_estudiosuc` as fact 
+                INNER JOIN dim_egresado as e 
+                on(fact.id_egresado = e.id) 
+                INNER JOIN dim_facultad as f 
+                on(fact.id_facultad = f.id) 
+                WHERE e.confianza>= %s and e.confianza<= %s
+                GROUP by e.confianza"""), [parameterTrust1, parameteTrust2])
+
+                result1 = self.queryAll(dedent("""
+                SELECT e.cedula, e.nombre, e.apellido, e.correo, f.codigo 
+                FROM `fact_egresado_estudiosuc` as fact 
+                INNER JOIN dim_egresado as e 
+                on(fact.id_egresado = e.id) 
+                INNER JOIN dim_facultad as f 
+                on(fact.id_facultad = f.id) 
+                WHERE e.confianza>= %s and e.confianza<= %s"""), [parameterTrust1, parameteTrust2])
+
+                response['egresados'] = result
+                response['items'] = result1
+
+            if parameterTrust1 is None and parameteTrust2 is None and parameterValidated is None:
+                # print("entro4")
+                result = self.queryAll(dedent("""
+                SELECT e.confianza, COUNT(e.id) cantidad_egresados 
+                FROM `fact_egresado_estudiosuc` as fact 
+                INNER JOIN dim_egresado as e 
+                on(fact.id_egresado = e.id) 
+                INNER JOIN dim_facultad as f 
+                on(fact.id_facultad = f.id)
+                GROUP by e.confianza"""))
+
+                result1 = self.queryAll(dedent("""
+                SELECT e.cedula, e.nombre, e.apellido, e.correo, f.codigo 
+                FROM `fact_egresado_estudiosuc` as fact 
+                INNER JOIN dim_egresado as e 
+                on(fact.id_egresado = e.id) 
+                INNER JOIN dim_facultad as f 
+                on(fact.id_facultad = f.id)"""))
+
+                response['egresados'] = result
+                response['items'] = result1
                        
             print(result)
         except Exception as e:
             abort(500, message="{0}:{1}".format(e.__class__.__name__, e.__str__()))
 
-        return json.dumps([]), 200, { 'Access-Control-Allow-Origin': '*' }
+        return json.dumps(response), 200, { 'Access-Control-Allow-Origin': '*' }

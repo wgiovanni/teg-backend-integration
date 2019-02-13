@@ -44,7 +44,7 @@ from resources.Profession import Profession, ProfessionId
 from resources.MicroservicesError import MicroservicesError
 
 from constants import CONTENT_TYPE, SCHEDULED_TASK_GRADUATES, SCHEDULED_TASK_TEACHERS, SCHEDULED_TASK_STUDENTS, LOG_ACTIVITY_MICROSERVICES
-from constants import CRON_TAB_GRADUATES, CRON_TAB_STUDENTS, CRON_TAB_TEACHERS
+from constants import CRON_TAB_GRADUATES, CRON_TAB_STUDENTS, CRON_TAB_TEACHERS, datawarehouse_name
 # metodos
 from etl import etl_process_students, etl_process_teachers, etl_process_graduates
 
@@ -184,7 +184,7 @@ class SystemParameterTaskStudents(BD, Resource):
 				"ip": ip,
 				"status": True
 			}
-			self.insert('HISTORY_ACTION', audit)
+			self.insert('history_action', audit)
 			self.commit()
 			definition = self.queryOne("SELECT definicion FROM parametro_sistema WHERE codigo = %s", [SCHEDULED_TASK_STUDENTS])
 			result = {
@@ -256,7 +256,7 @@ class SystemParameterTaskTeachers(BD, Resource):
 				"ip": ip,
 				"status": True
 			}
-			self.insert('HISTORY_ACTION', audit)
+			self.insert('history_action', audit)
 			self.commit()
 			definition = self.queryOne("SELECT definicion FROM parametro_sistema WHERE codigo = %s", [SCHEDULED_TASK_TEACHERS])
 			result = {
@@ -328,7 +328,7 @@ class SystemParameterTaskGraduates(BD, Resource):
 				"ip": ip,
 				"status": True
 			}
-			self.insert('HISTORY_ACTION', audit)
+			self.insert('history_action', audit)
 			self.commit()
 			definition = self.queryOne("SELECT definicion FROM parametro_sistema WHERE codigo = %s", [SCHEDULED_TASK_GRADUATES])
 			result = {
@@ -442,11 +442,11 @@ class SystemParameterTaskAll(BD, Resource):
 				"ip": ip,
 				"status": True
 			}
-			self.insert('HISTORY_ACTION', audit)
+			self.insert('history_action', audit)
 			self.commit()
-			self.insert('HISTORY_ACTION', audit1)
+			self.insert('history_action', audit1)
 			self.commit()
-			self.insert('HISTORY_ACTION', audit2)
+			self.insert('history_action', audit2)
 			self.commit()
 			result = {
 				'definicion': activeTask

@@ -44,28 +44,10 @@ from resources.Profession import Profession, ProfessionId
 from resources.MicroservicesError import MicroservicesError
 
 from constants import CONTENT_TYPE, SCHEDULED_TASK_GRADUATES, SCHEDULED_TASK_TEACHERS, SCHEDULED_TASK_STUDENTS, LOG_ACTIVITY_MICROSERVICES
-from constants import CRON_TAB_GRADUATES, CRON_TAB_STUDENTS, CRON_TAB_TEACHERS, datawarehouse_name
+from constants import CRON_TAB_GRADUATES, CRON_TAB_STUDENTS, CRON_TAB_TEACHERS
 # metodos
 from etl import etl_process_students, etl_process_teachers, etl_process_graduates
-
-
-# def sensor1():
-# # 	# print(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) # Se obtiene local para la actualizacion de la data cuando se ejecute el job
-# 	print("Scheduler esta vivo11111111111111111111111!")
-# # 	target_cnx = mysql.connector.connect(**datawarehouse_db_config)
-# # 	target_cursor = target_cnx.cursor(buffered=True)
-# # 	target_cursor.execute("USE {}".format(datawarehouse_name))
-# # 	target_cursor.execute(systemParameter.get_query, ["TAREA_PROGRAMADA"])
-# # 	row = target_cursor.fetchone()
-# # 	# print(row)
-# # 	if (row[4] == "1"):
-# # 		print("Activa Sensor 1")
-# # 		# print("Sensor 1")
-# # 		# sched.resume()
-# # 		# etl_process()
-# # 	else:
-# # 		print("Inactiva Sensor 1")
-# # 		# print("Scheduler esta vivo!000000000000000000000")
+from variables import datawarehouse_name
 
 
 def taskStudents1(task_id):
@@ -584,79 +566,6 @@ api.add_resource(GraduateJobs, '/egresado-trabajos')
 api.add_resource(GraduateTrust, '/egresado-confianza')
 
 
-@app.route('/run-tasks')
-def run_tasks():
-    # for i in range(3):
-	# app.apscheduler.add_job(func=scheduled_task, trigger='date', args=[1], id='j'+str(1))
-	crojob = '*/1'
-	cron = 'cron'
-	app.apscheduler.add_job(func=scheduled_task, trigger=cron, minute=crojob, args=[1], id='j'+str(1))
- 
-	return 'Scheduled several long running tasks.', 200
- 
-def scheduled_task(task_id):
-    # for i in range(3):
-	time.sleep(5)
-	print('Task {}'.format(task_id))
-
-def scheduled_task2(task_id):
-    # for i in range(3):
-	time.sleep(5)
-	print('Task {}'.format(task_id))
-
-
-# crojob = '*/1'
-# cron = 'cron'
-# cron = 'interval'
-# cronJob = 5
-
-
-# app.apscheduler.add_job(func=taskStudents1, trigger=cron, seconds=cronJob, args=[1], id='j'+str(1))
-# app.apscheduler.add_job(func=etl_process_teachers, trigger=cron, minute=crojob, args=[1], id='j'+str(2))
-# app.apscheduler.add_job(func=etl_process_graduates, trigger=cron, minute=crojob, args=[1], id='j'+str(3))
-
-# @app.route('/stop-tasks')
-# def stop_task():
-# 	app.apscheduler.pause_job(id='j'+str(1))
-# 	return 'stop', 200
-
-# @app.route('/stop-tasks2')
-# def stop_task2():l
-# 	app.apscheduler.pause_job(id='j'+str(2))
-# 	return 'stop', 200
- 
-# @app.route('/resume-tasks')
-# def resume_task():
-# 	app.apscheduler.resume_job(id='j'+str(1))
-# 	return 'resume', 200
-
-# @app.route('/resume-tasks2')
-# def resume_task2():
-# 	app.apscheduler.resume_job(id='j'+str(2))
-# 	return 'resume', 200
-
-
-
-if __name__ == "__main__":
-	# sched = BackgroundScheduler(daemon=True)
-	# sched.add_job(taskStudents, 'interval', minutes=1)
-
-	# sched1 = BackgroundScheduler(daemon=True)
-	# sched1.add_job(taskTeachers, 'interval', minutes=1)
-
-	# sched2 = BackgroundScheduler(daemon=True)
-	# sched2.add_job(taskGraduates, 'interval', minutes=1)
-
-	# sched3 = BackgroundScheduler()
-	# crojob = '*/1'
-	# cron = 'cron'
-	# sched3.add_job(sensor1, trigger=cron, minute=crojob, id='my_job_id')
-
-	# sched.start()
-	# sched1.start()
-	# sched2.start()
-	# sched3.start()
-
-	
+if __name__ == "__main__":	
 	app.run(debug=True, use_reloader=False)
 	

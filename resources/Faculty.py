@@ -8,6 +8,7 @@ from common.BD import BD
 import datetime
 import requests
 from flask import request
+from constants import URL_STUDENTS
 
 class FacultyReport(BD, Resource):
     representations = {'application/json': make_response}
@@ -36,7 +37,7 @@ class Faculty(BD, Resource):
             print(faculty)
             faculty['status'] = 1
             # verificar que se haya guardado en los modulos
-            students = requests.post("http://localhost:8082/api/v1/facultad", data= json.dumps(faculty))
+            students = requests.post(URL_STUDENTS + "/facultad", data= json.dumps(faculty))
             if(students.status_code == requests.codes.ok):
                 print("si funciono")
                 self.insert('dim_facultad', faculty)
@@ -134,7 +135,7 @@ class FacultyId(BD, Resource):
                     'status': 0
                 }
                 print("hola")
-                students = requests.post("http://localhost:8082/api/v1/facultad", data= json.dumps(faculty))
+                students = requests.post(URL_STUDENTS + "/facultad", data= json.dumps(faculty))
                 if(students.status_code == requests.codes.ok):
                     print("si funciono")
                     self.remove("DELETE FROM dim_facultad WHERE ID = %s", [faculty_id])

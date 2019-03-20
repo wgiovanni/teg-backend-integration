@@ -17,7 +17,7 @@ class SystemParameterList(BD, Resource):
 		try:
 			result = self.queryAll(dedent("""\
 			SELECT id, codigo, nombre, descripcion, definicion
-			FROM PARAMETRO_SISTEMA"""))
+			FROM parametro_sistema"""))
 			#result = self.queryAll("SELECT * FROM PUBLIC.USER")
 		except DatabaseError as e:
 			self.rollback()
@@ -31,9 +31,9 @@ class SystemParameterList(BD, Resource):
 		try:
 			systemParameter = request.get_json(force=True)
 			print(systemParameter)
-			self.insert('PARAMETRO_SISTEMA', systemParameter)
+			self.insert('parametro_sistema', systemParameter)
 			self.commit()
-			result = self.queryOne("SELECT id, codigo, nombre, descripcion, definicion FROM PARAMETRO_SISTEMA ORDER BY ID DESC LIMIT 1")
+			result = self.queryOne("SELECT id, codigo, nombre, descripcion, definicion FROM parametro_sistema ORDER BY ID DESC LIMIT 1")
 		except DatabaseError as e:
 			self.rollback()
 			abort(500, message="{0}: {1}".format(e.__class__.__name__, e.__str__()))
@@ -47,7 +47,7 @@ class SystemParameter(BD, Resource):
 
 	def get(self, systemParameter_id):
 		try:
-			result = self.queryOne("SELECT id, codigo, nombre, descripcion, definicion FROM PARAMETRO_SISTEMA WHERE ID = %s", [systemParameter_id])
+			result = self.queryOne("SELECT id, codigo, nombre, descripcion, definicion FROM parametro_sistema WHERE ID = %s", [systemParameter_id])
 			if result is None:
 				abort(404, message="Resource {} doesn't exists".format(systemParameter_id))
 		except DatabaseError as e:
@@ -67,9 +67,9 @@ class SystemParameter(BD, Resource):
 				"definicion": jsonData['definicion']
 			}
 			username = jsonData['user']
-			self.update('PARAMETRO_SISTEMA', systemParameter, {'ID': systemParameter_id})
+			self.update('parametro_sistema', systemParameter, {'ID': systemParameter_id})
 			self.commit()
-			result = self.queryOne("SELECT id, codigo, nombre, descripcion, definicion FROM PARAMETRO_SISTEMA WHERE ID = %s", [systemParameter_id])
+			result = self.queryOne("SELECT id, codigo, nombre, descripcion, definicion FROM parametro_sistema WHERE ID = %s", [systemParameter_id])
 			if result is None:
 				abort(404, message="Resource {} doesn't exist".format(systemParameter_id))
 			# datos de auditoria
@@ -85,7 +85,7 @@ class SystemParameter(BD, Resource):
 				"ip": ip,
 				"status": True
 			}
-			self.insert('HISTORY_ACTION', audit)
+			self.insert('history_action', audit)
 			self.commit()
 		except DatabaseError as e:
 			self.rollback()
@@ -99,13 +99,13 @@ class SystemParameter(BD, Resource):
 	def delete(self, systemParameter_id):
 		try:
 			print(systemParameter_id)
-			result = self.queryOne("SELECT id, codigo, nombre, descripcion, definicion FROM PARAMETRO_SISTEMA WHERE ID = %s", [systemParameter_id])
+			result = self.queryOne("SELECT id, codigo, nombre, descripcion, definicion FROM parametro_sistema WHERE ID = %s", [systemParameter_id])
 			print(result)
 			if result is None:
 				print("Entro")
 				abort(404, message="Resource {} doesn't exists".format(systemParameter_id))
 			else:
-				self.remove("DELETE FROM PARAMETRO_SISTEMA WHERE ID = %s", [systemParameter_id])
+				self.remove("DELETE FROM parametro_sistema WHERE ID = %s", [systemParameter_id])
 				self.commit()
 		except DatabaseError as e:
 			self.rollback()
@@ -120,7 +120,7 @@ class SystemParameterUpdateDateStudens(BD, Resource):
 
 	def get(self):
 		try:
-			date = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [DATE_UPDATE_STUDENS])
+			date = self.queryOne("SELECT definicion FROM parametro_sistema WHERE codigo = %s", [DATE_UPDATE_STUDENS])
 
 			if date['definicion'] == '':
 				jsonData = {"fecha": '0000-00-00 00:00:00'}
@@ -138,7 +138,7 @@ class SystemParameterUpdateDateTeachers(BD, Resource):
 
 	def get(self):
 		try:
-			date = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [DATE_UPDATE_TEACHERS])
+			date = self.queryOne("SELECT definicion FROM parametro_sistema WHERE codigo = %s", [DATE_UPDATE_TEACHERS])
 
 			if date['definicion'] == '':
 				jsonData = {"fecha": '0000-00-00 00:00:00'}
@@ -156,7 +156,7 @@ class SystemParameterUpdateDateGraduate(BD, Resource):
 
 	def get(self):
 		try:
-			date = self.queryOne("SELECT definicion FROM PARAMETRO_SISTEMA WHERE codigo = %s", [DATE_UPDATE_GRADUATE])
+			date = self.queryOne("SELECT definicion FROM parametro_sistema WHERE codigo = %s", [DATE_UPDATE_GRADUATE])
 
 			if date['definicion'] == '':
 				jsonData = {"fecha": '0000-00-00 00:00:00'}

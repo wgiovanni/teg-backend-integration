@@ -38,7 +38,7 @@ class MicroservicesError(BD, Resource):
         try:
             print("Entro")
             #self.remove("DELETE FROM HISTORY_ACTION",[])
-            self.remove("UPDATE LOG_ACTIVITY_MICROSERVICES SET status = %s",[True])
+            self.remove("UPDATE {} SET status = %s".format(LOG_ACTIVITY_MICROSERVICES),[True])
             self.commit()
             print("Salio")
         except DatabaseError as e:

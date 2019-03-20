@@ -8,7 +8,7 @@ from common.BD import BD
 import datetime
 import requests
 from flask import request
-
+from constants import URL_STUDENTS
 class Profession(BD, Resource):
     representations = {'application/json': make_response}
     def get(self):
@@ -38,7 +38,7 @@ class Profession(BD, Resource):
                 'status': 1
             }
 
-            students = requests.post("http://localhost:8082/api/v1/carrera", data= json.dumps(profession1))
+            students = requests.post(URL_STUDENTS + "/carrera", data= json.dumps(profession1))
             if(students.status_code == requests.codes.ok):
                 print("si funciono")
                 self.insert('dim_carrera', profession)
@@ -137,7 +137,7 @@ class ProfessionId(BD, Resource):
                     'facultad': faculty['codigo'],
                     'status': 0
                 }
-                students = requests.post("http://localhost:8082/api/v1/carrera", data= json.dumps(profession1))
+                students = requests.post(URL_STUDENTS +  "/carrera", data= json.dumps(profession1))
                 if(students.status_code == requests.codes.ok):
                     print("si funciono")
                     self.remove("DELETE FROM dim_carrera WHERE ID = %s", [profession_id])

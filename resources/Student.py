@@ -7,9 +7,10 @@ from pymysql import DatabaseError
 from common.BD import BD
 import datetime
 from constants import ROLE_USER_STUDENT, CONTENT_TYPE
+from db_credentials import datawarehouse_db_config
 
 workspace = Workspace()
-workspace.register_default_store("sql", url="mysql+mysqlconnector://root@localhost/prueba")
+workspace.register_default_store("sql", url="mysql+mysqlconnector://" + datawarehouse_db_config['user'] + ":" + datawarehouse_db_config['password'] + "@" + datawarehouse_db_config['host'] + "/" + datawarehouse_db_config['database'])
 workspace.import_model("resources/cubesmodel/model_student_faculty.json")
 browser = workspace.browser("fact_estudiante_facultad")
 

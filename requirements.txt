@@ -9,7 +9,7 @@ cryptography==2.3.1
 cubes==1.1
 expressions==0.2.3
 Flask==1.0.2
-Flask-Cors==3.0.6
+Flask-Cors==3.0.9
 Flask-RESTful==0.3.6
 grako==3.99.9
 idna==2.7
